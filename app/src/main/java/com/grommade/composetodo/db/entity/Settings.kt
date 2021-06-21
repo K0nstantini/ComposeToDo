@@ -3,7 +3,7 @@ package com.grommade.composetodo.db.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.homemade.anothertodo.add_classes.MyCalendar
+import com.grommade.composetodo.add_classes.MyCalendar
 
 @Entity(tableName = "settings_table")
 data class Settings(

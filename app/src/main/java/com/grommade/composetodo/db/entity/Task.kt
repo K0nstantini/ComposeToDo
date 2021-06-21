@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.homemade.anothertodo.add_classes.MyCalendar
-import com.homemade.anothertodo.enums.TypeTask
+import com.grommade.composetodo.add_classes.MyCalendar
+import com.grommade.composetodo.enums.TypeTask
 import kotlinx.parcelize.Parcelize
 
 const val DEFAULT_DEADLINE_SINGLE_TASK = 24

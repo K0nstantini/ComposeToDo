@@ -14,29 +14,32 @@ import com.grommade.composetodo.R
 @Composable
 fun HomeScreen(
     openDrawer: () -> Unit,
-    drawerGesturesEnabled: MutableState<Boolean> = remember { mutableStateOf(true) },
 ) {
-    drawerGesturesEnabled.value = true
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                navigationIcon = {
-                    IconButton(onClick = openDrawer) {
-                        Icon(Icons.Filled.Menu, contentDescription = null)
-                    }
-                }
-            )
+            TopBar(openDrawer)
         }
     ) {
         Text(text = "Home screen")
     }
 }
 
+@Composable
+private fun TopBar(openDrawer: () -> Unit) {
+    TopAppBar(
+        title = { Text(stringResource(R.string.app_name)) },
+        navigationIcon = {
+            IconButton(onClick = openDrawer) {
+                Icon(Icons.Filled.Menu, contentDescription = null)
+            }
+        }
+    )
+}
+
 
 @Preview
 @Composable
-fun DefaultPreview() {
+fun HomeScreenPreview() {
     HomeScreen(openDrawer = {})
 }

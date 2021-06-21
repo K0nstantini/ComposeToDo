@@ -1,15 +1,9 @@
 package com.grommade.composetodo.util
 
 import android.app.Application
-import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.FragmentActivity
-import com.grommade.composetodo.R
 import com.grommade.composetodo.db.entity.Task
 
-fun FragmentActivity.toast(res: Int) =
-    Toast.makeText(this, this.getString(res), Toast.LENGTH_SHORT).show()
-
+fun String.addArgument(argument: String) = "$this/{$argument}"
 
 fun Int.toStrTime(): String {
     return (this / 60).toString().padStart(2, '0') + ':' +

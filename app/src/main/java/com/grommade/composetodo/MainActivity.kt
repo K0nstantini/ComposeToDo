@@ -7,20 +7,24 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.grommade.composetodo.enums.ModeTaskList
+import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.ui.AppDrawer
-import com.grommade.composetodo.ui.MainDestinations
 import com.grommade.composetodo.ui.ToDoNavGraph
 import com.grommade.composetodo.ui.theme.ComposeToDoTheme
+import com.grommade.composetodo.util.MainDestinations
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CompositionLocalProvider(
-                LocalBackPressedDispatcher provides this.onBackPressedDispatcher
-            ) {
+            CompositionLocalProvider(LocalBackPressedDispatcher provides this.onBackPressedDispatcher) {
                 ToDoApp()
             }
         }
@@ -33,8 +37,10 @@ private fun ToDoApp() {
         val navController = rememberNavController()
         val scope = rememberCoroutineScope()
         val scaffoldState = rememberScaffoldState()
-        val drawerGesturesEnabled = remember { mutableStateOf(true) }
-        val closeDrawer: () -> Unit = { scope.launch { scaffoldState.drawerState.close() } }
+        val (drawerGesturesEnabled, setDrawerGesturesEnabled) = remember { mutableStateOf(true) }
+        val closeDrawer: () -> Unit = {
+            scope.launch { scaffoldState.drawerState.close() }
+        }
 
         if (scaffoldState.drawerState.isOpen) {
             BackPressHandler { closeDrawer() }
@@ -45,23 +51,28 @@ private fun ToDoApp() {
             scaffoldState = scaffoldState,
             drawerContent = {
                 AppDrawer(
-                    navigateToRegularTasks = { navController.navigate(MainDestinations.REGULAR_TASKS) },
-                    navigateToSingleTasks = { navController.navigate(MainDestinations.SINGLE_TASKS) },
+                    navigateToRegularTasks = { navigateToTaskList(navController, TypeTask.REGULAR_TASK) },
+                    navigateToSingleTasks = { navigateToTaskList(navController, TypeTask.SINGLE_TASK) },
                     closeDrawer = closeDrawer
                 )
             },
-            drawerGesturesEnabled = drawerGesturesEnabled.value
+            drawerGesturesEnabled = drawerGesturesEnabled
         ) {
             ToDoNavGraph(
                 navController = navController,
                 scaffoldState = scaffoldState,
-                drawerGesturesEnabled = drawerGesturesEnabled
+                drawerGesturesEnabled = setDrawerGesturesEnabled
             )
         }
     }
 }
 
-
+private fun navigateToTaskList(
+    navController: NavHostController,
+    typeTask: TypeTask
+) {
+    navController.navigate(MainDestinations.TASK_LIST + "/${typeTask.name}")
+}
 
 @Preview
 @Composable

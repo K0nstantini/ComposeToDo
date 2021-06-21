@@ -1,10 +1,7 @@
-package com.homemade.anothertodo.enums
+package com.grommade.composetodo.enums
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
-enum class TypeTask : Parcelable {
+enum class TypeTask {
     SINGLE_TASK,
     REGULAR_TASK,
 }

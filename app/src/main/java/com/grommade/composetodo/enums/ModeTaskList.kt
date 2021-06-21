@@ -1,18 +1,15 @@
-package com.homemade.anothertodo.enums
+package com.grommade.composetodo.enums
 
-import android.os.Parcelable
 import androidx.annotation.StringRes
 import com.grommade.composetodo.R
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
-enum class TaskListMode(
+enum class ModeTaskList(
 //    @MenuRes val menu: Int?,
     @StringRes val titleSingleTask: Int,
     @StringRes val titleRegularTask: Int,
     val showAddBtn: Boolean,
     val supportLongClick: Boolean
-) : Parcelable {
+) {
 
     DEFAULT(
 //        null,

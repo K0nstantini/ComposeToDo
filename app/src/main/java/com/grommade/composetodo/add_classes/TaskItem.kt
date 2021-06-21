@@ -5,7 +5,8 @@ import androidx.compose.ui.text.font.FontWeight
 import com.grommade.composetodo.db.entity.Task
 
 data class TaskItem(
-    val task: Task,
+    val id: Long,
+    val name: String,
     val padding: Int,
     val icon: ImageVector,
     val fontSize: Int,
