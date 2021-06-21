@@ -7,6 +7,7 @@ import com.grommade.composetodo.db.entity.Task
 data class TaskItem(
     val id: Long,
     val name: String,
+    var isSelected: Boolean,
     val padding: Int,
     val icon: ImageVector,
     val fontSize: Int,

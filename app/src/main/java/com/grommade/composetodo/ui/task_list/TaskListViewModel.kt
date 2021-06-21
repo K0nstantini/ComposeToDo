@@ -16,10 +16,8 @@ import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-const val TASK_MODE_KEY = "taskModeKey"
-const val TASK_TYPE_KEY = "taskTypeKey"
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
@@ -44,9 +42,68 @@ class TaskListViewModel @Inject constructor(
 
     private val allTasks: StateFlow<List<Task>> = repo.getTasksFlow(taskType).asState(emptyList())
 
-    val shownTasks: StateFlow<List<TaskItem>> = allTasks
-        .map { getTasksToShow(if (mode == ModeTaskList.SELECT_CATALOG) getOpenGroups() else it) }
+    private var selectedTasks: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
+
+    // FIXME
+    val shownTasks: StateFlow<List<TaskItem>> = allTasks.combine(selectedTasks) { task, taskItem -> task to taskItem }
+        .map { getTasksToShow(if (mode == ModeTaskList.SELECT_CATALOG) getOpenGroups() else it.first) }
         .asState(emptyList())
+
+    private val currentTask: StateFlow<Task?> = selectedTasks
+        .map { if (it.count() == 1) getTask(it.first()) else null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    private val _actionMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val actionMode: StateFlow<Boolean> = _actionMode.asStateFlow()
+
+    /** Variables others */
+
+    /** =========================================== FUNCTIONS ==================================================== */
+
+    /** Clicks */
+
+    fun onTaskClicked(id: Long) {
+        val task = requireNotNull(getTask(id))
+        when {
+            actionMode.value -> selectItemActionMode(id)
+//          isMarkTaskForSelection(task) -> selectTaskForSelectionMode(task)
+            task.group -> setGroupOpenClose(task)
+        }
+    }
+
+    fun onTaskLongClicked(id: Long) {
+        if (mode.supportLongClick) {
+            if (!_actionMode.value) {
+                _actionMode.value = true
+            }
+            selectItemActionMode(id)
+        }
+    }
+
+    fun onEditClicked() {
+//        setEvent(Event.NavigateToAddEdit(currentTask.value))
+        closeActionMode()
+    }
+
+    fun onDeleteClicked() {
+        selectedTasks.value
+            .map { getTask(it) ?: Task() }
+            .delete()
+        closeActionMode()
+    }
+
+    fun closeActionMode() {
+        _actionMode.value = false
+        selectedTasks.value = emptyList()
+    }
+
+    private fun selectItemActionMode(id: Long) {
+        val listAfter = { list: List<Long> -> if (list.contains(id)) list - id else list + id }
+        selectedTasks.value = listAfter(selectedTasks.value)
+        if (selectedTasks.value.isEmpty()) {
+            closeActionMode()
+        }
+    }
 
     // FIXME?
     private fun getTasksToShow(
@@ -66,6 +123,10 @@ class TaskListViewModel @Inject constructor(
         return list.toTaskItem()
     }
 
+    private fun setGroupOpenClose(task: Task) = task
+        .apply { groupOpen = !groupOpen }
+        .update()
+
     private fun getOpenGroups(): List<Task> =
         allTasks.value.filter { it.group }.map { it.copy(groupOpen = true) }
 
@@ -74,6 +135,7 @@ class TaskListViewModel @Inject constructor(
         TaskItem(
             id = task.id,
             name = task.name,
+            isSelected = selectedTasks.value.contains(task.id),
             padding = 16 + level * 4,
             icon = when {
                 task.groupOpen -> Icons.Filled.FolderOpen
@@ -87,6 +149,12 @@ class TaskListViewModel @Inject constructor(
 
     private fun <T> Flow<T>.asState(default: T) =
         stateIn(viewModelScope, SharingStarted.Lazily, default)
+
+    private fun getTask(id: Long) = allTasks.value.find { it.id == id }
+    private fun getTaskItem(id: Long) = shownTasks.value.find { it.id == id }
+
+    private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
+    private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
 
     /**
     sealed class Event {
@@ -108,9 +176,6 @@ class TaskListViewModel @Inject constructor(
     private val _selectedItems = MutableStateFlow(listOf<Int>())
     val selectedItems = _selectedItems.asStateFlow()
 
-    private val currentTask: StateFlow<Task?> = _selectedItems
-    .map { if (it.count() == 1) getTask(it.first()) else null }
-    .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val actionModeTitle: StateFlow<String?> = _selectedItems
     .map { currentTask.value?.name }
@@ -162,46 +227,13 @@ class TaskListViewModel @Inject constructor(
     fun onAddClicked() =
     setEvent(Event.NavigateToAddEdit())
 
-    fun onEditClicked() {
-    setEvent(Event.NavigateToAddEdit(currentTask.value))
-    destroyActionMode()
-    }
 
-    fun onDeleteClicked() {
-    _selectedItems.value
-    .map { getTask(it) ?: Task() }
-    .delete()
-    destroyActionMode()
-    }
 
-    fun onItemClicked(task: Task) {
-    when {
-    actionMode.value -> selectItemActionMode(task)
-    isMarkTaskForSelection(task) -> selectTaskForSelectionMode(task)
-    task.group -> setGroupOpenClose(task)
-    }
-    }
 
-    fun onItemLongClicked(task: Task) =
-    if (mode.supportLongClick) {
-    if (!actionMode.value) {
-    setActionMode()
-    }
-    selectItemActionMode(task)
-    true
-    } else {
-    false
-    }
 
     /** ActionMode */
 
-    private fun selectItemActionMode(task: Task) {
-    val listAfter = { list: List<Int>, pos: Int -> if (list.contains(pos)) list - pos else list + pos }
-    _selectedItems.value = listAfter(_selectedItems.value, task.position())
-    if (_selectedItems.value.isEmpty()) {
-    destroyActionMode()
-    }
-    }
+
 
     private fun setActionMode() =
     setEvent(Event.ShowActionMode(true))
@@ -219,20 +251,16 @@ class TaskListViewModel @Inject constructor(
     private fun selectTaskForSelectionMode(task: Task) =
     _selectedItems.apply { value = listOf(task.position()) }
 
-    private fun setGroupOpenClose(task: Task) = task
-    .apply { groupOpen = !groupOpen }
-    .update()
 
 
 
-    private fun getTask(id: Long) = allTasks.value.find { it.id == id }
+
     private fun getTask(index: Int): Task? = shownTasks.value.getOrNull(index)
 
     private fun Task.position() = shownTasks.value.indexOf(this)
     private fun Task.level(): Int = generateSequence(this) { getTask(it.parent) }.count() - 1
 
-    private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
-    private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
+
 
 
 
