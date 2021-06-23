@@ -43,7 +43,7 @@
     <string name="settings_add_single_task_title_date_start">Дата начала</string>
     <string name="settings_add_single_task_title_deadline">Время на выполнение</string>
     <string name="settings_add_single_task_deadline_zero_text">Укажите время, отведенное на выполнение задачи</string>
-    <string name="settings_add_single_task_deadline_time_hours_text">%dч</string>
+    <string name="settings_add_single_task_deadline_time_hours_text">ч</string>
     <string name="settings_add_regular_task_choose_from_group_text">Выбирать из группы</string>
 
 

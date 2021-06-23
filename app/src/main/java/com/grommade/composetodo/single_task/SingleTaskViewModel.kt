@@ -3,14 +3,16 @@ package com.grommade.composetodo.single_task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.grommade.composetodo.R
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.TypeTask
+import com.grommade.composetodo.settings.SettingItem
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +32,34 @@ class SingleTaskViewModel @Inject constructor(
         .map { it.name }
         .asState("")
 
+    val settings: StateFlow<List<SettingItem>> = currentTask
+        .map {
+            val setDeadline = it.single.deadline > 0
+            listOf(
+                SettingItem(R.string.settings_add_task_title_group)
+                    .setSwitch(::onGroupSwitchClicked, it.group)
+                    .setAction(::onGroupClicked),
+                SettingItem(R.string.settings_add_task_title_parent)
+                    .setClear(::onParentClearClicked, it.parent != 0L)
+                    .setAction(::onParentClicked)
+                    .setValue(repo.getTask(it.parent)?.name, R.string.settings_main_catalog_text),
+                SettingItem(R.string.settings_add_single_task_title_date_start)
+                    .setAction(::onsDateStartClicked)
+                    .setValue(it.single.dateStart.toString(false)),
+                SettingItem(R.string.settings_add_single_task_title_deadline)
+                    .setAction(::onDeadlineClicked)
+                    .setValue(
+                        it.single.deadline.toString() + if (setDeadline) "*R.string*" else "",
+                        if (setDeadline) {
+                            R.string.settings_add_single_task_deadline_time_hours_text
+                        } else {
+                            R.string.settings_add_single_task_deadline_zero_text
+                        }
+                    )
+            )
+        }
+        .asState(emptyList())
+
     /** =========================================== INIT ========================================================= */
 
     init {
@@ -43,12 +73,46 @@ class SingleTaskViewModel @Inject constructor(
     /** =========================================== FUNCTIONS ==================================================== */
 
 
+    /** Effects */
+
     fun onTaskNameChange(text: String) {
         currentTask.apply {
             if (text.length < 100) {
                 value = value.copy(name = text)
             }
         }
+    }
+
+    private fun onGroupClicked() {
+        onGroupSwitchClicked(!currentTask.value.group)
+    }
+
+    private fun onGroupSwitchClicked(group: Boolean) {
+        currentTask.apply {
+            value = value.copy(group = group)
+        }
+    }
+
+    private fun onParentClicked() {
+        // TODO
+    }
+
+    private fun onParentClearClicked() {
+        currentTask.apply {
+            value = value.copy(parent = 0L)
+        }
+    }
+
+    private fun onsDateStartClicked() {
+        // TODO
+    }
+
+    private fun onDeadlineClicked() {
+        // TODO
+//        val timeDeadline = when (_deadline.value ?: 0) {
+//            0 -> DEFAULT_DEADLINE_SINGLE_TASK
+//            else -> _deadline.value
+//        }.toString()
     }
 
     private fun <T> Flow<T>.asState(default: T) =
@@ -69,25 +133,7 @@ object NavigateToBack : Event1()
 
 val taskName = MutableStateFlow(currentTask.name)
 
-private val setGroup = SettingItem(R.string.settings_add_task_title_group)
-.setSwitch(::onGroupClicked)
-.setAction(::onGroupClicked)
-private val setParent = SettingItem(R.string.settings_add_task_title_parent)
-.setClear(::onParentClearClicked)
-.setAction(::onParentClicked)
-private val setDateStart = SettingItem(R.string.settings_add_single_task_title_date_start)
-.setAction(::onsDateStartClicked)
-private val setDeadline = SettingItem(R.string.settings_add_single_task_title_deadline)
-.setAction(::onDeadlineClicked)
 
-val settings: StateFlow<List<SettingItem>> = flowOf(
-listOf(
-setGroup,
-setParent,
-setDateStart,
-setDeadline,
-)
-).asState(emptyList())
 
 private val _group = MutableStateFlow(currentTask.group)
 val group: StateFlow<Pair<SettingItem, Boolean>> = _group
@@ -112,30 +158,11 @@ val deadline: StateFlow<Pair<SettingItem, Int>> = _deadline
 .map { setDeadline to it }
 .asState(setDeadline to currentTask.single.deadline)
 
-private fun onParentClicked() {
-setEvent(Event1.NavigateToParent)
-}
 
-private fun onParentClearClicked() {
-_parent.value = 0
-}
 
 fun setParent(id: Long) = _parent.apply { value = id }
 
-private fun onGroupClicked() {
-_group.value = !_group.value
-//        setEnabledSettings()
-}
 
-private fun onsDateStartClicked() {
-// TODO
-}
-
-private fun onDeadlineClicked() {
-val timeDeadline = when (_deadline.value ?: 0) {
-0 -> DEFAULT_DEADLINE_SINGLE_TASK
-else -> _deadline.value
-}.toString()
 
 val dialog = MyInputDialog(::saveDeadline, timeDeadline)
 .setTitle(R.string.alert_title_add_single_task_deadline)
