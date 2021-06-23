@@ -5,13 +5,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -22,24 +18,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.add_classes.TaskItem
 
 @Composable
 fun TaskListScreen(
-    onBack: () -> Unit,
-    viewModel: TaskListViewModel = hiltViewModel()
+    viewModel: TaskListViewModel = hiltViewModel(),
+    navController: NavHostController = rememberNavController(),
+    onBack: () -> Unit
 ) {
-    TaskListBody(
-        title = stringResource(viewModel.title),
-        actionMode = viewModel.actionMode.collectAsState().value,
-        tasks = viewModel.shownTasks.collectAsState().value,
-        onTaskClicked = viewModel::onTaskClicked,
-        onTaskLongClicked = viewModel::onTaskLongClicked,
-        closeActionMode = viewModel::closeActionMode,
-        editTask = viewModel::onEditClicked,
-        delTask = viewModel::onDeleteClicked,
-        onBack = onBack,
-    )
+    with(viewModel) {
+        val onAddEditClicked: () -> Unit = {
+            navController.navigate(navigateToAddEditTask)
+            closeActionMode() // FIXME
+        }
+        TaskListBody(
+            title = titleActionMode.collectAsState().value ?: stringResource(title),
+            actionMode = actionMode.collectAsState().value,
+            tasks = shownTasks.collectAsState().value,
+            showAddBtn = showAddButton.collectAsState().value,
+            showDoneActionMenu = showDoneActionMenu.collectAsState().value,
+            showEditActionMenu = showEditActionMenu.collectAsState().value,
+            onTaskClicked = ::onTaskClicked,
+            onTaskLongClicked = ::onTaskLongClicked,
+            closeActionMode = ::closeActionMode,
+            addEditTask = onAddEditClicked,
+            delTask = ::onDeleteClicked,
+            onBack = onBack,
+        )
+    }
 }
 
 @Composable
@@ -47,10 +55,13 @@ private fun TaskListBody(
     title: String,
     actionMode: Boolean,
     tasks: List<TaskItem>,
+    showAddBtn: Boolean,
+    showDoneActionMenu: Boolean,
+    showEditActionMenu: Boolean,
     onTaskClicked: (Long) -> Unit,
     onTaskLongClicked: (Long) -> Unit,
     closeActionMode: () -> Unit,
-    editTask: () -> Unit,
+    addEditTask: () -> Unit,
     delTask: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -58,13 +69,23 @@ private fun TaskListBody(
         topBar = {
             TopBar(
                 title = title,
+                showDoneActionMenu = showDoneActionMenu,
+                showEditActionMenu = showEditActionMenu,
                 actionMode = actionMode,
                 closeActionMode = closeActionMode,
-                editTask = editTask,
+                editTask = addEditTask,
                 delTask = delTask,
                 onBack = onBack
             )
         },
+        floatingActionButton = {
+            if (showAddBtn) {
+                FloatingActionButton(onClick = addEditTask) {
+                    Icon(Icons.Filled.Add, "")
+                }
+            }
+        }
+
     ) {
         LazyColumn(
             contentPadding = PaddingValues(top = 8.dp)
@@ -84,6 +105,8 @@ private fun TaskListBody(
 @Composable
 private fun TopBar(
     title: String,
+    showDoneActionMenu: Boolean,
+    showEditActionMenu: Boolean,
     actionMode: Boolean,
     closeActionMode: () -> Unit,
     editTask: () -> Unit,
@@ -93,6 +116,8 @@ private fun TopBar(
     when (actionMode) {
         true -> TopBarActionModeBody(
             title = title,
+            showDoneActionMenu = showDoneActionMenu,
+            showEditActionMenu = showEditActionMenu,
             closeActionMode = closeActionMode,
             editTask = editTask,
             delTask = delTask
@@ -105,7 +130,7 @@ private fun TopBar(
 }
 
 @Composable
-fun TopBarDefaultBody(
+private fun TopBarDefaultBody(
     title: String,
     onBack: () -> Unit
 ) {
@@ -113,15 +138,17 @@ fun TopBarDefaultBody(
         title = { Text(title) },
         navigationIcon = {
             IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = null)
+                Icon(Icons.Filled.ArrowBack, "")
             }
         }
     )
 }
 
 @Composable
-fun TopBarActionModeBody(
+private fun TopBarActionModeBody(
     title: String,
+    showDoneActionMenu: Boolean,
+    showEditActionMenu: Boolean,
     closeActionMode: () -> Unit,
     editTask: () -> Unit,
     delTask: () -> Unit,
@@ -130,17 +157,24 @@ fun TopBarActionModeBody(
         title = { Text(title) },
         navigationIcon = {
             IconButton(onClick = closeActionMode) {
-                Icon(Icons.Filled.Close, contentDescription = null)
+                Icon(Icons.Filled.Close, "")
             }
         },
         backgroundColor = MaterialTheme.colors.onSecondary,
         contentColor = MaterialTheme.colors.onPrimary,
         actions = {
-            IconButton(onClick = editTask) {
-                Icon(Icons.Filled.Edit, contentDescription = null)
+            if (showDoneActionMenu) {
+                IconButton(onClick = { /** TODO */ }) {
+                    Icon(Icons.Filled.Done, "")
+                }
+            }
+            if (showEditActionMenu) {
+                IconButton(onClick = editTask) {
+                    Icon(Icons.Filled.Edit, "")
+                }
             }
             IconButton(onClick = delTask) {
-                Icon(Icons.Filled.Delete, contentDescription = null)
+                Icon(Icons.Filled.Delete, "")
             }
         }
     )
@@ -164,7 +198,6 @@ private fun TaskItem(
                     onLongPress = { onTaskLongClicked(taskItem.id) },
                 )
             }
-//            .selectable(true, true)
             .background(backgroundColor)
             .padding(
                 horizontal = taskItem.padding.dp,
@@ -172,7 +205,7 @@ private fun TaskItem(
             ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(taskItem.icon, contentDescription = null)
+        Icon(taskItem.icon, "")
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = taskItem.name,
@@ -189,5 +222,5 @@ private fun TaskItem(
 @Preview
 @Composable
 fun TaskListScreenPreview() {
-    TaskListScreen({})
+    TaskListScreen() {}
 }

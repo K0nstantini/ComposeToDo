@@ -31,7 +31,7 @@ private fun TopBar(openDrawer: () -> Unit) {
         title = { Text(stringResource(R.string.app_name)) },
         navigationIcon = {
             IconButton(onClick = openDrawer) {
-                Icon(Icons.Filled.Menu, contentDescription = null)
+                Icon(Icons.Filled.Menu, "")
             }
         }
     )

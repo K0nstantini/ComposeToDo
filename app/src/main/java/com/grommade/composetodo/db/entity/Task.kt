@@ -55,6 +55,9 @@ data class Task(
         var rolls: Int = 0,                                      // количество замен задачи
     ) : Parcelable
 
+    val isNew: Boolean
+        get() = (id == 0L)
+
     val readyToActivate: Boolean
         get() = !group && single.dateActivation.isEmpty() && single.dateStart < MyCalendar().now()
 

@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
+import com.grommade.composetodo.TasksScreen
 import com.grommade.composetodo.add_classes.TaskItem
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
@@ -42,7 +43,7 @@ class TaskListViewModel @Inject constructor(
 
     private val allTasks: StateFlow<List<Task>> = repo.getTasksFlow(taskType).asState(emptyList())
 
-    private var selectedTasks: MutableStateFlow<List<Long>> = MutableStateFlow(listOf())
+    private var selectedTasks = MutableStateFlow(listOf<Long>())
 
     // FIXME
     val shownTasks: StateFlow<List<TaskItem>> = allTasks.combine(selectedTasks) { task, taskItem -> task to taskItem }
@@ -53,12 +54,49 @@ class TaskListViewModel @Inject constructor(
         .map { if (it.count() == 1) getTask(it.first()) else null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    private val currentIDTask: Long
+        get() = currentTask.value?.id ?: -1
+
+    val navigateToAddEditTask: String
+        get() = when (taskType) {
+            TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentIDTask)
+            TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentIDTask)
+        }
+
+    val titleActionMode: StateFlow<String?> = selectedTasks
+        .map { currentTask.value?.name ?: if (it.isEmpty()) null else "" }
+        .asState(null)
+
     private val _actionMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val actionMode: StateFlow<Boolean> = _actionMode.asStateFlow()
 
-    /** Variables others */
+    /** Variables Visibility & Enabling */
+
+    val showAddButton: StateFlow<Boolean> = actionMode
+        .map { !it && mode.showAddBtn }
+        .asState(mode.showAddBtn)
+
+    val showDoneActionMenu: StateFlow<Boolean> = selectedTasks
+        .map { mapToShowDoneActionMenu(it) }
+        .asState(false)
+
+    val showEditActionMenu: StateFlow<Boolean> = selectedTasks
+        .map { !actionMode.value || it.count() == 1 }
+        .asState(false)
+
 
     /** =========================================== FUNCTIONS ==================================================== */
+
+    private fun mapToShowDoneActionMenu(selected: List<Long>): Boolean {
+        val noMultiSelect = selected.count() == 1
+        val noGroup = !(currentTask.value?.group ?: false)
+        return !actionMode.value || (taskType == TypeTask.SINGLE_TASK && noGroup && noMultiSelect)
+    }
+
+//    private fun mapToEnabledConfirmMenu() = when (val task = currentTask.value) {
+//        is Task -> isMarkTaskForSelection(task)
+//        else -> false
+//    }
 
     /** Clicks */
 
@@ -80,7 +118,7 @@ class TaskListViewModel @Inject constructor(
         }
     }
 
-    fun onEditClicked() {
+    fun onAddEditClicked() {
 //        setEvent(Event.NavigateToAddEdit(currentTask.value))
         closeActionMode()
     }
@@ -157,93 +195,13 @@ class TaskListViewModel @Inject constructor(
     private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
 
     /**
-    sealed class Event {
-    data class NavigateToAddEdit(val task: Task? = null) : Event()
-    data class ShowActionMode(val show: Boolean) : Event()
-    }
 
-
-
-
-    val shownTasks: StateFlow<List<Task>> = allTasks
-    .map { getTasksToShow(if (mode == TaskListMode.SELECT_CATALOG) getOpenGroups() else it) }
-    .asState(emptyList())
-
-    val levels: StateFlow<Map<Long, Int>> = allTasks
-    .map { tasks -> tasks.associateBy({ it.id }, { it.level() }) }
-    .asState(emptyMap())
-
-    private val _selectedItems = MutableStateFlow(listOf<Int>())
-    val selectedItems = _selectedItems.asStateFlow()
-
-
-    val actionModeTitle: StateFlow<String?> = _selectedItems
-    .map { currentTask.value?.name }
-    .asState(null)
-
-    val showAddButton: StateFlow<Boolean> = getEvents()
-    .filterIsInstance<Event.ShowActionMode>()
-    .map { !it.show && mode.showAddBtn }
-    .asState(mode.showAddBtn)
-
-    val showDoneActionMenu: StateFlow<Boolean> = _selectedItems
-    .map { mapToShowDoneActionMenu(it) }
-    .asState(false)
-
-    val showEditActionMenu: StateFlow<Boolean> = _selectedItems
-    .map { !actionMode.value || it.count() == 1 }
-    .asState(false)
 
     val enabledConfirmMenu: StateFlow<Boolean> = _selectedItems
     .map { mapToEnabledConfirmMenu() }
     .asState(false)
 
-    private val actionMode: StateFlow<Boolean> = _selectedItems
-    .map { it.isNotEmpty() }
-    .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    /** Variables others */
-
-    val currentTaskID: Long
-    get() = currentTask.value?.id ?: -1
-
-    /** =========================================== FUNCTIONS ==================================================== */
-
-    /** Transformations flow */
-
-    private fun mapToShowDoneActionMenu(selected: List<Int>): Boolean {
-    val noMultiSelect = selected.count() == 1
-    val noGroup = !(currentTask.value?.group ?: false)
-    return !actionMode.value || (taskType == TypeTask.SINGLE_TASK && noGroup && noMultiSelect)
-    }
-
-    private fun mapToEnabledConfirmMenu() = when (val task = currentTask.value) {
-    is Task -> isMarkTaskForSelection(task)
-    else -> false
-    }
-
-    /** Clicks */
-
-    fun onAddClicked() =
-    setEvent(Event.NavigateToAddEdit())
-
-
-
-
-
-    /** ActionMode */
-
-
-
-    private fun setActionMode() =
-    setEvent(Event.ShowActionMode(true))
-
-    fun destroyActionMode() {
-    _selectedItems.value = emptyList()
-    setEvent(Event.ShowActionMode(false))
-    }
-
-    /** ======================================================================================================== */
 
     private fun isMarkTaskForSelection(task: Task): Boolean =
     (mode == TaskListMode.SELECT_CATALOG) || (mode == TaskListMode.SELECT_TASK && !task.group)
@@ -252,18 +210,10 @@ class TaskListViewModel @Inject constructor(
     _selectedItems.apply { value = listOf(task.position()) }
 
 
-
-
-
     private fun getTask(index: Int): Task? = shownTasks.value.getOrNull(index)
 
     private fun Task.position() = shownTasks.value.indexOf(this)
     private fun Task.level(): Int = generateSequence(this) { getTask(it.parent) }.count() - 1
-
-
-
-
-
 
 
      */

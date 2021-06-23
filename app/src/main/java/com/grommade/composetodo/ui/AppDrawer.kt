@@ -66,10 +66,7 @@ private fun DrawerButton(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    imageVector = icon,
-                    contentDescription = null, // decorative
-                )
+                Image(imageVector = icon, "")
                 Spacer(Modifier.width(16.dp))
                 Text(
                     text = label,

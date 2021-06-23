@@ -5,6 +5,8 @@ import com.grommade.composetodo.db.entity.Task
 
 fun String.addArgument(argument: String) = "$this/{$argument}"
 
+fun String.addOptionalArgument(argument: String) = "$this/?$argument={$argument}"
+
 fun Int.toStrTime(): String {
     return (this / 60).toString().padStart(2, '0') + ':' +
             (this % 60).toString().padStart(2, '0')
