@@ -3,16 +3,17 @@ package com.grommade.composetodo.single_task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.grommade.composetodo.MainScreen
 import com.grommade.composetodo.R
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.settings.SettingItem
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,6 +61,9 @@ class SingleTaskViewModel @Inject constructor(
         }
         .asState(emptyList())
 
+    private var _navigateToSelectParent = MutableSharedFlow<String>()
+    val navigateToSelectParent = _navigateToSelectParent.asSharedFlow()
+
     /** =========================================== INIT ========================================================= */
 
     init {
@@ -94,7 +98,15 @@ class SingleTaskViewModel @Inject constructor(
     }
 
     private fun onParentClicked() {
-        // TODO
+        viewModelScope.launch {
+            _navigateToSelectParent.emit(
+                MainScreen.TaskList.createRoute(
+                    mode = ModeTaskList.SELECT_CATALOG,
+                    type = TypeTask.SINGLE_TASK,
+                    id = currentTask.value.parent
+                )
+            )
+        }
     }
 
     private fun onParentClearClicked() {
@@ -113,6 +125,12 @@ class SingleTaskViewModel @Inject constructor(
 //            0 -> DEFAULT_DEADLINE_SINGLE_TASK
 //            else -> _deadline.value
 //        }.toString()
+    }
+
+    fun setParentsID(id: Long) {
+        currentTask.apply {
+            value = value.copy(parent = id)
+        }
     }
 
     private fun <T> Flow<T>.asState(default: T) =

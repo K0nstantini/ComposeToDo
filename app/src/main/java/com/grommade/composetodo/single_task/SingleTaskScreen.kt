@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -21,6 +20,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.settings.SettingItem
+import com.grommade.composetodo.util.Keys
 
 @Composable
 fun SingleTaskScreen(
@@ -28,6 +28,14 @@ fun SingleTaskScreen(
     navController: NavHostController = rememberNavController(),
 ) {
     with(viewModel) {
+        navigateToSelectParent.collectAsState(null).value?.let {
+            navController.navigate(it)
+        }
+        val handle = navController.currentBackStackEntry?.savedStateHandle
+        handle?.get<Long>(Keys.SELECTED_TASK_ID)?.let {
+            setParentsID(it)
+            handle.remove<Long>(Keys.SELECTED_TASK_ID)
+        }
         SingleTaskBody(
             title = title.collectAsState().value ?: stringResource(R.string.title_add_task_new_task),
             taskName = taskName.collectAsState().value,
@@ -46,7 +54,6 @@ private fun SingleTaskBody(
     onTaskNameChange: (String) -> Unit,
     onBack: () -> Unit
 ) {
-
     Scaffold(
         topBar = {
             TopBar(
@@ -151,7 +158,6 @@ private fun SetItemBody(
     Divider(thickness = 1.dp)
 }
 
-
 @Composable
 private fun TopBar(
     title: String,
@@ -182,7 +188,6 @@ private fun TaskName(
         modifier = Modifier.fillMaxWidth()
     )
 }
-
 
 @Preview
 @Composable

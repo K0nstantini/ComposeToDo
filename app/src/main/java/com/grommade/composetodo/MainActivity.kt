@@ -8,6 +8,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.ui.AppDrawer
 import com.grommade.composetodo.ui.ToDoNavGraph
@@ -48,13 +49,21 @@ private fun ToDoApp() {
             scaffoldState = scaffoldState,
             drawerContent = {
                 AppDrawer(
-//                    navigateToRegularTasks = { navigateToTaskList(navController, TypeTask.REGULAR_TASK) },
-//                    navigateToSingleTasks = { navigateToTaskList(navController, TypeTask.SINGLE_TASK) },
                     navigateToRegularTasks = {
-                        navController.navigate(MainScreen.TaskList.createRoute(TypeTask.REGULAR_TASK))
+                        navController.navigate(
+                            MainScreen.TaskList.createRoute(
+                                ModeTaskList.DEFAULT,
+                                TypeTask.REGULAR_TASK
+                            )
+                        )
                     },
                     navigateToSingleTasks = {
-                        navController.navigate(MainScreen.TaskList.createRoute(TypeTask.SINGLE_TASK))
+                        navController.navigate(
+                            MainScreen.TaskList.createRoute(
+                                ModeTaskList.DEFAULT,
+                                TypeTask.SINGLE_TASK
+                            )
+                        )
                     },
                     closeDrawer = closeDrawer
                 )

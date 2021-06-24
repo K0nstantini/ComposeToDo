@@ -34,7 +34,9 @@ class TaskListViewModel @Inject constructor(
     private val mode: ModeTaskList =
         handle.get<String>(Keys.TASK_LIST_MODE_KEY)?.let { ModeTaskList.valueOf(it) } ?: ModeTaskList.DEFAULT
 
-    val title: Int = when (taskType) {
+    private val selectedTaskID: Long = handle.get<Long>(Keys.TASK_ID) ?: -1L
+
+    val defaultTitle: Int = when (taskType) {
         TypeTask.REGULAR_TASK -> mode.titleRegularTask
         TypeTask.SINGLE_TASK -> mode.titleSingleTask
     }
@@ -43,7 +45,9 @@ class TaskListViewModel @Inject constructor(
 
     private val allTasks: StateFlow<List<Task>> = repo.getTasksFlow(taskType).asState(emptyList())
 
-    private var selectedTasks = MutableStateFlow(listOf<Long>())
+    private var selectedTasks: MutableStateFlow<List<Long>> = MutableStateFlow(
+        if (selectedTaskID > 0L) listOf(selectedTaskID) else emptyList()
+    )
 
     // FIXME
     val shownTasks: StateFlow<List<TaskItem>> = allTasks.combine(selectedTasks) { task, taskItem -> task to taskItem }
@@ -51,38 +55,44 @@ class TaskListViewModel @Inject constructor(
         .asState(emptyList())
 
     private val currentTask: StateFlow<Task?> = selectedTasks
-        .map { if (it.count() == 1) getTask(it.first()) else null }
+        .map { mapToCurrentTask(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val currentIDTask: Long
         get() = currentTask.value?.id ?: -1
 
-    val navigateToAddEditTask: String
-        get() = when (taskType) {
-            TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentIDTask)
-            TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentIDTask)
-        }
-
-    val titleActionMode: StateFlow<String?> = selectedTasks
-        .map { currentTask.value?.name ?: if (it.isEmpty()) null else "" }
+    val title: StateFlow<String?> = currentTask
+        .map { it?.name ?: if (selectedTasks.value.isEmpty()) null else "" }
         .asState(null)
 
     private val _actionMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val actionMode: StateFlow<Boolean> = _actionMode.asStateFlow()
 
-    /** Variables Visibility & Enabling */
+    /** Variables Visibility & Availability */
 
-    val showAddButton: StateFlow<Boolean> = actionMode
-        .map { !it && mode.showAddBtn }
-        .asState(mode.showAddBtn)
+    data class Availability(
+        val showAddButton: Boolean = false,
+        val showDoneActionMenu: Boolean = false,
+        val showEditActionMenu: Boolean = false,
+        val enabledDoneBtn: Boolean = false
+    )
 
-    val showDoneActionMenu: StateFlow<Boolean> = selectedTasks
-        .map { mapToShowDoneActionMenu(it) }
-        .asState(false)
+    val visibility = actionMode.combine(selectedTasks) { actMode, selected ->
+        Availability(
+            showAddButton = !actMode && mode.showAddBtn,
+            showDoneActionMenu = mapToShowDoneActionMenu(selected),
+            showEditActionMenu = !actionMode.value || selected.count() == 1,
+            enabledDoneBtn = selected.count() == 1
+        )
+    }.asState(Availability())
 
-    val showEditActionMenu: StateFlow<Boolean> = selectedTasks
-        .map { !actionMode.value || it.count() == 1 }
-        .asState(false)
+    /** Navigation */
+
+    private var _navigateToAddEditTask = MutableSharedFlow<String>()
+    val navigateToAddEditTask = _navigateToAddEditTask.asSharedFlow()
+
+    private var _navigateToBack = MutableSharedFlow<Long>()
+    val navigateToBack = _navigateToBack.asSharedFlow()
 
 
     /** =========================================== FUNCTIONS ==================================================== */
@@ -90,8 +100,17 @@ class TaskListViewModel @Inject constructor(
     private fun mapToShowDoneActionMenu(selected: List<Long>): Boolean {
         val noMultiSelect = selected.count() == 1
         val noGroup = !(currentTask.value?.group ?: false)
-        return !actionMode.value || (taskType == TypeTask.SINGLE_TASK && noGroup && noMultiSelect)
+        val select = (mode == ModeTaskList.SELECT_CATALOG || mode == ModeTaskList.SELECT_TASK)
+//                && currentTask.value is Task
+        return select || (actionMode.value && taskType == TypeTask.SINGLE_TASK && noGroup && noMultiSelect)
     }
+
+    private suspend fun mapToCurrentTask(selected: List<Long>): Task? =
+        // При выборе родителя нужно получить текущую задачу сразу и allTask еще не подгрузятся
+        when (val id = if (selected.count() == 1) selected.first() else null) {
+            is Long -> getTask(id) ?: repo.getTask(id)
+            else -> null
+        }
 
 //    private fun mapToEnabledConfirmMenu() = when (val task = currentTask.value) {
 //        is Task -> isMarkTaskForSelection(task)
@@ -104,7 +123,7 @@ class TaskListViewModel @Inject constructor(
         val task = requireNotNull(getTask(id))
         when {
             actionMode.value -> selectItemActionMode(id)
-//          isMarkTaskForSelection(task) -> selectTaskForSelectionMode(task)
+            isMarkTaskForSelection(task) -> selectTaskForSelectionMode(id)
             task.group -> setGroupOpenClose(task)
         }
     }
@@ -118,8 +137,24 @@ class TaskListViewModel @Inject constructor(
         }
     }
 
+    fun onConfirmClicked() {
+        when (mode) {
+            ModeTaskList.SELECT_CATALOG, ModeTaskList.SELECT_TASK -> viewModelScope.launch {
+                _navigateToBack.emit(currentIDTask)
+            }
+            ModeTaskList.DEFAULT -> null
+        }
+    }
+
     fun onAddEditClicked() {
-//        setEvent(Event.NavigateToAddEdit(currentTask.value))
+        viewModelScope.launch {
+            _navigateToAddEditTask.emit(
+                when (taskType) {
+                    TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentIDTask)
+                    TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentIDTask)
+                }
+            )
+        }
         closeActionMode()
     }
 
@@ -142,6 +177,9 @@ class TaskListViewModel @Inject constructor(
             closeActionMode()
         }
     }
+
+    private fun selectTaskForSelectionMode(id: Long) =
+        selectedTasks.apply { value = listOf(id) }
 
     // FIXME?
     private fun getTasksToShow(
@@ -185,11 +223,13 @@ class TaskListViewModel @Inject constructor(
         )
     }
 
+    private fun isMarkTaskForSelection(task: Task): Boolean =
+        (mode == ModeTaskList.SELECT_CATALOG) || (mode == ModeTaskList.SELECT_TASK && !task.group)
+
     private fun <T> Flow<T>.asState(default: T) =
         stateIn(viewModelScope, SharingStarted.Lazily, default)
 
-    private fun getTask(id: Long) = allTasks.value.find { it.id == id }
-    private fun getTaskItem(id: Long) = shownTasks.value.find { it.id == id }
+    private fun getTask(id: Long): Task? = allTasks.value.find { it.id == id }
 
     private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
     private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
@@ -203,11 +243,6 @@ class TaskListViewModel @Inject constructor(
 
 
 
-    private fun isMarkTaskForSelection(task: Task): Boolean =
-    (mode == TaskListMode.SELECT_CATALOG) || (mode == TaskListMode.SELECT_TASK && !task.group)
-
-    private fun selectTaskForSelectionMode(task: Task) =
-    _selectedItems.apply { value = listOf(task.position()) }
 
 
     private fun getTask(index: Int): Task? = shownTasks.value.getOrNull(index)

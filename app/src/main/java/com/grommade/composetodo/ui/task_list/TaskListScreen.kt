@@ -21,29 +21,32 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.add_classes.TaskItem
+import com.grommade.composetodo.util.Keys
 
 @Composable
 fun TaskListScreen(
     viewModel: TaskListViewModel = hiltViewModel(),
-    navController: NavHostController = rememberNavController(),
-    onBack: () -> Unit
+    navController: NavHostController = rememberNavController()
 ) {
+    val onBack: () -> Unit = { navController.navigateUp() }
     with(viewModel) {
-        val onAddEditClicked: () -> Unit = {
-            navController.navigate(navigateToAddEditTask)
-            closeActionMode() // FIXME
+        navigateToAddEditTask.collectAsState(null).value?.let { rout ->
+            navController.navigate(rout)
+        }
+        navigateToBack.collectAsState(null).value?.let { id ->
+            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, id)
+            onBack()
         }
         TaskListBody(
-            title = titleActionMode.collectAsState().value ?: stringResource(title),
+            title = title.collectAsState().value ?: stringResource(defaultTitle),
             actionMode = actionMode.collectAsState().value,
             tasks = shownTasks.collectAsState().value,
-            showAddBtn = showAddButton.collectAsState().value,
-            showDoneActionMenu = showDoneActionMenu.collectAsState().value,
-            showEditActionMenu = showEditActionMenu.collectAsState().value,
+            availability = visibility.collectAsState().value,
             onTaskClicked = ::onTaskClicked,
             onTaskLongClicked = ::onTaskLongClicked,
             closeActionMode = ::closeActionMode,
-            addEditTask = onAddEditClicked,
+            confirm = ::onConfirmClicked,
+            addEditTask = ::onAddEditClicked,
             delTask = ::onDeleteClicked,
             onBack = onBack,
         )
@@ -55,12 +58,11 @@ private fun TaskListBody(
     title: String,
     actionMode: Boolean,
     tasks: List<TaskItem>,
-    showAddBtn: Boolean,
-    showDoneActionMenu: Boolean,
-    showEditActionMenu: Boolean,
+    availability: TaskListViewModel.Availability,
     onTaskClicked: (Long) -> Unit,
     onTaskLongClicked: (Long) -> Unit,
     closeActionMode: () -> Unit,
+    confirm: () -> Unit,
     addEditTask: () -> Unit,
     delTask: () -> Unit,
     onBack: () -> Unit,
@@ -69,17 +71,17 @@ private fun TaskListBody(
         topBar = {
             TopBar(
                 title = title,
-                showDoneActionMenu = showDoneActionMenu,
-                showEditActionMenu = showEditActionMenu,
+                availability = availability,
                 actionMode = actionMode,
                 closeActionMode = closeActionMode,
+                confirm = confirm,
                 editTask = addEditTask,
                 delTask = delTask,
                 onBack = onBack
             )
         },
         floatingActionButton = {
-            if (showAddBtn) {
+            if (availability.showAddButton) {
                 FloatingActionButton(onClick = addEditTask) {
                     Icon(Icons.Filled.Add, "")
                 }
@@ -105,10 +107,10 @@ private fun TaskListBody(
 @Composable
 private fun TopBar(
     title: String,
-    showDoneActionMenu: Boolean,
-    showEditActionMenu: Boolean,
+    availability: TaskListViewModel.Availability,
     actionMode: Boolean,
     closeActionMode: () -> Unit,
+    confirm: () -> Unit,
     editTask: () -> Unit,
     delTask: () -> Unit,
     onBack: () -> Unit
@@ -116,14 +118,16 @@ private fun TopBar(
     when (actionMode) {
         true -> TopBarActionModeBody(
             title = title,
-            showDoneActionMenu = showDoneActionMenu,
-            showEditActionMenu = showEditActionMenu,
+            availability = availability,
             closeActionMode = closeActionMode,
+            confirm = confirm,
             editTask = editTask,
             delTask = delTask
         )
         false -> TopBarDefaultBody(
             title = title,
+            availability = availability,
+            confirm = confirm,
             onBack = onBack
         )
     }
@@ -132,6 +136,8 @@ private fun TopBar(
 @Composable
 private fun TopBarDefaultBody(
     title: String,
+    availability: TaskListViewModel.Availability,
+    confirm: () -> Unit,
     onBack: () -> Unit
 ) {
     TopAppBar(
@@ -140,6 +146,13 @@ private fun TopBarDefaultBody(
             IconButton(onClick = onBack) {
                 Icon(Icons.Filled.ArrowBack, "")
             }
+        },
+        actions = {
+            if (availability.showDoneActionMenu) {
+                IconButton(onClick = confirm, enabled = availability.enabledDoneBtn) {
+                    Icon(Icons.Filled.Done, "")
+                }
+            }
         }
     )
 }
@@ -147,9 +160,9 @@ private fun TopBarDefaultBody(
 @Composable
 private fun TopBarActionModeBody(
     title: String,
-    showDoneActionMenu: Boolean,
-    showEditActionMenu: Boolean,
+    availability: TaskListViewModel.Availability,
     closeActionMode: () -> Unit,
+    confirm: () -> Unit,
     editTask: () -> Unit,
     delTask: () -> Unit,
 ) {
@@ -163,12 +176,12 @@ private fun TopBarActionModeBody(
         backgroundColor = MaterialTheme.colors.onSecondary,
         contentColor = MaterialTheme.colors.onPrimary,
         actions = {
-            if (showDoneActionMenu) {
-                IconButton(onClick = { /** TODO */ }) {
+            if (availability.showDoneActionMenu) {
+                IconButton(onClick = confirm) {
                     Icon(Icons.Filled.Done, "")
                 }
             }
-            if (showEditActionMenu) {
+            if (availability.showEditActionMenu) {
                 IconButton(onClick = editTask) {
                     Icon(Icons.Filled.Edit, "")
                 }
@@ -222,5 +235,5 @@ private fun TaskItem(
 @Preview
 @Composable
 fun TaskListScreenPreview() {
-    TaskListScreen() {}
+    TaskListScreen()
 }
