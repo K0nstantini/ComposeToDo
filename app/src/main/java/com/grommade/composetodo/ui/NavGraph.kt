@@ -15,8 +15,9 @@ import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.MainScreen
 import com.grommade.composetodo.TasksScreen
 import com.grommade.composetodo.single_task.SingleTaskScreen
-import com.grommade.composetodo.ui.home.HomeScreen
-import com.grommade.composetodo.ui.task_list.TaskListScreen
+import com.grommade.composetodo.home.HomeScreen
+import com.grommade.composetodo.home.HomeViewModel
+import com.grommade.composetodo.task_list.TaskListScreen
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
@@ -52,6 +53,7 @@ private fun NavGraphBuilder.addRoutMainScreen(
 ) {
     drawerGesturesEnabled(true)
     HomeScreen(
+        viewModel = hiltViewModel<HomeViewModel>().also { it.refreshTasks() },
         openDrawer = openDrawer
     )
 }

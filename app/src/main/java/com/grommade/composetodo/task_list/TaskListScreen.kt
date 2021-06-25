@@ -1,4 +1,4 @@
-package com.grommade.composetodo.ui.task_list
+package com.grommade.composetodo.task_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures

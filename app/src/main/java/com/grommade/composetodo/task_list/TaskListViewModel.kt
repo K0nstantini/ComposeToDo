@@ -1,4 +1,4 @@
-package com.grommade.composetodo.ui.task_list
+package com.grommade.composetodo.task_list
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
@@ -111,11 +111,6 @@ class TaskListViewModel @Inject constructor(
             is Long -> getTask(id) ?: repo.getTask(id)
             else -> null
         }
-
-//    private fun mapToEnabledConfirmMenu() = when (val task = currentTask.value) {
-//        is Task -> isMarkTaskForSelection(task)
-//        else -> false
-//    }
 
     /** Clicks */
 
@@ -233,24 +228,5 @@ class TaskListViewModel @Inject constructor(
 
     private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
     private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
-
-    /**
-
-
-    val enabledConfirmMenu: StateFlow<Boolean> = _selectedItems
-    .map { mapToEnabledConfirmMenu() }
-    .asState(false)
-
-
-
-
-
-    private fun getTask(index: Int): Task? = shownTasks.value.getOrNull(index)
-
-    private fun Task.position() = shownTasks.value.indexOf(this)
-    private fun Task.level(): Int = generateSequence(this) { getTask(it.parent) }.count() - 1
-
-
-     */
 
 }

@@ -39,4 +39,8 @@ object Modules {
     @Singleton
     fun provideAlarmService(@ApplicationContext appContext: Context) = AlarmService(appContext)
 
+//    @Provides
+//    @Singleton
+//    fun provideRefreshSingleTasks(repository: Repository): RefreshSingleTasks = RefreshSingleTasks(repository)
+
 }

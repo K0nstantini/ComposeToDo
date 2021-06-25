@@ -50,7 +50,7 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable {
 
     fun today() = this.now().set(year, month, day, 0, 0, 0)
 
-    fun addHours(minutes: Int) = MyCalendar(calendar.timeInMillis + hours.hoursToMilli())
+    fun addHours(_hours: Int) = MyCalendar(calendar.timeInMillis + _hours.hoursToMilli())
 
     fun isEmpty() = milli == 0L
     fun isNoEmpty() = milli != 0L

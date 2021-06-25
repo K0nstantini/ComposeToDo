@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -224,7 +223,7 @@ private fun TaskNameEditField(
         label = { Text(stringResource(R.string.hint_edit_text_name)) },
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         maxLines = 1,
-        textStyle = MaterialTheme.typography.h6,
+        textStyle = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.secondaryVariant),
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -236,7 +235,7 @@ private fun TaskNameEditField(
 fun SingleTaskScreenPreview() {
     SingleTaskBody(
         title = stringResource(R.string.title_add_task_new_task),
-        taskItem = SingleTaskViewModel.SingleTaskItem(),
+        taskItem = SingleTaskViewModel.SingleTaskItem(name = "New Task"),
         readyToSafe = true,
         onTaskNameChange = {},
         onClickGroup = {},

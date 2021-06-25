@@ -31,19 +31,19 @@ interface TaskDao {
     @Query("SELECT * FROM task_table WHERE type = :type ORDER BY name ASC")
     fun getTasksFlow(type: String): Flow<List<Task>>
 
-    @Query("SELECT * FROM task_table WHERE dateActivation > 0 ORDER BY dateActivation ASC")
-    fun getTasksToDoFlow(): Flow<List<Task>>
-
     @Query("SELECT * FROM task_table ORDER BY name ASC")
     fun getTasks(): List<Task>
+
+    @Query("SELECT * FROM task_table  WHERE type = :type ORDER BY name ASC")
+    fun getSingleTasks(type: String): List<Task>
 
     @Query("SELECT COUNT(*) FROM task_table WHERE `group` = 0")
     fun getCountTasks(): Int
 
     @Query("SELECT * FROM task_table WHERE dateActivation > 0")
-    fun getActiveTasks(): List<Task>
+    fun getActiveTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM task_table WHERE dateActivation = 0")
-    fun getNoActiveTasks(): List<Task>
+    @Query("SELECT * FROM task_table WHERE dateActivation = 0 AND type = :type")
+    fun getNoActiveTasks(type: String): List<Task>
 
 }

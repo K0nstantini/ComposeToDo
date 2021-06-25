@@ -62,7 +62,7 @@
     <string name="notification_title_task_to_do_default">Есть новые задачи</string>
 
 
-    <!--    Items texts-->
+    <!--    Main screen texts-->
     <string name="main_screen_single_task_second_text">Срок: %s</string>
 
     <!--    Messages-->

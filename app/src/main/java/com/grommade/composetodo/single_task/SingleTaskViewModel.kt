@@ -71,8 +71,6 @@ class SingleTaskViewModel @Inject constructor(
     /** =========================================== FUNCTIONS ==================================================== */
 
 
-    /** Effects */
-
     fun onTaskNameChange(text: String) {
         currentTask.apply {
             if (text.length < 100) {
@@ -128,39 +126,3 @@ class SingleTaskViewModel @Inject constructor(
     private fun <T> Flow<T>.asState(default: T) =
         stateIn(viewModelScope, SharingStarted.Lazily, default)
 }
-
-/**
-
-
-fun onSaveClicked(): Boolean {
-// TODO: Проверить заполнение
-//        saveTask()
-setEvent(Event1.NavigateToBack)
-return true
-}
-
-private fun saveTask() {
-currentTask.setDataSingleTask(taskName, _group, _parent, _dateStart, _deadline)
-when (currentTask.id) {
-0L -> currentTask.insert()
-else -> currentTask.update()
-}
-}
-
-private fun saveDeadline(value: String) {
-_deadline.value = value.toIntOrNull() ?: 0
-}
-
-
-
-private fun <T> Flow<T>.asState(default: T) =
-stateIn(viewModelScope, SharingStarted.Lazily, default)
-
-}
-
- */
-
-/**
-var dateUntilToDo: MyCalendar = MyCalendar(),           // Задача должна быть сгенерирована до этой даты
-var toDoAfterTask: String = ""                          // Задача будет сегенрирована только после выполнения другой задачи
- **/

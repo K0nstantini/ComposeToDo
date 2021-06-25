@@ -52,12 +52,24 @@ class Repository @Inject constructor(private val settingsDao: SettingsDao, priva
         TypeTask.SINGLE_TASK -> taskDao.getTasksFlow(type.name)
     }
 
-    suspend fun getTasks() = withContext(Dispatchers.IO) { taskDao.getTasks() }
+    val activatedSingleTasks = taskDao.getActiveTasks()
+
+    @WorkerThread
+    suspend fun getAllSingleTasks() = withContext(Dispatchers.IO) {
+        taskDao.getSingleTasks(TypeTask.SINGLE_TASK.name)
+    }
+
+
+    @WorkerThread
+    suspend fun getReadyToActivateSingleTasks() = withContext(Dispatchers.IO) {
+        taskDao.getNoActiveTasks(TypeTask.SINGLE_TASK.name)
+    }
+
+    private suspend fun getTasks() = withContext(Dispatchers.IO) { taskDao.getTasks() }
 
     suspend fun getTask(id: Long) = withContext(Dispatchers.IO) { taskDao.getTask(id) }
 
     /** ======================================================================================= */
-
 
 
 }

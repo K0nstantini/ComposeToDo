@@ -98,14 +98,17 @@ private fun SetItemBody(
                     text = title,
                     style = when (enabled) {
                         true -> MaterialTheme.typography.h6.copy(fontSize = 16.sp)
-                        false -> MaterialTheme.typography.h6.copy(fontSize = 16.sp, color = Color.DarkGray)
+                        false -> MaterialTheme.typography.h6.copy(fontSize = 16.sp, color = Color.Gray)
                     }
                 )
                 Row(
                     modifier = if (showClear) Modifier.fillMaxWidth() else Modifier, // FIXME: WTF?
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(value, style = MaterialTheme.typography.body2.copy(color = Color.DarkGray))
+                    Text(
+                        text = if (enabled) value else "-",
+                        style = MaterialTheme.typography.body2.copy(color = Color.DarkGray)
+                    )
                     if (showClear) {
                         Text(
                             text = stringResource(R.string.btn_clear),
