@@ -1,9 +1,11 @@
 package com.grommade.composetodo.ui
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -17,6 +19,8 @@ import com.grommade.composetodo.ui.home.HomeScreen
 import com.grommade.composetodo.ui.task_list.TaskListScreen
 import kotlinx.coroutines.launch
 
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
 @Composable
 fun ToDoNavGraph(
     navController: NavHostController = rememberNavController(),
@@ -75,6 +79,8 @@ private fun NavGraphBuilder.addRoutRegularTask(
     // TODO
 }
 
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
 private fun NavGraphBuilder.addRoutSingleTask(
     navController: NavHostController
 ) = composable(

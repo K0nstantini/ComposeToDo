@@ -3,9 +3,11 @@ package com.grommade.composetodo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.enums.ModeTaskList
@@ -19,6 +21,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @ExperimentalMaterialApi
+    @ExperimentalComposeUiApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -29,6 +33,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
 @Composable
 private fun ToDoApp() {
     ComposeToDoTheme {
@@ -79,6 +85,8 @@ private fun ToDoApp() {
     }
 }
 
+@ExperimentalMaterialApi
+@ExperimentalComposeUiApi
 @Preview
 @Composable
 fun DefaultPreview() {
