@@ -196,7 +196,7 @@ class TaskListViewModel @Inject constructor(
 
     private fun setGroupOpenClose(task: Task) = task
         .apply { groupOpen = !groupOpen }
-        .update()
+        .save()
 
     private fun getOpenGroups(): List<Task> =
         allTasks.value.filter { it.group }.map { it.copy(groupOpen = true) }
@@ -226,7 +226,7 @@ class TaskListViewModel @Inject constructor(
 
     private fun getTask(id: Long): Task? = allTasks.value.find { it.id == id }
 
-    private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
+    private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
     private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
 
 }

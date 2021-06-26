@@ -7,42 +7,44 @@ import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.nestedTasks
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class Repository @Inject constructor(private val settingsDao: SettingsDao, private val taskDao: TaskDao) {
+class Repository @Inject constructor(
+    private val settingsDao: SettingsDao,
+    private val taskDao: TaskDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
 
     /** Settings */
 
     val settingsFlow: Flow<Settings> = settingsDao.getSettingsFlow()
 
-    @WorkerThread
     suspend fun insertSettings() = settingsDao.insert(Settings())
 
-    @WorkerThread
     suspend fun updateSettings(set: Settings) = settingsDao.update(set)
 
-    suspend fun getSettings() = withContext(Dispatchers.IO) { settingsDao.getSettings() }
+    suspend fun getSettings() = withContext(ioDispatcher) {settingsDao.getSettings()}
 
     /** ======================================================================================= */
 
     /** Tasks */
 
-    @WorkerThread
     suspend fun insertTask(task: Task) = taskDao.insert(task)
 
-    @WorkerThread
     suspend fun updateTask(task: Task) = taskDao.update(task)
 
-    @WorkerThread
+    suspend fun saveTask(task: Task) {
+        if (task.isNew) taskDao.insert(task) else taskDao.update(task)
+    }
+
     suspend fun updateTasks(tasks: List<Task>) = taskDao.updateTasks(tasks)
 
-    @WorkerThread
     suspend fun deleteTask(task: Task) = taskDao.deleteTasks(getTasks().nestedTasks(task))
 
-    @WorkerThread
     suspend fun deleteTasks(tasks: List<Task>) = tasks.forEach { task ->
         taskDao.deleteTasks(getTasks().nestedTasks(task))
     }
@@ -54,13 +56,10 @@ class Repository @Inject constructor(private val settingsDao: SettingsDao, priva
 
     val activatedSingleTasks = taskDao.getActiveTasks()
 
-    @WorkerThread
     suspend fun getAllSingleTasks() = withContext(Dispatchers.IO) {
         taskDao.getSingleTasks(TypeTask.SINGLE_TASK.name)
     }
 
-
-    @WorkerThread
     suspend fun getReadyToActivateSingleTasks() = withContext(Dispatchers.IO) {
         taskDao.getNoActiveTasks(TypeTask.SINGLE_TASK.name)
     }

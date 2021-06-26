@@ -72,57 +72,46 @@ class SingleTaskViewModel @Inject constructor(
 
 
     fun onTaskNameChange(text: String) {
-        currentTask.apply {
-            if (text.length < 100) {
-                value = value.copy(name = text)
-            }
+        if (text.length < 100) {
+            currentTask.setValue { copy(name = text) }
         }
     }
 
     fun onGroupClicked(group: Boolean) {
-        currentTask.apply {
-            value = value.copy(group = group)
-        }
+        currentTask.setValue { copy(group = group) }
     }
 
     fun onParentClearClicked() {
-        currentTask.apply {
-            value = value.copy(parent = 0L)
-        }
+        currentTask.setValue { copy(parent = 0L) }
     }
 
     fun saveDateStart(date: MyCalendar) {
-        currentTask.apply {
-            value = value.copy(single = value.single.copy(dateStart = date))
-        }
+        currentTask.setValue { copy(single = single.copy(dateStart = date))}
     }
 
     fun saveDeadline(text: String) {
         text.toIntOrNull()?.let { deadline ->
-            currentTask.apply {
-                value = value.copy(single = value.single.copy(deadline = deadline))
-            }
+            currentTask.setValue { copy(single = single.copy(deadline = deadline))}
         }
     }
 
     fun saveTask() {
         if (readyToSafe.value) {
-            when (currentTask.value.isNew) {
-                true -> currentTask.value.insert()
-                else -> currentTask.value.update()
-            }
+            currentTask.value.save()
         }
     }
 
     fun setParentsID(id: Long) {
-        currentTask.apply {
-            value = value.copy(parent = id)
-        }
+        currentTask.setValue { copy(parent = id) }
     }
 
-    private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
-    private fun Task.insert() = viewModelScope.launch { repo.insertTask(this@insert) }
+    private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
 
     private fun <T> Flow<T>.asState(default: T) =
         stateIn(viewModelScope, SharingStarted.Lazily, default)
+
+
+    private fun MutableStateFlow<Task>.setValue(block: Task.() -> Task) =
+        apply { value = block(value) }
+
 }

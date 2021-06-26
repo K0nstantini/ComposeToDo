@@ -10,10 +10,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +31,7 @@ fun TaskListScreen(
     navController: NavHostController = rememberNavController()
 ) {
     val onBack: () -> Unit = { navController.navigateUp() }
+
     with(viewModel) {
         navigateToAddEditTask.collectAsState(null).value?.let { rout ->
             navController.navigate(rout)
@@ -141,7 +144,7 @@ private fun TopBarDefaultBody(
     onBack: () -> Unit
 ) {
     TopAppBar(
-        title = { Text(title) },
+        title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(Icons.Filled.ArrowBack, "")
@@ -167,7 +170,7 @@ private fun TopBarActionModeBody(
     delTask: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text(title) },
+        title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
             IconButton(onClick = closeActionMode) {
                 Icon(Icons.Filled.Close, "")

@@ -1,26 +1,28 @@
 package com.grommade.composetodo.home
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
+import com.grommade.composetodo.ui.components.TopBarActionMode
 
 @Composable
 fun HomeScreen(
@@ -31,8 +33,13 @@ fun HomeScreen(
     with(viewModel) {
         HomeScreenBody(
             tasksItems = tasksItems.collectAsState().value.sortedBy { it.deadline.milli },
+            actionMode = actionMode.collectAsState().value,
+            actionTitle = actionTitle.collectAsState().value,
+            onTaskLongClicked = ::onTaskLongClicked,
             refreshTasks = ::refreshTasks,
             deactivateTasks = ::deactivateTasks,
+            closeActionMode = ::closeActionMode,
+            doneTask = ::doneTask,
             openDrawer = openDrawer
         )
     }
@@ -41,17 +48,32 @@ fun HomeScreen(
 @Composable
 fun HomeScreenBody(
     tasksItems: List<HomeViewModel.HomeTaskItem>,
+    actionMode: Boolean = false,
+    actionTitle: String = "",
+    onTaskLongClicked: (Long) -> Unit = {},
     refreshTasks: () -> Unit = {},
     deactivateTasks: () -> Unit = {},
+    closeActionMode: () -> Unit = {},
+    doneTask: () -> Unit = {},
     openDrawer: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
-            TopBar(
-                refreshTasks = refreshTasks,
-                deactivateTasks = deactivateTasks,
-                openDrawer = openDrawer
-            )
+            if (actionMode) {
+                TopBarActionMode(
+                    title = actionTitle,
+                    actions = actionsTopBar(
+                        doneTask = doneTask
+                    ),
+                    closeActionMode = closeActionMode
+                )
+            } else {
+                TopBar(
+                    refreshTasks = refreshTasks,
+                    deactivateTasks = deactivateTasks,
+                    openDrawer = openDrawer
+                )
+            }
         }
     ) {
         LazyColumn(
@@ -60,8 +82,11 @@ fun HomeScreenBody(
         ) {
             items(tasksItems, key = { task -> task.id }) { task ->
                 TaskItem(
+                    taskID = task.id,
                     taskName = task.name,
-                    deadline = stringResource(R.string.main_screen_single_task_second_text, task.deadline.toString())
+                    deadline = stringResource(R.string.main_screen_single_task_second_text, task.deadline.toString()),
+                    selected = task.selected,
+                    onTaskLongClicked = onTaskLongClicked
                 )
             }
         }
@@ -93,13 +118,40 @@ private fun TopBar(
 }
 
 @Composable
+fun actionsTopBar(
+    doneTask: () -> Unit
+): @Composable RowScope.() -> Unit = {
+    IconButton(onClick = doneTask) {
+        Icon(Icons.Filled.Done, "")
+    }
+}
+
+
+@Composable
 fun TaskItem(
+    taskID: Long,
     taskName: String,
-    deadline: String
+    deadline: String,
+    selected: Boolean,
+    onTaskLongClicked: (Long) -> Unit
 ) {
-    Surface(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)) {
+    val backgroundColor = when (selected) {
+        true -> MaterialTheme.colors.secondaryVariant
+        false -> Color.Transparent
+    }
+    Surface(
+        color = backgroundColor,
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 8.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { onTaskLongClicked(taskID) },
+                )
+            }
+            .fillMaxWidth()
+    ) {
         Column() {
-            Text(taskName, style = MaterialTheme.typography.body2)
+            Text(taskName, style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold))
             Text(deadline, style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp, color = Color.Gray))
         }
     }
@@ -115,12 +167,14 @@ fun HomeScreenPreview() {
             HomeViewModel.HomeTaskItem(
                 id = 1,
                 name = "Task-1",
-                deadline = MyCalendar().now()
+                deadline = MyCalendar().now(),
+                selected = false
             ),
             HomeViewModel.HomeTaskItem(
                 id = 2,
                 name = "Task-2",
-                deadline = MyCalendar().now().addHours(12)
+                deadline = MyCalendar().now().addHours(12),
+                selected = true
             )
         )
     )

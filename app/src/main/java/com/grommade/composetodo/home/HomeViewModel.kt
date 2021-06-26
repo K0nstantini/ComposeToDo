@@ -20,20 +20,32 @@ class HomeViewModel @Inject constructor(
     data class HomeTaskItem(
         val id: Long,
         val name: String,
-        val deadline: MyCalendar
+        val deadline: MyCalendar,
+        val selected: Boolean
     )
 
     private val settings: StateFlow<Settings> = repo.settingsFlow.asState(Settings())
 
     private val activatedSingleTasks = repo.activatedSingleTasks.asState(emptyList())
 
-    val tasksItems = activatedSingleTasks
+    private var currentTask = MutableStateFlow<Task?>(null)
+
+    val actionMode = currentTask
+        .map { task -> task != null }
+        .asState(false)
+
+    val actionTitle = currentTask
+        .map { task -> task?.name ?: "" }
+        .asState("")
+
+    val tasksItems = activatedSingleTasks.combine(currentTask) { tasks, _ -> tasks }
         .map { tasks ->
             tasks.map { task ->
                 HomeTaskItem(
                     id = task.id,
                     name = task.name,
-                    deadline = task.single.dateActivation.addHours(task.single.deadline)
+                    deadline = task.single.dateActivation.addHours(task.single.deadline),
+                    selected = task.id == currentTask.value?.id ?: 0
                 )
             }
         }
@@ -56,7 +68,24 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onTaskLongClicked(id: Long) {
+        currentTask.value = when (currentTask.value?.id) {
+            id -> null
+            else -> activatedSingleTasks.value.find { it.id == id }
+        }
+    }
+
+    fun doneTask() {
+        currentTask.value?.delete()
+        closeActionMode()
+    }
+
+    fun closeActionMode() {
+        currentTask.value = null
+    }
+
     private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
+    private fun Task.delete() = viewModelScope.launch { repo.deleteTask(this@delete) }
     private fun List<Task>.update() = viewModelScope.launch { repo.updateTasks(this@update) }
     private fun Settings.update() = viewModelScope.launch { repo.updateSettings(this@update) }
 
@@ -67,13 +96,6 @@ class HomeViewModel @Inject constructor(
 
 /**
 
-@HiltViewModel
-class MainScreenViewModel @Inject constructor(
-private val repo: Repository,
-private val alarmService: AlarmService
-) : BaseViewModel<String>() {
-
-/** Settings */
 
 val settingsLive = repo.settingsFlow.asLiveData()
 private val settings get() = checkNotNull(settingsLive.value) { "Settings isn't initialised" }
@@ -103,40 +125,7 @@ private var currentTask = MutableLiveData<Task?>(null)
 val currentTaskName: String get() = currentTask.value?.name ?: String()
 val currentTaskPosition = Transformations.map(currentTask) { it?.position() ?: -1 }
 
-fun initData() {
-setSingleTasks()
-}
 
-private fun setSingleTasks() = viewModelScope.launch {
-//        delClearData()
-//        return@launch
-if (needToActivateSingleTasks(tasks, sDateActivation)) {
-
-val dates = getDatesToActivateSingleTasks(
-tasks,
-settings.singleTask.frequency,
-sDateActivation
-)
-
-val lastDate = dates.last()
-alarmService.setExactAlarm(lastDate)
-settings.apply { singleTask.dateActivation = lastDate }.update()
-
-getTasksToUpdateDatesActivation(tasks, dates).update()
-}
-}
-
-// FIXME: Del
-private suspend fun delClearData() {
-settings.apply { singleTask.dateActivation = MyCalendar() }.update()
-val tasks = repo.getTasks()
-tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
-task.apply { single.dateActivation = MyCalendar() }.update()
-}
-tasks.filter { it.single.rolls > 0 }.forEach { task ->
-task.apply { single.rolls = 0 }.update()
-}
-}
 
 fun onItemClicked(task: Task) {
 currentTask.value = task
