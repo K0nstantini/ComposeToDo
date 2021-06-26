@@ -1,10 +1,10 @@
 package com.grommade.composetodo.single_task
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.MainScreen
 import com.grommade.composetodo.Repository
+import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class SingleTaskViewModel @Inject constructor(
     private val repo: Repository,
     handle: SavedStateHandle
-) : ViewModel() {
+) : BaseViewModel() {
 
     data class SingleTaskItem(
         val name: String = "",
@@ -106,10 +106,6 @@ class SingleTaskViewModel @Inject constructor(
     }
 
     private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
-
-    private fun <T> Flow<T>.asState(default: T) =
-        stateIn(viewModelScope, SharingStarted.Lazily, default)
-
 
     private fun MutableStateFlow<Task>.setValue(block: Task.() -> Task) =
         apply { value = block(value) }

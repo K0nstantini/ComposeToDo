@@ -27,6 +27,8 @@ sealed class MainScreen(val route: String) {
         )
 
     }
+
+    object Statistics : MainScreen("statistics")
 }
 
 sealed class TasksScreen(val route: String) {

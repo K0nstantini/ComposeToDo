@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
-import com.grommade.composetodo.ui.AppDrawer
+import com.grommade.composetodo.ui.components.AppDrawer
 import com.grommade.composetodo.ui.ToDoNavGraph
 import com.grommade.composetodo.ui.theme.ComposeToDoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,6 +71,7 @@ private fun ToDoApp() {
                             )
                         )
                     },
+                    navigateToStatistics = { navController.navigate(MainScreen.Statistics.route) },
                     closeDrawer = closeDrawer
                 )
             },

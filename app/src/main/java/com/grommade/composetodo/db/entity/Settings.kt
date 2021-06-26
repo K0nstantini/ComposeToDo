@@ -1,5 +1,6 @@
 package com.grommade.composetodo.db.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,6 +10,10 @@ import com.grommade.composetodo.add_classes.MyCalendar
 data class Settings(
     @PrimaryKey val id: Int = 1,
 
+    /** Regular tasks */
+    @Embedded
+    val regularTask: SettingsRegularTask = SettingsRegularTask(),
+
     /** Single tasks */
     @Embedded
     val singleTask: SettingsSingleTask = SettingsSingleTask()
@@ -16,11 +21,17 @@ data class Settings(
 
 ) {
 
+    data class SettingsRegularTask(
+        @ColumnInfo(name = "regular_points") val points: Int = 0,         // баллы завыполнение/невыполнение задач
+    ) {
+
+    }
+
     data class SettingsSingleTask(
         var dateActivation: MyCalendar = MyCalendar(),                                  // время, когда задача запланирована
         var frequency: Int = FREQUENCY_GENERATE_S_TASKS,                                // частота генерации задач в часах (в среднем равная 1/2 от значения)
         var rewards: Boolean = true,                                                    // включение системы наказаний/вознаграждений
-        var points: Int = 0,                                                            // баллы завыполнение/невыполнение задач
+        @ColumnInfo(name = "single_points") var points: Int = 0,                        // баллы завыполнение/невыполнение задач
         var pointsForTask: Int = POINTS_FOR_TASK,                                       // баллы за выполнение запланированной задачи
         var pointsForOutOfOrderTask: Int = POINTS_FOR_OUT_OF_ORDER_TASK,                // баллы за внеочередное выполнение задачи
         var daysToConsiderTaskOld: Int = DAYS_TO_CONSIDER_TASK_OLD,                     // количество дней жизни задачи чтобы считать ее пригодной для внеочередного выполнения (заработать баллы)
@@ -46,6 +57,5 @@ data class Settings(
         }
 
     }
-
 
 }

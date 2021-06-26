@@ -13,7 +13,7 @@ import javax.inject.Inject
 class CalcSingleTasks(private val repo: Repository) {
 
     fun refresh(scope: CoroutineScope) = scope.launch {
-        val settings = requireNotNull(repo.getSettings()) { "Settings isn't initialised" }
+        val settings = repo.getSettings() ?: return@launch
         val lastDateActivation = settings.singleTask.dateActivation
         val tasks = repo.getReadyToActivateSingleTasks()
 

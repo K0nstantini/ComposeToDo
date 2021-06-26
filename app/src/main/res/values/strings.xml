@@ -4,7 +4,7 @@
     <!--    Menu Navigation Drawer-->
     <string name="nav_regular_task_list">Регулярные задачи</string>
     <string name="nav_single_task_list">Разовые задачи</string>
-    <string name="nav_statistic">Статистика</string>
+    <string name="nav_statistics">Статистика</string>
 
     <!--    Menu action bar-->
     <string name="save_btn_menu">Сохранить</string>
@@ -71,5 +71,7 @@
     <string name="message_over_limit_rolls_for_task">Превышен лимит замен для задачи</string>
 
     <!--    Statistic texts-->
-    <string name="statistic_text_count_points">Количество баллов:</string>
+    <string name="statistic_title_points">Баллы</string>
+    <string name="statistic_text_count_points_s_tasks">Регулярные задачи: %d</string>
+    <string name="statistic_text_count_points_r_tasks">Разовые задачи: %d</string>
 </resources>

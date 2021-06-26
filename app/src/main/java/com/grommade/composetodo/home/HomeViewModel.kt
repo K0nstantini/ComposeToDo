@@ -1,8 +1,8 @@
 package com.grommade.composetodo.home
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
+import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repo: Repository
-) : ViewModel() {
+) : BaseViewModel() {
 
     data class HomeTaskItem(
         val id: Long,
@@ -61,10 +61,10 @@ class HomeViewModel @Inject constructor(
         settings.value.apply { singleTask.dateActivation = MyCalendar() }.update()
         val tasks = repo.getAllSingleTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
-            task.apply { single.dateActivation = MyCalendar() }.update()
+            task.apply { single.dateActivation = MyCalendar() }.save()
         }
         tasks.filter { it.single.rolls > 0 }.forEach { task ->
-            task.apply { single.rolls = 0 }.update()
+            task.apply { single.rolls = 0 }.save()
         }
     }
 
@@ -75,7 +75,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun doneTask() {
+    fun onTaskDoneClicked() {
         currentTask.value?.delete()
         closeActionMode()
     }
@@ -84,13 +84,9 @@ class HomeViewModel @Inject constructor(
         currentTask.value = null
     }
 
-    private fun Task.update() = viewModelScope.launch { repo.updateTask(this@update) }
+    private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
     private fun Task.delete() = viewModelScope.launch { repo.deleteTask(this@delete) }
-    private fun List<Task>.update() = viewModelScope.launch { repo.updateTasks(this@update) }
     private fun Settings.update() = viewModelScope.launch { repo.updateSettings(this@update) }
-
-    private fun <T> Flow<T>.asState(default: T) =
-        stateIn(viewModelScope, SharingStarted.Lazily, default)
 
 }
 

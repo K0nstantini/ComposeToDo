@@ -10,7 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -22,8 +22,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.TaskItem
+import com.grommade.composetodo.ui.components.BuiltSimpleOkCancelDialog
 import com.grommade.composetodo.util.Keys
+import com.vanpra.composematerialdialogs.MaterialDialog
 
 @Composable
 fun TaskListScreen(
@@ -36,8 +39,12 @@ fun TaskListScreen(
         navigateToAddEditTask.collectAsState(null).value?.let { rout ->
             navController.navigate(rout)
         }
-        navigateToBack.collectAsState(null).value?.let { id ->
-            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, id)
+//        navigateToBack.collectAsState(null).value?.let { id ->
+//            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, id)
+//            onBack()
+//        }
+        val onBackWithID = {
+            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, currentIDTask)
             onBack()
         }
         TaskListBody(
@@ -48,9 +55,10 @@ fun TaskListScreen(
             onTaskClicked = ::onTaskClicked,
             onTaskLongClicked = ::onTaskLongClicked,
             closeActionMode = ::closeActionMode,
-            confirm = ::onConfirmClicked,
+            taskDone = ::onTaskDoneClicked,
             addEditTask = ::onAddEditClicked,
             delTask = ::onDeleteClicked,
+            onBackWithID = onBackWithID,
             onBack = onBack,
         )
     }
@@ -65,9 +73,10 @@ private fun TaskListBody(
     onTaskClicked: (Long) -> Unit,
     onTaskLongClicked: (Long) -> Unit,
     closeActionMode: () -> Unit,
-    confirm: () -> Unit,
+    taskDone: () -> Unit,
     addEditTask: () -> Unit,
     delTask: () -> Unit,
+    onBackWithID: () -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
@@ -77,9 +86,10 @@ private fun TaskListBody(
                 availability = availability,
                 actionMode = actionMode,
                 closeActionMode = closeActionMode,
-                confirm = confirm,
+                taskDone = taskDone,
                 editTask = addEditTask,
                 delTask = delTask,
+                onBackWithID = onBackWithID,
                 onBack = onBack
             )
         },
@@ -113,9 +123,10 @@ private fun TopBar(
     availability: TaskListViewModel.Availability,
     actionMode: Boolean,
     closeActionMode: () -> Unit,
-    confirm: () -> Unit,
+    taskDone: () -> Unit,
     editTask: () -> Unit,
     delTask: () -> Unit,
+    onBackWithID: () -> Unit,
     onBack: () -> Unit
 ) {
     when (actionMode) {
@@ -123,14 +134,14 @@ private fun TopBar(
             title = title,
             availability = availability,
             closeActionMode = closeActionMode,
-            confirm = confirm,
+            taskDone = taskDone,
             editTask = editTask,
             delTask = delTask
         )
         false -> TopBarDefaultBody(
             title = title,
             availability = availability,
-            confirm = confirm,
+            onBackWithID = onBackWithID,
             onBack = onBack
         )
     }
@@ -140,7 +151,7 @@ private fun TopBar(
 private fun TopBarDefaultBody(
     title: String,
     availability: TaskListViewModel.Availability,
-    confirm: () -> Unit,
+    onBackWithID: () -> Unit,
     onBack: () -> Unit
 ) {
     TopAppBar(
@@ -152,7 +163,7 @@ private fun TopBarDefaultBody(
         },
         actions = {
             if (availability.showDoneActionMenu) {
-                IconButton(onClick = confirm, enabled = availability.enabledDoneBtn) {
+                IconButton(onClick = onBackWithID, enabled = availability.enabledDoneBtn) {
                     Icon(Icons.Filled.Done, "")
                 }
             }
@@ -165,10 +176,17 @@ private fun TopBarActionModeBody(
     title: String,
     availability: TaskListViewModel.Availability,
     closeActionMode: () -> Unit,
-    confirm: () -> Unit,
+    taskDone: () -> Unit,
     editTask: () -> Unit,
     delTask: () -> Unit,
 ) {
+    val taskDoneDialog = remember { MaterialDialog() }.apply {
+        BuiltSimpleOkCancelDialog(
+            title = stringResource(R.string.alert_title_single_task_done),
+            onClick = taskDone
+        )
+    }
+
     TopAppBar(
         title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
@@ -180,7 +198,7 @@ private fun TopBarActionModeBody(
         contentColor = MaterialTheme.colors.onPrimary,
         actions = {
             if (availability.showDoneActionMenu) {
-                IconButton(onClick = confirm) {
+                IconButton(onClick = { taskDoneDialog.show() }) {
                     Icon(Icons.Filled.Done, "")
                 }
             }

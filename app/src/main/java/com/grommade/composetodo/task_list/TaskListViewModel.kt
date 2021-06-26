@@ -6,10 +6,10 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.outlined.Task
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.TasksScreen
+import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.TaskItem
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class TaskListViewModel @Inject constructor(
     private val repo: Repository,
     handle: SavedStateHandle
-) : ViewModel() {
+) : BaseViewModel() {
 
     /** Variables static */
 
@@ -58,7 +58,7 @@ class TaskListViewModel @Inject constructor(
         .map { mapToCurrentTask(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    private val currentIDTask: Long
+    val currentIDTask: Long
         get() = currentTask.value?.id ?: -1
 
     val title: StateFlow<String?> = currentTask
@@ -91,9 +91,8 @@ class TaskListViewModel @Inject constructor(
     private var _navigateToAddEditTask = MutableSharedFlow<String>()
     val navigateToAddEditTask = _navigateToAddEditTask.asSharedFlow()
 
-    private var _navigateToBack = MutableSharedFlow<Long>()
-    val navigateToBack = _navigateToBack.asSharedFlow()
-
+//    private var _navigateToBack = MutableSharedFlow<Long>()
+//    val navigateToBack = _navigateToBack.asSharedFlow()
 
     /** =========================================== FUNCTIONS ==================================================== */
 
@@ -132,13 +131,9 @@ class TaskListViewModel @Inject constructor(
         }
     }
 
-    fun onConfirmClicked() {
-        when (mode) {
-            ModeTaskList.SELECT_CATALOG, ModeTaskList.SELECT_TASK -> viewModelScope.launch {
-                _navigateToBack.emit(currentIDTask)
-            }
-            ModeTaskList.DEFAULT -> null
-        }
+    fun onTaskDoneClicked() {
+        currentTask.value?.delete()
+        closeActionMode()
     }
 
     fun onAddEditClicked() {
@@ -221,12 +216,10 @@ class TaskListViewModel @Inject constructor(
     private fun isMarkTaskForSelection(task: Task): Boolean =
         (mode == ModeTaskList.SELECT_CATALOG) || (mode == ModeTaskList.SELECT_TASK && !task.group)
 
-    private fun <T> Flow<T>.asState(default: T) =
-        stateIn(viewModelScope, SharingStarted.Lazily, default)
-
     private fun getTask(id: Long): Task? = allTasks.value.find { it.id == id }
 
     private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
     private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
 
+    private fun Task.delete() = viewModelScope.launch { repo.deleteTask(this@delete) }
 }

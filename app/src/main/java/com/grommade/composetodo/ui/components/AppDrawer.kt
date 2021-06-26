@@ -1,4 +1,4 @@
-package com.grommade.composetodo.ui
+package com.grommade.composetodo.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -7,6 +7,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.FormatListBulleted
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,11 +25,12 @@ import com.grommade.composetodo.ui.theme.ComposeToDoTheme
 fun AppDrawer(
     navigateToRegularTasks: () -> Unit,
     navigateToSingleTasks: () -> Unit,
+    navigateToStatistics: () -> Unit,
     closeDrawer: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         DrawerButton(
-            icon = Icons.Filled.List,
+            icon = Icons.Filled.FormatListNumbered,
             label = stringResource(id = R.string.nav_regular_task_list),
             action = {
                 navigateToRegularTasks()
@@ -34,10 +38,18 @@ fun AppDrawer(
             }
         )
         DrawerButton(
-            icon = Icons.Filled.List,
+            icon = Icons.Filled.FormatListBulleted,
             label = stringResource(id = R.string.nav_single_task_list),
             action = {
                 navigateToSingleTasks()
+                closeDrawer()
+            }
+        )
+        DrawerButton(
+            icon = Icons.Filled.BarChart,
+            label = stringResource(id = R.string.nav_statistics),
+            action = {
+                navigateToStatistics()
                 closeDrawer()
             }
         )
@@ -83,7 +95,7 @@ private fun DrawerButton(
 fun PreviewAppDrawer() {
     ComposeToDoTheme {
         Surface {
-            AppDrawer({}, {}, {})
+            AppDrawer({}, {}, {}, {})
         }
     }
 }

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -22,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
+import com.grommade.composetodo.ui.components.BuiltSimpleOkCancelDialog
 import com.grommade.composetodo.ui.components.TopBarActionMode
+import com.vanpra.composematerialdialogs.MaterialDialog
 
 @Composable
 fun HomeScreen(
@@ -39,14 +42,14 @@ fun HomeScreen(
             refreshTasks = ::refreshTasks,
             deactivateTasks = ::deactivateTasks,
             closeActionMode = ::closeActionMode,
-            doneTask = ::doneTask,
+            taskDone = ::onTaskDoneClicked,
             openDrawer = openDrawer
         )
     }
 }
 
 @Composable
-fun HomeScreenBody(
+private fun HomeScreenBody(
     tasksItems: List<HomeViewModel.HomeTaskItem>,
     actionMode: Boolean = false,
     actionTitle: String = "",
@@ -54,7 +57,7 @@ fun HomeScreenBody(
     refreshTasks: () -> Unit = {},
     deactivateTasks: () -> Unit = {},
     closeActionMode: () -> Unit = {},
-    doneTask: () -> Unit = {},
+    taskDone: () -> Unit = {},
     openDrawer: () -> Unit = {},
 ) {
     Scaffold(
@@ -63,7 +66,7 @@ fun HomeScreenBody(
                 TopBarActionMode(
                     title = actionTitle,
                     actions = actionsTopBar(
-                        doneTask = doneTask
+                        taskDone = taskDone
                     ),
                     closeActionMode = closeActionMode
                 )
@@ -118,17 +121,24 @@ private fun TopBar(
 }
 
 @Composable
-fun actionsTopBar(
-    doneTask: () -> Unit
+private fun actionsTopBar(
+    taskDone: () -> Unit
 ): @Composable RowScope.() -> Unit = {
-    IconButton(onClick = doneTask) {
+    val taskDoneDialog = remember { MaterialDialog() }.apply {
+        BuiltSimpleOkCancelDialog(
+            title = stringResource(R.string.alert_title_single_task_done),
+            onClick = taskDone
+        )
+    }
+
+    IconButton(onClick = { taskDoneDialog.show() }) {
         Icon(Icons.Filled.Done, "")
     }
 }
 
 
 @Composable
-fun TaskItem(
+private fun TaskItem(
     taskID: Long,
     taskName: String,
     deadline: String,
@@ -150,7 +160,7 @@ fun TaskItem(
             }
             .fillMaxWidth()
     ) {
-        Column() {
+        Column {
             Text(taskName, style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold))
             Text(deadline, style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp, color = Color.Gray))
         }

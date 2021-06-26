@@ -14,9 +14,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.MainScreen
 import com.grommade.composetodo.TasksScreen
-import com.grommade.composetodo.single_task.SingleTaskScreen
 import com.grommade.composetodo.home.HomeScreen
 import com.grommade.composetodo.home.HomeViewModel
+import com.grommade.composetodo.single_task.SingleTaskScreen
+import com.grommade.composetodo.statistics.StatisticsScreen
 import com.grommade.composetodo.task_list.TaskListScreen
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,7 @@ fun ToDoNavGraph(
     ) {
         addRoutMainScreen(drawerGesturesEnabled, openDrawer)
         addRoutTaskList(navController, drawerGesturesEnabled)
+        addRoutStatistics(navController, drawerGesturesEnabled)
         addRoutRegularTask(navController)
         addRoutSingleTask(navController)
     }
@@ -67,6 +69,19 @@ private fun NavGraphBuilder.addRoutTaskList(
 ) {
     drawerGesturesEnabled(false)
     TaskListScreen(
+        viewModel = hiltViewModel(),
+        navController
+    )
+}
+
+private fun NavGraphBuilder.addRoutStatistics(
+    navController: NavHostController,
+    drawerGesturesEnabled: (Boolean) -> Unit
+) = composable(
+    route = MainScreen.Statistics.route
+) {
+    drawerGesturesEnabled(false)
+    StatisticsScreen(
         viewModel = hiltViewModel(),
         navController
     )
