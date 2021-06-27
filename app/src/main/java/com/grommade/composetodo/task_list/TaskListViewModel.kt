@@ -4,16 +4,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.outlined.Task
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.TasksScreen
 import com.grommade.composetodo.add_classes.BaseViewModel
-import com.grommade.composetodo.add_classes.TaskItem
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
+import com.grommade.composetodo.use_cases.DeleteTask
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,8 +26,20 @@ import javax.inject.Inject
 class TaskListViewModel @Inject constructor(
     private val repo: Repository,
     private val performSingleTask: PerformSingleTask,
+    private val deleteTask: DeleteTask,
     handle: SavedStateHandle,
 ) : BaseViewModel() {
+
+    data class TaskItem(
+        val id: Long,
+        val name: String,
+        val group: Boolean,
+        var isSelected: Boolean,
+        val padding: Int,
+        val icon: ImageVector,
+        val fontSize: Int,
+        val fontWeight: FontWeight,
+    )
 
     /** Variables static */
 
@@ -45,8 +58,8 @@ class TaskListViewModel @Inject constructor(
 
     val routToAddEditTask: String
         get() = when (taskType) {
-            TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentIDTask)
-            TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentIDTask)
+            TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentTaskID)
+            TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentTaskID)
         }
 
     /** Variables flow */
@@ -65,11 +78,11 @@ class TaskListViewModel @Inject constructor(
         .map { mapToCurrentTask(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val currentIDTask: Long
+    val currentTaskID: Long
         get() = currentTask.value?.id ?: -1
 
-    val title: StateFlow<String?> = currentTask
-        .map { it?.name ?: if (selectedTasks.value.isEmpty()) null else "" }
+    val title: StateFlow<String?> = selectedTasks.combine(currentTask) { selected, task -> selected to task }
+        .map { it.second?.name ?: if (it.first.isEmpty()) null else "" }
         .asState(null)
 
     private val _actionMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -99,7 +112,6 @@ class TaskListViewModel @Inject constructor(
         val noMultiSelect = selected.count() == 1
         val noGroup = !(currentTask.value?.group ?: false)
         val select = (mode == ModeTaskList.SELECT_CATALOG || mode == ModeTaskList.SELECT_TASK)
-//                && currentTask.value is Task //FIXME WTF?
         return select || (actionMode.value && taskType == TypeTask.SINGLE_TASK && noGroup && noMultiSelect)
     }
 
@@ -138,9 +150,12 @@ class TaskListViewModel @Inject constructor(
     }
 
     fun onDeleteClicked() {
-        selectedTasks.value
-            .map { getTask(it) ?: Task() }
-            .delete()
+        viewModelScope.launch {
+            val tasks = selectedTasks.value
+                .map { getTask(it) }
+                .filterIsInstance<Task>()
+            deleteTask(tasks = tasks)
+        }
         closeActionMode()
     }
 
@@ -186,11 +201,13 @@ class TaskListViewModel @Inject constructor(
     private fun getOpenGroups(): List<Task> =
         allTasks.value.filter { it.group }.map { it.copy(groupOpen = true) }
 
+    // FIXME: Удалить часть полей
     private fun List<Task>.toTaskItem(): List<TaskItem> = map { task ->
         val level = task.getLevel(allTasks.value)
         TaskItem(
             id = task.id,
             name = task.name,
+            group = task.group,
             isSelected = selectedTasks.value.contains(task.id),
             padding = 16 + level * 4,
             icon = when {

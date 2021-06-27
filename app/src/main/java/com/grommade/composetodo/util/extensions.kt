@@ -15,6 +15,7 @@ fun Int.toStrTime(): String {
 fun Int.toArray(app: Application): Array<String> = app.resources.getStringArray(this)
 
 fun Int.hoursToMilli(): Long = this.toLong() * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
+fun Int.daysToMilli(): Long = this.toLong() * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 
 //FIXME: Не чистая ф-я?
 fun List<Task>.nestedTasks(
@@ -25,6 +26,9 @@ fun List<Task>.nestedTasks(
     this.filter { it.parent == task.id }.forEach { this.nestedTasks(it, list) }
     return list
 }
+
+fun List<Task>.groupIsEmpty(task: Task): Boolean =
+    task.group && nestedTasks(task).count() == 1
 
 //FIXME: Не чистая ф-я?
 fun List<Task>.delEmptyGroups(): List<Task> {

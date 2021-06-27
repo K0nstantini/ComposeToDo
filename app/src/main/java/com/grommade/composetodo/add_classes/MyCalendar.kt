@@ -3,6 +3,7 @@ package com.grommade.composetodo.add_classes
 import android.os.Parcel
 import android.os.Parcelable
 import com.grommade.composetodo.util.MINUTES_IN_HOUR
+import com.grommade.composetodo.util.daysToMilli
 import com.grommade.composetodo.util.hoursToMilli
 import com.grommade.composetodo.util.toStrTime
 import java.util.*
@@ -46,11 +47,8 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable {
     fun set(y: Int = 0, m: Int = 0, d: Int = 0, h: Int = 0, min: Int = 0, s: Int = 0) =
         this.also { calendar.set(y, m, d, h, min, s) }
 
-    fun now() = this.also { calendar.timeInMillis = System.currentTimeMillis() }
-
-    fun today() = this.now().set(year, month, day, 0, 0, 0)
-
     fun addHours(_hours: Int) = MyCalendar(calendar.timeInMillis + _hours.hoursToMilli())
+    fun addDays(_days: Int) = MyCalendar(calendar.timeInMillis + _days.daysToMilli())
 
     fun isEmpty() = milli == 0L
     fun isNoEmpty() = milli != 0L
@@ -80,6 +78,10 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable {
         override fun newArray(size: Int): Array<MyCalendar?> {
             return arrayOfNulls(size)
         }
+
+        fun now() = MyCalendar(System.currentTimeMillis())
+        fun today() = MyCalendar(System.currentTimeMillis())
+            .apply { calendar.set(year, month, day, 0, 0, 0) }
     }
 
 }

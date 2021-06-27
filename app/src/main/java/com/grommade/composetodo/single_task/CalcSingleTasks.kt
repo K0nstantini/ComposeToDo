@@ -30,14 +30,14 @@ class CalcSingleTasks(private val repo: Repository) {
     }
 
     private fun needToActivateSingleTasks(tasks: List<Task>, date: MyCalendar) =
-        date < MyCalendar().now() && tasks.any { it.singleReadyToActivate }
+        date < MyCalendar.now() && tasks.any { it.singleReadyToActivate }
 
     private fun getDatesToActivateSingleTasks(
         tasks: List<Task>,
         frequency: Int,
         lastDateActivation: MyCalendar
     ): List<MyCalendar> {
-        val dates = generateDates(frequency, lastDateActivation, MyCalendar().now())
+        val dates = generateDates(frequency, lastDateActivation, MyCalendar.now())
         return when {
             noTaskLastDateActivation(tasks, lastDateActivation) -> listOf(lastDateActivation) + dates
             else -> dates
@@ -57,7 +57,7 @@ class CalcSingleTasks(private val repo: Repository) {
     }
 
     private fun generateDate(frequency: Int, date: MyCalendar) = MyCalendar(
-        (if (date.isEmpty()) MyCalendar().now() else date).milli + 60_000L
+        (if (date.isEmpty()) MyCalendar.now() else date).milli + 60_000L
     )
 
     private fun noTaskLastDateActivation(tasks: List<Task>, date: MyCalendar) =

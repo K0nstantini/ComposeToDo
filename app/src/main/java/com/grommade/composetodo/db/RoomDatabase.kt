@@ -72,6 +72,7 @@ abstract class AppDatabase : RoomDatabase() {
             dao.insert(Task(name = "Сиденье унитаза", parent = routine))
             dao.insert(Task(name = "Почистить кофемашину", parent = routine))
             dao.insert(Task(name = "Сходить в банк", parent = routine))
+            dao.insert(Task(name = "Разобраться с пылесосом", parent = routine))
 
             val pc = dao.insert(Task(name = "Компьютер, телефон и пр.", group = true))
             dao.insert(Task(name = "Придумать систему бэкапов", parent = pc))

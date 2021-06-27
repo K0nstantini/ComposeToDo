@@ -55,6 +55,8 @@
     <string name="alert_title_single_task_roll">Заменить текущую задачу?</string>
     <string name="alert_title_postpone_current_task">Отложить текущую задачу</string>
     <string name="alert_title_postpone_next_task">Отложить следующую задачу</string>
+    <string name="alert_title_delete_task">Удалить выбранные задачи?</string>
+    <string name="alert_message_delete_group_task">Задачи в группе будут также удалены</string>
 
     <!--    Notifications-->
     <string name="single_task_notification_channel_id" translatable="false">s_task_channel</string>
@@ -74,4 +76,8 @@
     <string name="statistic_title_points">Баллы</string>
     <string name="statistic_text_count_points_s_tasks">Регулярные задачи: %d</string>
     <string name="statistic_text_count_points_r_tasks">Разовые задачи: %d</string>
+
+    <!--    ResultOf.Failure messages-->
+    <string name="failure_text_task_is_active">\'%d\' - задача активна</string>
+    <string name="failure_text_delete_restrict_by_settings">\'%d\' - удаление запрещено настройками</string>
 </resources>

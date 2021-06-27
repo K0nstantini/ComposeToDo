@@ -140,7 +140,7 @@ fun SetItemDefaultPreview() {
     ComposeToDoTheme {
         SetItemDefault(
             title = stringResource(R.string.settings_add_single_task_title_date_start),
-            value = MyCalendar().now().toString(false)
+            value = MyCalendar.now().toString(false)
         )
     }
 }

@@ -23,7 +23,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
-import com.grommade.composetodo.add_classes.TaskItem
 import com.grommade.composetodo.ui.components.BuiltSimpleOkCancelDialog
 import com.grommade.composetodo.util.Keys
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -36,12 +35,12 @@ fun TaskListScreen(
     val onBack: () -> Unit = { navController.navigateUp() }
 
     with(viewModel) {
-        val addEditTask = {
+        val taskAddEdit = {
             navController.navigate(routToAddEditTask)
             closeActionMode()
         }
         val onBackWithID = {
-            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, currentIDTask)
+            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, currentTaskID)
             onBack()
         }
         TaskListBody(
@@ -53,8 +52,8 @@ fun TaskListScreen(
             onTaskLongClicked = ::onTaskLongClicked,
             closeActionMode = ::closeActionMode,
             taskDone = ::onTaskDoneClicked,
-            addEditTask = addEditTask,
-            delTask = ::onDeleteClicked,
+            taskAddEdit = taskAddEdit,
+            taskDel = ::onDeleteClicked,
             onBackWithID = onBackWithID,
             onBack = onBack,
         )
@@ -65,34 +64,40 @@ fun TaskListScreen(
 private fun TaskListBody(
     title: String,
     actionMode: Boolean,
-    tasks: List<TaskItem>,
+    tasks: List<TaskListViewModel.TaskItem>,
     availability: TaskListViewModel.Availability,
     onTaskClicked: (Long) -> Unit,
     onTaskLongClicked: (Long) -> Unit,
     closeActionMode: () -> Unit,
     taskDone: () -> Unit,
-    addEditTask: () -> Unit,
-    delTask: () -> Unit,
+    taskAddEdit: () -> Unit,
+    taskDel: () -> Unit,
     onBackWithID: () -> Unit,
     onBack: () -> Unit,
 ) {
     Scaffold(
         topBar = {
-            TopBar(
-                title = title,
-                availability = availability,
-                actionMode = actionMode,
-                closeActionMode = closeActionMode,
-                taskDone = taskDone,
-                editTask = addEditTask,
-                delTask = delTask,
-                onBackWithID = onBackWithID,
-                onBack = onBack
-            )
+            when (actionMode) {
+                true -> TopBarActionModeBody(
+                    title = title,
+                    group = tasks.any { it.isSelected && it.group },
+                    availability = availability,
+                    closeActionMode = closeActionMode,
+                    taskDone = taskDone,
+                    taskEdit = taskAddEdit,
+                    taskDel = taskDel
+                )
+                false -> TopBarDefaultBody(
+                    title = title,
+                    availability = availability,
+                    onBackWithID = onBackWithID,
+                    onBack = onBack
+                )
+            }
         },
         floatingActionButton = {
             if (availability.showAddButton) {
-                FloatingActionButton(onClick = addEditTask) {
+                FloatingActionButton(onClick = taskAddEdit) {
                     Icon(Icons.Filled.Add, "")
                 }
             }
@@ -110,37 +115,6 @@ private fun TaskListBody(
                 )
             }
         }
-    }
-}
-
-
-@Composable
-private fun TopBar(
-    title: String,
-    availability: TaskListViewModel.Availability,
-    actionMode: Boolean,
-    closeActionMode: () -> Unit,
-    taskDone: () -> Unit,
-    editTask: () -> Unit,
-    delTask: () -> Unit,
-    onBackWithID: () -> Unit,
-    onBack: () -> Unit
-) {
-    when (actionMode) {
-        true -> TopBarActionModeBody(
-            title = title,
-            availability = availability,
-            closeActionMode = closeActionMode,
-            taskDone = taskDone,
-            editTask = editTask,
-            delTask = delTask
-        )
-        false -> TopBarDefaultBody(
-            title = title,
-            availability = availability,
-            onBackWithID = onBackWithID,
-            onBack = onBack
-        )
     }
 }
 
@@ -171,16 +145,24 @@ private fun TopBarDefaultBody(
 @Composable
 private fun TopBarActionModeBody(
     title: String,
+    group: Boolean,
     availability: TaskListViewModel.Availability,
     closeActionMode: () -> Unit,
     taskDone: () -> Unit,
-    editTask: () -> Unit,
-    delTask: () -> Unit,
+    taskEdit: () -> Unit,
+    taskDel: () -> Unit,
 ) {
     val taskDoneDialog = remember { MaterialDialog() }.apply {
         BuiltSimpleOkCancelDialog(
             title = stringResource(R.string.alert_title_single_task_done),
             onClick = taskDone
+        )
+    }
+    val taskDelDialog = remember { MaterialDialog() }.apply {
+        BuiltSimpleOkCancelDialog(
+            title = stringResource(R.string.alert_title_delete_task),
+            message = if (group) stringResource(R.string.alert_message_delete_group_task) else "",
+            onClick = taskDel
         )
     }
 
@@ -200,11 +182,11 @@ private fun TopBarActionModeBody(
                 }
             }
             if (availability.showEditActionMenu) {
-                IconButton(onClick = editTask) {
+                IconButton(onClick = taskEdit) {
                     Icon(Icons.Filled.Edit, "")
                 }
             }
-            IconButton(onClick = delTask) {
+            IconButton(onClick = { taskDelDialog.show() }) {
                 Icon(Icons.Filled.Delete, "")
             }
         }
@@ -213,7 +195,7 @@ private fun TopBarActionModeBody(
 
 @Composable
 private fun TaskItem(
-    taskItem: TaskItem,
+    taskItem: TaskListViewModel.TaskItem,
     onTaskClicked: (Long) -> Unit,
     onTaskLongClicked: (Long) -> Unit
 ) {

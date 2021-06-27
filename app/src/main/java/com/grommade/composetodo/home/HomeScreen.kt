@@ -177,13 +177,13 @@ fun HomeScreenPreview() {
             HomeViewModel.HomeTaskItem(
                 id = 1,
                 name = "Task-1",
-                deadline = MyCalendar().now(),
+                deadline = MyCalendar.now(),
                 selected = false
             ),
             HomeViewModel.HomeTaskItem(
                 id = 2,
                 name = "Task-2",
-                deadline = MyCalendar().now().addHours(12),
+                deadline = MyCalendar.now().addHours(12),
                 selected = true
             )
         )
