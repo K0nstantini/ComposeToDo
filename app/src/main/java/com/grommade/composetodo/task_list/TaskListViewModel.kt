@@ -14,6 +14,7 @@ import com.grommade.composetodo.add_classes.TaskItem
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
+import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
     private val repo: Repository,
-    handle: SavedStateHandle
+    private val performSingleTask: PerformSingleTask,
+    handle: SavedStateHandle,
 ) : BaseViewModel() {
 
     /** Variables static */
@@ -41,6 +43,12 @@ class TaskListViewModel @Inject constructor(
         TypeTask.SINGLE_TASK -> mode.titleSingleTask
     }
 
+    val routToAddEditTask: String
+        get() = when (taskType) {
+            TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentIDTask)
+            TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentIDTask)
+        }
+
     /** Variables flow */
 
     private val allTasks: StateFlow<List<Task>> = repo.getTasksFlow(taskType).asState(emptyList())
@@ -49,9 +57,8 @@ class TaskListViewModel @Inject constructor(
         if (selectedTaskID > 0L) listOf(selectedTaskID) else emptyList()
     )
 
-    // FIXME
-    val shownTasks: StateFlow<List<TaskItem>> = allTasks.combine(selectedTasks) { task, taskItem -> task to taskItem }
-        .map { getTasksToShow(if (mode == ModeTaskList.SELECT_CATALOG) getOpenGroups() else it.first) }
+    val shownTasks: StateFlow<List<TaskItem>> = allTasks.combine(selectedTasks) { tasks, _ -> tasks }
+        .map { getTasksToShow(if (mode == ModeTaskList.SELECT_CATALOG) getOpenGroups() else it) }
         .asState(emptyList())
 
     private val currentTask: StateFlow<Task?> = selectedTasks
@@ -77,7 +84,7 @@ class TaskListViewModel @Inject constructor(
         val enabledDoneBtn: Boolean = false
     )
 
-    val visibility = actionMode.combine(selectedTasks) { actMode, selected ->
+    val availability = actionMode.combine(selectedTasks) { actMode, selected ->
         Availability(
             showAddButton = !actMode && mode.showAddBtn,
             showDoneActionMenu = mapToShowDoneActionMenu(selected),
@@ -86,21 +93,13 @@ class TaskListViewModel @Inject constructor(
         )
     }.asState(Availability())
 
-    /** Navigation */
-
-    private var _navigateToAddEditTask = MutableSharedFlow<String>()
-    val navigateToAddEditTask = _navigateToAddEditTask.asSharedFlow()
-
-//    private var _navigateToBack = MutableSharedFlow<Long>()
-//    val navigateToBack = _navigateToBack.asSharedFlow()
-
     /** =========================================== FUNCTIONS ==================================================== */
 
     private fun mapToShowDoneActionMenu(selected: List<Long>): Boolean {
         val noMultiSelect = selected.count() == 1
         val noGroup = !(currentTask.value?.group ?: false)
         val select = (mode == ModeTaskList.SELECT_CATALOG || mode == ModeTaskList.SELECT_TASK)
-//                && currentTask.value is Task
+//                && currentTask.value is Task //FIXME WTF?
         return select || (actionMode.value && taskType == TypeTask.SINGLE_TASK && noGroup && noMultiSelect)
     }
 
@@ -132,18 +131,8 @@ class TaskListViewModel @Inject constructor(
     }
 
     fun onTaskDoneClicked() {
-        currentTask.value?.delete()
-        closeActionMode()
-    }
-
-    fun onAddEditClicked() {
         viewModelScope.launch {
-            _navigateToAddEditTask.emit(
-                when (taskType) {
-                    TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentIDTask)
-                    TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentIDTask)
-                }
-            )
+            currentTask.value?.let { performSingleTask(it) }
         }
         closeActionMode()
     }
@@ -154,6 +143,7 @@ class TaskListViewModel @Inject constructor(
             .delete()
         closeActionMode()
     }
+
 
     fun closeActionMode() {
         _actionMode.value = false
@@ -220,6 +210,4 @@ class TaskListViewModel @Inject constructor(
 
     private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
     private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
-
-    private fun Task.delete() = viewModelScope.launch { repo.deleteTask(this@delete) }
 }

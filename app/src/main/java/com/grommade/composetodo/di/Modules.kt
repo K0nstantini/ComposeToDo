@@ -6,6 +6,10 @@ import com.grommade.composetodo.alarm.AlarmService
 import com.grommade.composetodo.db.AppDatabase
 import com.grommade.composetodo.db.dao.SettingsDao
 import com.grommade.composetodo.db.dao.TaskDao
+import com.grommade.composetodo.use_cases.GetSettings
+import com.grommade.composetodo.use_cases.GetSettingsImpl
+import com.grommade.composetodo.use_cases.PerformSingleTask
+import com.grommade.composetodo.use_cases.PerformSingleTaskImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,8 +43,14 @@ object Modules {
     @Singleton
     fun provideAlarmService(@ApplicationContext appContext: Context) = AlarmService(appContext)
 
-//    @Provides
-//    @Singleton
-//    fun provideRefreshSingleTasks(repository: Repository): RefreshSingleTasks = RefreshSingleTasks(repository)
+    @Provides
+    @Singleton
+    fun providePerformSingleTask(repo: Repository, settings: GetSettings): PerformSingleTask =
+        PerformSingleTaskImpl(repo, settings)
+
+
+    @Provides
+    @Singleton
+    fun provideGetSettings(repo: Repository): GetSettings = GetSettingsImpl(repo)
 
 }

@@ -5,10 +5,8 @@ import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.util.delEmptyGroups
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class CalcSingleTasks(private val repo: Repository) {
 
@@ -32,7 +30,7 @@ class CalcSingleTasks(private val repo: Repository) {
     }
 
     private fun needToActivateSingleTasks(tasks: List<Task>, date: MyCalendar) =
-        date < MyCalendar().now() && tasks.any { it.readyToActivate }
+        date < MyCalendar().now() && tasks.any { it.singleReadyToActivate }
 
     private fun getDatesToActivateSingleTasks(
         tasks: List<Task>,
@@ -70,7 +68,7 @@ class CalcSingleTasks(private val repo: Repository) {
         dates: List<MyCalendar>
     ): List<Task> {
         dates.dropLast(1).forEach { date ->
-            val tasksToActivate = tasks.filter { it.group || it.readyToActivate }.delEmptyGroups()
+            val tasksToActivate = tasks.filter { it.group || it.singleReadyToActivate }.delEmptyGroups()
             when (val task = generateTask(tasksToActivate)) {
                 null -> return@forEach
                 else -> task.single.dateActivation = date

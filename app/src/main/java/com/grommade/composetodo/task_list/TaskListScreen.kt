@@ -36,13 +36,10 @@ fun TaskListScreen(
     val onBack: () -> Unit = { navController.navigateUp() }
 
     with(viewModel) {
-        navigateToAddEditTask.collectAsState(null).value?.let { rout ->
-            navController.navigate(rout)
+        val addEditTask = {
+            navController.navigate(routToAddEditTask)
+            closeActionMode()
         }
-//        navigateToBack.collectAsState(null).value?.let { id ->
-//            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, id)
-//            onBack()
-//        }
         val onBackWithID = {
             navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, currentIDTask)
             onBack()
@@ -51,12 +48,12 @@ fun TaskListScreen(
             title = title.collectAsState().value ?: stringResource(defaultTitle),
             actionMode = actionMode.collectAsState().value,
             tasks = shownTasks.collectAsState().value,
-            availability = visibility.collectAsState().value,
+            availability = availability.collectAsState().value,
             onTaskClicked = ::onTaskClicked,
             onTaskLongClicked = ::onTaskLongClicked,
             closeActionMode = ::closeActionMode,
             taskDone = ::onTaskDoneClicked,
-            addEditTask = ::onAddEditClicked,
+            addEditTask = addEditTask,
             delTask = ::onDeleteClicked,
             onBackWithID = onBackWithID,
             onBack = onBack,

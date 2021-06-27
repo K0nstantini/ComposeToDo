@@ -7,6 +7,7 @@ import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.single_task.CalcSingleTasks
+import com.grommade.composetodo.use_cases.PerformSingleTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repo: Repository
+    private val repo: Repository,
+    private val performSingleTask: PerformSingleTask
 ) : BaseViewModel() {
 
     data class HomeTaskItem(
@@ -28,7 +30,7 @@ class HomeViewModel @Inject constructor(
 
     private val activatedSingleTasks = repo.activatedSingleTasks.asState(emptyList())
 
-    private var currentTask = MutableStateFlow<Task?>(null)
+    private val currentTask = MutableStateFlow<Task?>(null)
 
     val actionMode = currentTask
         .map { task -> task != null }
@@ -76,7 +78,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onTaskDoneClicked() {
-        currentTask.value?.delete()
+        viewModelScope.launch {
+            currentTask.value?.let { performSingleTask(it) }
+        }
         closeActionMode()
     }
 
@@ -85,7 +89,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
-    private fun Task.delete() = viewModelScope.launch { repo.deleteTask(this@delete) }
     private fun Settings.update() = viewModelScope.launch { repo.updateSettings(this@update) }
 
 }

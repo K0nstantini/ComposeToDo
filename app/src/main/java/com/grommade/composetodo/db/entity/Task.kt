@@ -58,8 +58,11 @@ data class Task(
     val isNew: Boolean
         get() = (id == 0L)
 
-    val readyToActivate: Boolean
+    val singleReadyToActivate: Boolean
         get() = !group && single.dateActivation.isEmpty() && single.dateStart < MyCalendar().now()
+
+    val singleIsActivated: Boolean
+        get() = single.dateActivation.isNoEmpty()
 
     fun canRoll(settings: Settings) = single.rolls < settings.singleTask.numberPossibleRolls
 

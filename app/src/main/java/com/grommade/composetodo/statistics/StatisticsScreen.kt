@@ -60,8 +60,8 @@ private fun StatisticsScreenBody(
             style = MaterialTheme.typography.h6.copy(fontSize = 18.sp)
             )
             Column(modifier = Modifier.padding(start = 20.dp)) {
-                Text(stringResource(R.string.statistic_text_count_points_r_tasks, regularPoints))
-                Text(stringResource(R.string.statistic_text_count_points_s_tasks, singlePoints))
+                Text(stringResource(R.string.statistic_text_count_points_s_tasks, regularPoints))
+                Text(stringResource(R.string.statistic_text_count_points_r_tasks, singlePoints))
             }
 
         }

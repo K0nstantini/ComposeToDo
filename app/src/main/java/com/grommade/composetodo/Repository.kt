@@ -1,6 +1,5 @@
 package com.grommade.composetodo
 
-import androidx.annotation.WorkerThread
 import com.grommade.composetodo.db.dao.SettingsDao
 import com.grommade.composetodo.db.dao.TaskDao
 import com.grommade.composetodo.db.entity.Settings
