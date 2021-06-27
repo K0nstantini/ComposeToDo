@@ -16,6 +16,7 @@ interface DeleteTask {
     suspend operator fun invoke(task: Task? = null, tasks: List<Task> = emptyList()): ResultOf<Boolean>
 }
 
+// TODO: Check work
 class DeleteTaskImpl @Inject constructor(
     private val appContext: Context,
     private val repo: Repository,

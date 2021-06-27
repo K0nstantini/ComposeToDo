@@ -10,7 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +26,7 @@ fun AppDrawer(
     navigateToRegularTasks: () -> Unit,
     navigateToSingleTasks: () -> Unit,
     navigateToStatistics: () -> Unit,
+    navigateToSettings: () -> Unit,
     closeDrawer: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -50,6 +51,14 @@ fun AppDrawer(
             label = stringResource(id = R.string.nav_statistics),
             action = {
                 navigateToStatistics()
+                closeDrawer()
+            }
+        )
+        DrawerButton(
+            icon = Icons.Filled.Settings,
+            label = stringResource(id = R.string.nav_settings),
+            action = {
+                navigateToSettings()
                 closeDrawer()
             }
         )
@@ -95,7 +104,7 @@ private fun DrawerButton(
 fun PreviewAppDrawer() {
     ComposeToDoTheme {
         Surface {
-            AppDrawer({}, {}, {}, {})
+            AppDrawer({}, {}, {}, {}, {})
         }
     }
 }

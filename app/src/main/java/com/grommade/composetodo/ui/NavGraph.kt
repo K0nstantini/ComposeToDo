@@ -16,10 +16,13 @@ import com.grommade.composetodo.MainScreen
 import com.grommade.composetodo.TasksScreen
 import com.grommade.composetodo.home.HomeScreen
 import com.grommade.composetodo.home.HomeViewModel
+import com.grommade.composetodo.settings.SettingsScreen
+import com.grommade.composetodo.settings.single_task.SettingsSingleTaskScreen
 import com.grommade.composetodo.single_task.SingleTaskScreen
 import com.grommade.composetodo.statistics.StatisticsScreen
 import com.grommade.composetodo.task_list.TaskListScreen
 import kotlinx.coroutines.launch
+import com.grommade.composetodo.SettingsScreen
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -40,12 +43,18 @@ fun ToDoNavGraph(
         startDestination = MainScreen.Home.route
     ) {
         addRoutMainScreen(drawerGesturesEnabled, openDrawer)
-        addRoutTaskList(navController, drawerGesturesEnabled)
         addRoutStatistics(navController, drawerGesturesEnabled)
+
+        addRoutSettings(navController, drawerGesturesEnabled)
+        addRoutSettingsSingleTask(navController)
+
+        addRoutTaskList(navController, drawerGesturesEnabled)
         addRoutRegularTask(navController)
         addRoutSingleTask(navController)
     }
 }
+
+/** Main */
 
 private fun NavGraphBuilder.addRoutMainScreen(
     drawerGesturesEnabled: (Boolean) -> Unit,
@@ -87,6 +96,21 @@ private fun NavGraphBuilder.addRoutStatistics(
     )
 }
 
+private fun NavGraphBuilder.addRoutSettings(
+    navController: NavHostController,
+    drawerGesturesEnabled: (Boolean) -> Unit
+) = composable(
+    route = MainScreen.Settings.route
+) {
+    drawerGesturesEnabled(false)
+    SettingsScreen(
+        viewModel = hiltViewModel(),
+        navController
+    )
+}
+
+/** Types Tasks */
+
 private fun NavGraphBuilder.addRoutRegularTask(
     navController: NavHostController
 ) = composable(
@@ -105,6 +129,20 @@ private fun NavGraphBuilder.addRoutSingleTask(
     arguments = TasksScreen.SingleTask.addArguments()
 ) {
     SingleTaskScreen(
+        viewModel = hiltViewModel(),
+        navController,
+    )
+}
+
+/** Types Settings */
+
+@ExperimentalMaterialApi
+private fun NavGraphBuilder.addRoutSettingsSingleTask(
+    navController: NavHostController
+) = composable(
+    route = SettingsScreen.SettingsSingleTask.route
+) {
+    SettingsSingleTaskScreen(
         viewModel = hiltViewModel(),
         navController,
     )

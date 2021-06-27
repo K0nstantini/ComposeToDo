@@ -1,11 +1,5 @@
 package com.grommade.composetodo.task_list
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.FolderOpen
-import androidx.compose.material.icons.outlined.Task
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
@@ -31,14 +25,9 @@ class TaskListViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     data class TaskItem(
-        val id: Long,
-        val name: String,
-        val group: Boolean,
+        val task: Task,
+        val level: Int,
         var isSelected: Boolean,
-        val padding: Int,
-        val icon: ImageVector,
-        val fontSize: Int,
-        val fontWeight: FontWeight,
     )
 
     /** Variables static */
@@ -201,22 +190,11 @@ class TaskListViewModel @Inject constructor(
     private fun getOpenGroups(): List<Task> =
         allTasks.value.filter { it.group }.map { it.copy(groupOpen = true) }
 
-    // FIXME: Удалить часть полей
     private fun List<Task>.toTaskItem(): List<TaskItem> = map { task ->
-        val level = task.getLevel(allTasks.value)
         TaskItem(
-            id = task.id,
-            name = task.name,
-            group = task.group,
-            isSelected = selectedTasks.value.contains(task.id),
-            padding = 16 + level * 4,
-            icon = when {
-                task.groupOpen -> Icons.Filled.FolderOpen
-                task.group -> Icons.Filled.Folder
-                else -> Icons.Outlined.Task
-            },
-            fontSize = (16 - level * 2).coerceIn(8..16),
-            fontWeight = if (task.group) FontWeight.Bold else FontWeight.Normal
+            task = task,
+            level = task.getLevel(allTasks.value),
+            isSelected = selectedTasks.value.contains(task.id)
         )
     }
 
@@ -226,5 +204,4 @@ class TaskListViewModel @Inject constructor(
     private fun getTask(id: Long): Task? = allTasks.value.find { it.id == id }
 
     private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
-    private fun List<Task>.delete() = viewModelScope.launch { repo.deleteTasks(this@delete) }
 }

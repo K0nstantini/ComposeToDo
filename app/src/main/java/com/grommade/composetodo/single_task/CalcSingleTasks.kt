@@ -15,7 +15,7 @@ class CalcSingleTasks(private val repo: Repository) {
         val lastDateActivation = settings.singleTask.dateActivation
         val tasks = repo.getReadyToActivateSingleTasks()
 
-        if (needToActivateSingleTasks(tasks, lastDateActivation)) {
+        if (settings.singleTask.active && needToActivateSingleTasks(tasks, lastDateActivation)) {
             val dates = getDatesToActivateSingleTasks(
                 tasks,
                 settings.singleTask.frequency,

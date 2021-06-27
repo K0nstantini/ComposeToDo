@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Task
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.ui.components.BuiltSimpleOkCancelDialog
+import com.grommade.composetodo.ui.components.NavigationBackIcon
 import com.grommade.composetodo.util.Keys
 import com.vanpra.composematerialdialogs.MaterialDialog
 
@@ -80,7 +83,7 @@ private fun TaskListBody(
             when (actionMode) {
                 true -> TopBarActionModeBody(
                     title = title,
-                    group = tasks.any { it.isSelected && it.group },
+                    group = tasks.any { it.isSelected && it.task.group },
                     availability = availability,
                     closeActionMode = closeActionMode,
                     taskDone = taskDone,
@@ -107,9 +110,14 @@ private fun TaskListBody(
         LazyColumn(
             contentPadding = PaddingValues(top = 8.dp)
         ) {
-            items(tasks, key = { task -> task.id }) { task ->
+            items(tasks, key = { item -> item.task.id }) { item ->
                 TaskItem(
-                    taskItem = task,
+                    id = item.task.id,
+                    name = item.task.name,
+                    group = item.task.group,
+                    groupOpen = item.task.groupOpen,
+                    level = item.level,
+                    isSelected = item.isSelected,
                     onTaskClicked = onTaskClicked,
                     onTaskLongClicked = onTaskLongClicked
                 )
@@ -127,11 +135,7 @@ private fun TopBarDefaultBody(
 ) {
     TopAppBar(
         title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, "")
-            }
-        },
+        navigationIcon = { NavigationBackIcon(onBack) },
         actions = {
             if (availability.showDoneActionMenu) {
                 IconButton(onClick = onBackWithID, enabled = availability.enabledDoneBtn) {
@@ -195,36 +199,46 @@ private fun TopBarActionModeBody(
 
 @Composable
 private fun TaskItem(
-    taskItem: TaskListViewModel.TaskItem,
+    id: Long,
+    name: String,
+    group: Boolean,
+    groupOpen: Boolean,
+    level: Int,
+    isSelected: Boolean,
     onTaskClicked: (Long) -> Unit,
     onTaskLongClicked: (Long) -> Unit
 ) {
-    val backgroundColor = when (taskItem.isSelected) {
+    val backgroundColor = when (isSelected) {
         true -> MaterialTheme.colors.secondaryVariant
         false -> Color.Transparent
+    }
+    val icon = when {
+        groupOpen -> Icons.Filled.FolderOpen
+        group -> Icons.Filled.Folder
+        else -> Icons.Outlined.Task
     }
     Row(
         modifier = Modifier
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = { onTaskClicked(taskItem.id) },
-                    onLongPress = { onTaskLongClicked(taskItem.id) },
+                    onTap = { onTaskClicked(id) },
+                    onLongPress = { onTaskLongClicked(id) },
                 )
             }
             .background(backgroundColor)
             .padding(
-                horizontal = taskItem.padding.dp,
+                horizontal = (16 + level * 4).dp,
                 vertical = 8.dp
             ),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(taskItem.icon, "")
+        Icon(icon, "")
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = taskItem.name,
+            text = name,
             style = MaterialTheme.typography.body1.copy(
-                fontSize = taskItem.fontSize.sp,
-                fontWeight = taskItem.fontWeight
+                fontSize = ((16 - level * 2).coerceIn(8..16)).sp,
+                fontWeight = if (group) FontWeight.Bold else FontWeight.Normal
             ),
             modifier = Modifier.fillMaxWidth()
         )

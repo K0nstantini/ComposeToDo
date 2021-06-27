@@ -29,6 +29,7 @@ sealed class MainScreen(val route: String) {
     }
 
     object Statistics : MainScreen("statistics")
+    object Settings : MainScreen("settings")
 }
 
 sealed class TasksScreen(val route: String) {
@@ -45,4 +46,10 @@ sealed class TasksScreen(val route: String) {
     fun addArgumentTaskID() = listOf(navArgument(Keys.TASK_ID) {
         defaultValue = -1L
     })
+}
+
+sealed class SettingsScreen(val route: String) {
+    object SettingsGeneral : SettingsScreen("settings/general")
+    object SettingsRegularTask : SettingsScreen("settings/REGULAR_TASK")
+    object SettingsSingleTask : SettingsScreen("settings/SINGLE_TASK")
 }
