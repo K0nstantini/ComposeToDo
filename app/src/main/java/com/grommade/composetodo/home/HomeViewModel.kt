@@ -8,6 +8,9 @@ import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.single_task.CalcSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
+import com.grommade.composetodo.use_cases.UpdateSettings
+import com.grommade.composetodo.util.change
+import com.grommade.composetodo.util.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repo: Repository,
-    private val performSingleTask: PerformSingleTask
+    private val performSingleTask: PerformSingleTask,
+    private val updateSettings: UpdateSettings
 ) : BaseViewModel() {
 
     data class HomeTaskItem(
@@ -60,7 +64,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun deactivateTasks() = viewModelScope.launch {
-        settings.value.apply { singleTask.dateActivation = MyCalendar() }.update()
+        updateSettings(
+            settings.value.change { set: singleSet -> set.copy(dateActivation = MyCalendar()) }
+        )
+//        settings.value.apply { singleTask.dateActivation = MyCalendar() }.update()
         val tasks = repo.getAllSingleTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
             task.apply { single.dateActivation = MyCalendar() }.save()

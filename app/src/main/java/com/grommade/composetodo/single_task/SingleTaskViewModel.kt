@@ -2,7 +2,7 @@ package com.grommade.composetodo.single_task
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.grommade.composetodo.MainScreen
+import com.grommade.composetodo.MainRoute
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
@@ -52,7 +52,7 @@ class SingleTaskViewModel @Inject constructor(
         .asState(false)
 
     val navigateToSelectParent: String
-        get() = MainScreen.TaskList.createRoute(
+        get() = MainRoute.TaskListChildRoute.createRoute(
             mode = ModeTaskList.SELECT_CATALOG,
             type = TypeTask.SINGLE_TASK,
             id = currentTask.value.parent

@@ -3,7 +3,7 @@ package com.grommade.composetodo.task_list
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
-import com.grommade.composetodo.TasksScreen
+import com.grommade.composetodo.TasksRoute
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
@@ -47,8 +47,8 @@ class TaskListViewModel @Inject constructor(
 
     val routToAddEditTask: String
         get() = when (taskType) {
-            TypeTask.REGULAR_TASK -> TasksScreen.RegularTask.createRoute(currentTaskID)
-            TypeTask.SINGLE_TASK -> TasksScreen.SingleTask.createRoute(currentTaskID)
+            TypeTask.REGULAR_TASK -> TasksRoute.RegularTaskChildRoute.createRoute(currentTaskID)
+            TypeTask.SINGLE_TASK -> TasksRoute.SingleTaskChildRoute.createRoute(currentTaskID)
         }
 
     /** Variables flow */

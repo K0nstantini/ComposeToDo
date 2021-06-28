@@ -4,10 +4,13 @@ import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.util.change
 import com.grommade.composetodo.util.delEmptyGroups
+import com.grommade.composetodo.util.singleSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+// TODO: Сделать use-case
 class CalcSingleTasks(private val repo: Repository) {
 
     fun refresh(scope: CoroutineScope) = scope.launch {
@@ -23,7 +26,7 @@ class CalcSingleTasks(private val repo: Repository) {
             )
 
             val lastDate = dates.last()
-            settings.apply { singleTask.dateActivation = lastDate }.update()
+            settings.change { set: singleSet -> set.copy(dateActivation = lastDate) }.update()
 
             getTasksToUpdateDatesActivation(tasks, dates).update()
         }

@@ -4,28 +4,28 @@ import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.db.entity.Settings
+import com.grommade.composetodo.enums.ModeGenerationSingleTasks
+import com.grommade.composetodo.use_cases.UpdateSettings
+import com.grommade.composetodo.util.change
+import com.grommade.composetodo.util.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsSingleTaskViewModel @Inject constructor(
-    private val repo: Repository
+    private val repo: Repository,
+    private val updateSettings: UpdateSettings
 ) : BaseViewModel() {
-
+    
     val settings = repo.settingsFlow.asState(Settings())
 
     fun onClickActive(active: Boolean) {
-        changeSettings(active = active).update()
+        viewModelScope.launch {
+            updateSettings(
+                settings.value.change { set: singleSet -> set.copy(active = active) }
+            )
+        }
     }
 
-    private fun changeSettings(
-        active: Boolean? = null
-    ): Settings {
-        val oldActive = settings.value.singleTask.active
-        return settings.value.copy(singleTask = settings.value.singleTask.copy(active = active ?: oldActive))
-    }
-
-    // TODO: Проверять перед записью актуальные настройки ли загрузились
-    private fun Settings.update() = viewModelScope.launch { repo.updateSettings(this@update) }
 }

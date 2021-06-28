@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.grommade.composetodo.MainScreen
+import com.grommade.composetodo.MainRoute
 import com.grommade.composetodo.R
-import com.grommade.composetodo.SettingsScreen
+import com.grommade.composetodo.SettingsRoute
 import com.grommade.composetodo.ui.components.NavigationBackIcon
 
 @Composable
@@ -27,9 +27,9 @@ fun SettingsScreen(
 
     with(viewModel) {
         SettingsScreenBody(
-            onClickGeneralSettings = { navController.navigate(MainScreen.Home.route) },
-            onClickRegularSettings = { navController.navigate(MainScreen.Home.route) },
-            onClickSingleSettings = { navController.navigate(SettingsScreen.SettingsSingleTask.route) },
+            onClickGeneralSettings = { navController.navigate(MainRoute.HomeChildRoute.route) },
+            onClickRegularSettings = { navController.navigate(MainRoute.HomeChildRoute.route) },
+            onClickSingleSettings = { navController.navigate(SettingsRoute.SettingsSingleTaskChildRoute.route) },
             onBack = { navController.navigateUp() }
         )
     }

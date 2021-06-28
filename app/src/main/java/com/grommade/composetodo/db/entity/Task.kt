@@ -49,7 +49,7 @@ data class Task(
     @Parcelize
     data class SingleTask(
         var dateActivation: MyCalendar = MyCalendar(),           // Дата активации задачи
-        var dateStart: MyCalendar = MyCalendar.today(),        // Дата, начиная с которой, задача становиться активной
+        var dateStart: MyCalendar = MyCalendar.today(),          // Дата, начиная с которой, задача становиться активной
         var dateUntilToDo: MyCalendar = MyCalendar(),            // Задача должна быть сгенерирована до этой даты
         var deadline: Int = DEFAULT_DEADLINE_SINGLE_TASK,
         var toDoAfterTask: Long = 0L,                            // Задача будет сегенрирована только после выполнения другой задачи

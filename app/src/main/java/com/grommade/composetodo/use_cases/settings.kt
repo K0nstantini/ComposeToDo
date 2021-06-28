@@ -19,3 +19,22 @@ class GetSettingsImpl @Inject constructor(
         checkNotNull(repo.getSettings()) { "Settings isn't initialised" }
 
 }
+
+
+interface UpdateSettings {
+    suspend operator fun invoke(settings: Settings)
+}
+
+
+class UpdateSettingsImpl @Inject constructor(
+    private val repo: Repository
+) : UpdateSettings {
+
+    override suspend fun invoke(settings: Settings) {
+        when (settings.id) {
+            1 -> repo.updateSettings(settings)
+            else -> throw IllegalArgumentException("Settings isn't initialised")
+        }
+    }
+
+}

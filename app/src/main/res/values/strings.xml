@@ -29,7 +29,8 @@
     <string name="title_add_task_new_task">Новая задача</string>
     <string name="title_statistic">Статистика</string>
     <string name="title_settings">Настройки</string>
-    <string name="title_settings_s_tasks">Настройки: Разовые задачи</string>
+    <string name="title_settings_s_tasks">Разовые задачи</string>
+    <string name="title_settings_s_tasks_time_and_frequency">Время и частота</string>
 
     <!--    Buttons title-->
     <string name="btn_clear">Очистить</string>
@@ -51,7 +52,13 @@
 
     <!--    Settings Items Settings Single Tasks -->
     <string name="settings_s_task_title_active">Активность</string>
-    <string name="settings_s_task_value_active">Генерация задач из списка</string>
+    <string name="settings_s_task_value_active_true">Генерация задач из списка</string>
+    <string name="settings_s_task_value_active_false">Включить генерацию задач из списка</string>
+    <string name="settings_s_task_title_frequency_and_time">Время и частота</string>
+    <string name="settings_s_task_title_mode_generation">Режим генерации</string>
+    <string name="settings_s_task_title_period">Время генерации задач</string>
+    <string name="settings_s_task_value_period">%s - %s</string>
+    <string name="settings_s_task_value_no_period">Без ограничений</string>
 
 
     <!--    Alert-->
@@ -64,6 +71,8 @@
     <string name="alert_title_postpone_next_task">Отложить следующую задачу</string>
     <string name="alert_title_delete_task">Удалить выбранные задачи?</string>
     <string name="alert_message_delete_group_task">Задачи в группе будут также удалены</string>
+    <string name="alert_mode_generation_single_tasks">Выберите режим генерации задач</string>
+    <string name="alert_title_time_picker">Выберите время</string>
 
     <!--    Notifications-->
     <string name="single_task_notification_channel_id" translatable="false">s_task_channel</string>
@@ -92,4 +101,10 @@
     <!--    ResultOf.Failure messages-->
     <string name="failure_text_task_is_active">\'%d\' - задача активна</string>
     <string name="failure_text_delete_restrict_by_settings">\'%d\' - удаление запрещено настройками</string>
+    <string name="failure_text_settings_load_error">Настройки не загружены. Требуется перезапустить приложение</string>
+
+    <!--    Choice dialogs-->
+    <string name="choice_mode_generation_s_tasks_random">Случайный</string>
+    <string name="choice_mode_generation_s_tasks_fixed">Фиксированный</string>
+
 </resources>

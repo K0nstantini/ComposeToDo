@@ -5,6 +5,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.grommade.composetodo.add_classes.MyCalendar
+import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 
 @Entity(tableName = "settings_table")
 data class Settings(
@@ -22,15 +23,37 @@ data class Settings(
 ) {
 
     data class SettingsRegularTask(
-        @ColumnInfo(name = "regular_points") val points: Int = 0,                       // баллы завыполнение/невыполнение задач
+        @ColumnInfo(name = "regular_points") val points: Int = 0,                       // баллы за выполнение/невыполнение задач
     ) {
 
     }
-
+    /**
+     * @param active активация режима разовых задач
+     * @param dateActivation время, когда задача запланирована
+     * @param showDateNextTask показывать время следующей запланированной задачи
+     * @param modeGeneration режим генерации задач (фиксированный - в определенное время или внутри определенного интервала,
+     * рандомный - генерацйия задач, основываясь на частоте генерации)
+     * @param periodFrom интервал (от) времени в котором будут генерироваться задачи
+     * @param periodTo интервал (до) времени в котором будут генерироваться задачи
+     * @param daysOfWeek дни недели, в которые будут генерироваться задачи
+     * @param countGeneratedTasksAtATime количество генерируемых задач за раз (только для фиксированного режима генерации)
+     * @param frequency частота генерации задач в часах (в среднем равная 1/2 от значения,
+     * только для рандомного режима генерации)
+     *
+     *
+     * */
     data class SettingsSingleTask(
-        @ColumnInfo(name = "single_active") val active: Boolean = false,                                                // активация режима разовых задач
-        var frequency: Int = FREQUENCY_GENERATE_S_TASKS,                                                                // частота генерации задач в часах (в среднем равная 1/2 от значения)
-        var dateActivation: MyCalendar = MyCalendar(),                                                                  // время, когда задача запланирована
+        @ColumnInfo(name = "single_active") val active: Boolean = false,
+        val dateActivation: MyCalendar = MyCalendar(),
+        val showDateNextTask: Boolean = false,
+
+        /** Frequency */
+        val modeGeneration: ModeGenerationSingleTasks = ModeGenerationSingleTasks.RANDOM,
+        val periodFrom: Int = 0,
+        val periodTo: Int = 0,
+        val daysOfWeek: String = "",
+        val countGeneratedTasksAtATime: Int = 1,
+        val frequency: Int = FREQUENCY_GENERATE_S_TASKS,
 
         /** Restrictions */
 
@@ -41,16 +64,16 @@ data class Settings(
 
         /** Rewards */
 
-        var rewards: Boolean = true,                                                                                    // включение системы наказаний/вознаграждений
+        val rewards: Boolean = true,                                                                                    // включение системы наказаний/вознаграждений
         @ColumnInfo(name = "single_points") val points: Int = 0,                                                        // баллы за выполнение/невыполнение задач
-        var pointsForTask: Int = POINTS_FOR_TASK,                                                                       // баллы за выполнение запланированной задачи
-        var pointsForOutOfOrderTask: Int = POINTS_FOR_OUT_OF_ORDER_TASK,                                                // баллы за внеочередное выполнение задачи
-        var daysToConsiderTaskOld: Int = DAYS_TO_CONSIDER_TASK_OLD,                                                     // количество дней жизни задачи чтобы считать ее пригодной для внеочередного выполнения (заработать баллы)
-        var pointsForRoll: Int = POINTS_FOR_ROLL,                                                                       // баллы за рандомную замену текущей задачи
-        var numberPossibleRolls: Int = NUMBER_POSSIBLE_ROLLS,                                                           // сколько раз можно заменять одну задачу
-        var currentTaskTakePartInRoll: Boolean = true,                                                                  // текущая задача учавствует при генерации новой задачи (т. е. замена может не сработать)
-        var postponeCurrentTaskForOnePoint: Int = POSTPONE_CURRENT_TASK_FOR_ONE_POINT,                                  // количество часов, на которые можно отложить текущую задачу за 1 балл
-        var postponeNextTaskForOnePoint: Int = POSTPONE_NEXT_TASK_FOR_ONE_POINT,                                        // количество часов, на которые можно отложить следующую задачу за 1 балл
+        val pointsForTask: Int = POINTS_FOR_TASK,                                                                       // баллы за выполнение запланированной задачи
+        val pointsForOutOfOrderTask: Int = POINTS_FOR_OUT_OF_ORDER_TASK,                                                // баллы за внеочередное выполнение задачи
+        val daysToConsiderTaskOld: Int = DAYS_TO_CONSIDER_TASK_OLD,                                                     // количество дней жизни задачи чтобы считать ее пригодной для внеочередного выполнения (заработать баллы)
+        val pointsForRoll: Int = POINTS_FOR_ROLL,                                                                       // баллы за рандомную замену текущей задачи
+        val numberPossibleRolls: Int = NUMBER_POSSIBLE_ROLLS,                                                           // сколько раз можно заменять одну задачу
+        val currentTaskTakePartInRoll: Boolean = true,                                                                  // текущая задача учавствует при генерации новой задачи (т. е. замена может не сработать)
+        val postponeCurrentTaskForOnePoint: Int = POSTPONE_CURRENT_TASK_FOR_ONE_POINT,                                  // количество часов, на которые можно отложить текущую задачу за 1 балл
+        val postponeNextTaskForOnePoint: Int = POSTPONE_NEXT_TASK_FOR_ONE_POINT,                                        // количество часов, на которые можно отложить следующую задачу за 1 балл
     ) {
 
         val canRoll: Boolean

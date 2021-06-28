@@ -7,10 +7,10 @@ import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
 
 
-sealed class MainScreen(val route: String) {
-    object Home : MainScreen("main")
+sealed class MainRoute(val route: String) {
+    object HomeChildRoute : MainRoute("main")
 
-    object TaskList : MainScreen("taskList/{taskTypeKey}?taskListModeKey={taskListModeKey}&taskID={taskID}") {
+    object TaskListChildRoute : MainRoute("taskList/{taskTypeKey}?taskListModeKey={taskListModeKey}&taskID={taskID}") {
         fun createRoute(mode: ModeTaskList, type: TypeTask, id: Long = -1) =
             "taskList/${type.name}?taskListModeKey=${mode.name}&taskID=$id"
 
@@ -28,17 +28,18 @@ sealed class MainScreen(val route: String) {
 
     }
 
-    object Statistics : MainScreen("statistics")
-    object Settings : MainScreen("settings")
+    object StatisticsChildRoute : MainRoute("statistics")
+    // TODO: Change name
+    object SettingsChildRoute : MainRoute("settings")
 }
 
-sealed class TasksScreen(val route: String) {
-    object RegularTask : TasksScreen("taskList/REGULAR_TASK/addEditTask?taskID={taskID}") {
+sealed class TasksRoute(val route: String) {
+    object RegularTaskChildRoute : TasksRoute("taskList/REGULAR_TASK/addEditTask?taskID={taskID}") {
         fun createRoute(id: Long) = "taskList/REGULAR_TASK/addEditTask?taskID=$id"
         fun addArguments() = addArgumentTaskID()
     }
 
-    object SingleTask : TasksScreen("taskList/SINGLE_TASK/addEditTask?taskID={taskID}") {
+    object SingleTaskChildRoute : TasksRoute("taskList/SINGLE_TASK/addEditTask?taskID={taskID}") {
         fun createRoute(id: Long) = "taskList/SINGLE_TASK/addEditTask?taskID=$id"
         fun addArguments() = addArgumentTaskID()
     }
@@ -48,8 +49,12 @@ sealed class TasksScreen(val route: String) {
     })
 }
 
-sealed class SettingsScreen(val route: String) {
-    object SettingsGeneral : SettingsScreen("settings/general")
-    object SettingsRegularTask : SettingsScreen("settings/REGULAR_TASK")
-    object SettingsSingleTask : SettingsScreen("settings/SINGLE_TASK")
+sealed class SettingsRoute(val route: String) {
+    object SettingsGeneralChildRoute : SettingsRoute("settings/general")
+    object SettingsRegularTaskChildRoute : SettingsRoute("settings/REGULAR_TASK")
+    object SettingsSingleTaskChildRoute : SettingsRoute("settings/SINGLE_TASK")
+}
+
+sealed class SettingsSingleTaskRoute(val route: String) {
+    object SettingsSingleTaskFrequencyChildRoute : SettingsSingleTaskRoute("settings/SINGLE_TASK/frequency")
 }

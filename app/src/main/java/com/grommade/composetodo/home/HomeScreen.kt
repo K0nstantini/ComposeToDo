@@ -127,7 +127,7 @@ private fun actionsTopBar(
     val taskDoneDialog = remember { MaterialDialog() }.apply {
         BuiltSimpleOkCancelDialog(
             title = stringResource(R.string.alert_title_single_task_done),
-            onClick = taskDone
+            callback = taskDone
         )
     }
 

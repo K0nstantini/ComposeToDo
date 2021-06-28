@@ -1,0 +1,34 @@
+<resources>
+
+    <string-array name="days_of_week_short">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+        <item>Сб</item>
+        <item>Вск</item>
+    </string-array>
+
+    <string-array name="days_of_week_long">
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+        <item>Воскресенье</item>
+    </string-array>
+
+    <string-array name="cont_menu_add_edit_task_regular_to_do">
+        <item>Раз в (выбрать) дней</item>
+        <item>По дням недели</item>
+    </string-array>
+
+    <string-array name="from_to">
+        <item>От</item>
+        <item>До</item>
+        <item>Без ограничений</item>
+    </string-array>
+
+</resources>

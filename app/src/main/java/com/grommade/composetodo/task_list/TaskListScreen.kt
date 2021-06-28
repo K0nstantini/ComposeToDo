@@ -159,14 +159,14 @@ private fun TopBarActionModeBody(
     val taskDoneDialog = remember { MaterialDialog() }.apply {
         BuiltSimpleOkCancelDialog(
             title = stringResource(R.string.alert_title_single_task_done),
-            onClick = taskDone
+            callback = taskDone
         )
     }
     val taskDelDialog = remember { MaterialDialog() }.apply {
         BuiltSimpleOkCancelDialog(
             title = stringResource(R.string.alert_title_delete_task),
             message = if (group) stringResource(R.string.alert_message_delete_group_task) else "",
-            onClick = taskDel
+            callback = taskDel
         )
     }
 

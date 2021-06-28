@@ -1,7 +1,11 @@
 package com.grommade.composetodo.util
 
 import android.app.Application
+import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
+import java.time.LocalTime
+
+typealias singleSet = Settings.SettingsSingleTask
 
 fun String.addArgument(argument: String) = "$this/{$argument}"
 
@@ -16,6 +20,9 @@ fun Int.toArray(app: Application): Array<String> = app.resources.getStringArray(
 
 fun Int.hoursToMilli(): Long = this.toLong() * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 fun Int.daysToMilli(): Long = this.toLong() * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
+
+fun Int.minutesToLocalTime(): LocalTime = LocalTime.of(this / MINUTES_IN_HOUR, this % MINUTES_IN_HOUR)
+fun LocalTime.toMinutes(): Int = hour * MINUTES_IN_HOUR + minute
 
 //FIXME: Не чистая ф-я?
 fun List<Task>.nestedTasks(
@@ -44,3 +51,6 @@ fun List<Task>.delEmptyGroups(): List<Task> {
     }
     return noEmptyGroups
 }
+
+fun Settings.change(body: (singleSet) -> singleSet): Settings =
+    copy(singleTask = body(singleTask))

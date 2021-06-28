@@ -60,4 +60,8 @@ object Modules {
     ): DeleteTask =
         DeleteTaskImpl(appContext, repo, settings)
 
+    @Provides
+    @Singleton
+    fun provideUpdateSettings(repo: Repository): UpdateSettings = UpdateSettingsImpl(repo)
+
 }
