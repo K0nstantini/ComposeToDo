@@ -1,22 +1,26 @@
 package com.grommade.composetodo.util
 
-import android.app.Application
+import android.content.res.Resources
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.enums.DialogDaysOfWeek
 import java.time.LocalTime
+import java.util.*
 
 typealias singleSet = Settings.SettingsSingleTask
 
-fun String.addArgument(argument: String) = "$this/{$argument}"
+fun String.toListInt(): List<Int> = when (this) {
+    "" -> emptyList()
+    else -> split(",").map { it.toInt() }
+}
 
-fun String.addOptionalArgument(argument: String) = "$this/?$argument={$argument}"
+fun String.toDaysOfWeek(resources: Resources): String =
+    split(",").joinToString(",") { resources.getString(DialogDaysOfWeek.values()[it.toInt()].abbr) }
 
 fun Int.toStrTime(): String {
     return (this / 60).toString().padStart(2, '0') + ':' +
             (this % 60).toString().padStart(2, '0')
 }
-
-fun Int.toArray(app: Application): Array<String> = app.resources.getStringArray(this)
 
 fun Int.hoursToMilli(): Long = this.toLong() * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 fun Int.daysToMilli(): Long = this.toLong() * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND

@@ -36,9 +36,10 @@ data class Settings(
      * @param periodFrom интервал (от) времени в котором будут генерироваться задачи
      * @param periodTo интервал (до) времени в котором будут генерироваться задачи
      * @param daysOfWeek дни недели, в которые будут генерироваться задачи
+     * @param everyFewDays генерация задач раз в 1/2/3 и т. д. дня
      * @param countGeneratedTasksAtATime количество генерируемых задач за раз (только для фиксированного режима генерации)
-     * @param frequency частота генерации задач в часах (в среднем равная 1/2 от значения,
-     * только для рандомного режима генерации)
+     * @param frequencyFrom частота генерации задач в часах от
+     * @param frequencyTo частота генерации задач в часах до
      *
      *
      * */
@@ -52,8 +53,10 @@ data class Settings(
         val periodFrom: Int = 0,
         val periodTo: Int = 0,
         val daysOfWeek: String = "",
+        val everyFewDays: Int = 1,
         val countGeneratedTasksAtATime: Int = 1,
-        val frequency: Int = FREQUENCY_GENERATE_S_TASKS,
+        val frequencyFrom: Int = FREQUENCY_GENERATE_FROM,
+        val frequencyTo: Int = FREQUENCY_GENERATE_TO,
 
         /** Restrictions */
 
@@ -83,7 +86,8 @@ data class Settings(
             get() = active && restrictionOnChange
 
         companion object {
-            private const val FREQUENCY_GENERATE_S_TASKS = 96
+            const val FREQUENCY_GENERATE_FROM = 1
+            const val FREQUENCY_GENERATE_TO = 96
             private const val ACTIVITY_PERIOD = 30
             private const val TIME_AFTER_ACTIVATION_TO_CHANGE_GENERAL_SETTINGS = 24
             private const val TIME_AFTER_ADDING_TASK_TO_EDIT_OR_DEL = 24

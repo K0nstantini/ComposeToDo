@@ -29,7 +29,6 @@ sealed class MainRoute(val route: String) {
     }
 
     object StatisticsChildRoute : MainRoute("statistics")
-    // TODO: Change name
     object SettingsChildRoute : MainRoute("settings")
 }
 

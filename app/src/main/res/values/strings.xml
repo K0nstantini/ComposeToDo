@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">ComposeToDo</string>
 
+    <!--    Plurals-->
+    <plurals name="every_n_days">
+        <item quantity="one">Не чаще чем раз в %1$d день</item>
+        <item quantity="few">Не чаще чем раз в %1$d дня</item>
+        <item quantity="many">Не чаще чем раз в %1$d дней</item>
+        <item quantity="other">Не чаще чем раз в %1$d дней</item>
+    </plurals>
+
     <!--    Menu Navigation Drawer-->
     <string name="nav_regular_task_list">Регулярные задачи</string>
     <string name="nav_single_task_list">Разовые задачи</string>
@@ -55,10 +63,16 @@
     <string name="settings_s_task_value_active_true">Генерация задач из списка</string>
     <string name="settings_s_task_value_active_false">Включить генерацию задач из списка</string>
     <string name="settings_s_task_title_frequency_and_time">Время и частота</string>
-    <string name="settings_s_task_title_mode_generation">Режим генерации</string>
-    <string name="settings_s_task_title_period">Время генерации задач</string>
+    <string name="settings_s_task_title_mode_generation">Режим</string>
+    <string name="settings_s_task_title_days">Дни</string>
+    <string name="settings_s_task_title_period">Время</string>
     <string name="settings_s_task_value_period">%s - %s</string>
     <string name="settings_s_task_value_no_period">Без ограничений</string>
+    <string name="settings_s_task_value_no_days">Без ограничений</string>
+    <string name="settings_s_task_value_days_of_week">Дни недели: %s</string>
+    <string name="settings_s_task_title_count_tasks">Количество</string>
+    <string name="settings_s_task_title_frequency">Частота</string>
+    <string name="settings_s_task_value_frequency">Каждые %s - %s ч</string>
 
 
     <!--    Alert-->
@@ -71,8 +85,22 @@
     <string name="alert_title_postpone_next_task">Отложить следующую задачу</string>
     <string name="alert_title_delete_task">Удалить выбранные задачи?</string>
     <string name="alert_message_delete_group_task">Задачи в группе будут также удалены</string>
-    <string name="alert_mode_generation_single_tasks">Выберите режим генерации задач</string>
+    <string name="alert_title_mode_generation_s_tasks">Выберите режим генерации задач</string>
+    <string name="alert_title_select_time_s_tasks">Время генерации задач</string>
+    <string name="alert_title_select_days_s_tasks">Дни генерации задач</string>
     <string name="alert_title_time_picker">Выберите время</string>
+    <string name="alert_title_select_every_few_days">Выберите количество дней</string>
+    <string name="alert_message_select_every_few_days">Задачи будут генерироваться в выбранное количество дней</string>
+    <string name="alert_label_select_every_few_days">Дни</string>
+    <string name="alert_title_select_days_of_week">Выберите дни недели</string>
+    <string name="alert_title_select_count_tasks">Выберите количество задач</string>
+    <string name="alert_message_select_count_tasks">Генерируемое количество задач в день</string>
+    <string name="alert_label_select_count_tasks">Количество</string>
+    <string name="alert_title_frequency_generation_tasks">Выберите частоту генерации задач</string>
+    <string name="alert_message_frequency_generation_tasks">
+        Каждая следующая задача будет сгенерирована через указанный интервал времени (в часах)
+    </string>
+    <string name="alert_label_frequency_generation_tasks">Часы</string>
 
     <!--    Notifications-->
     <string name="single_task_notification_channel_id" translatable="false">s_task_channel</string>
@@ -106,5 +134,29 @@
     <!--    Choice dialogs-->
     <string name="choice_mode_generation_s_tasks_random">Случайный</string>
     <string name="choice_mode_generation_s_tasks_fixed">Фиксированный</string>
+
+    <string name="choice_select_period_from">От</string>
+    <string name="choice_select_period_to">До</string>
+    <string name="choice_select_period_no_period">Без ограничений</string>
+
+    <string name="choice_select_days_every_few_days">Раз в (выбрать) дней</string>
+    <string name="choice_select_days_days_of_week">По дням недели</string>
+    <string name="choice_select_days_no_days">Без ограничений</string>
+
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+
+    <string name="abbr_monday">Пн</string>
+    <string name="abbr_tuesday">Вт</string>
+    <string name="abbr_wednesday">Ср</string>
+    <string name="abbr_thursday">Чт</string>
+    <string name="abbr_friday">Пт</string>
+    <string name="abbr_saturday">Сб</string>
+    <string name="abbr_sunday">Вс</string>
 
 </resources>

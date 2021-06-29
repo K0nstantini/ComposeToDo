@@ -21,7 +21,7 @@ class CalcSingleTasks(private val repo: Repository) {
         if (settings.singleTask.active && needToActivateSingleTasks(tasks, lastDateActivation)) {
             val dates = getDatesToActivateSingleTasks(
                 tasks,
-                settings.singleTask.frequency,
+                settings.singleTask.frequencyFrom,
                 lastDateActivation
             )
 
@@ -66,7 +66,7 @@ class CalcSingleTasks(private val repo: Repository) {
     private fun noTaskLastDateActivation(tasks: List<Task>, date: MyCalendar) =
         date.isNoEmpty() && !tasks.any { it.single.dateActivation == date }
 
-    fun getTasksToUpdateDatesActivation(
+    private fun getTasksToUpdateDatesActivation(
         tasks: List<Task>,
         dates: List<MyCalendar>
     ): List<Task> {

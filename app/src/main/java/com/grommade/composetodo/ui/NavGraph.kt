@@ -153,6 +153,7 @@ private fun NavGraphBuilder.addRoutSettingsSingleTask(
 
 /** Single Task Settings */
 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 private fun NavGraphBuilder.addRoutSettingsSingleTaskFrequency(
     navController: NavHostController
