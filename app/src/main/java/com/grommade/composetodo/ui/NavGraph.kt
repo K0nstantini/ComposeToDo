@@ -19,6 +19,8 @@ import com.grommade.composetodo.TasksRoute
 import com.grommade.composetodo.home.HomeScreen
 import com.grommade.composetodo.home.HomeViewModel
 import com.grommade.composetodo.settings.SettingsScreen
+import com.grommade.composetodo.settings.general.SettingsGeneralTaskScreen
+import com.grommade.composetodo.settings.regular_task.SettingsRegularTaskScreen
 import com.grommade.composetodo.settings.single_task.SettingsSingleTaskScreen
 import com.grommade.composetodo.settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyScreen
 import com.grommade.composetodo.single_task.SingleTaskScreen
@@ -48,6 +50,8 @@ fun ToDoNavGraph(
         addRoutStatistics(navController, drawerGesturesEnabled)
 
         addRoutSettings(navController, drawerGesturesEnabled)
+        addRoutSettingsGeneralTask(navController)
+        addRoutSettingsRegularTask(navController)
         addRoutSettingsSingleTask(navController)
         addRoutSettingsSingleTaskFrequency(navController)
 
@@ -138,6 +142,22 @@ private fun NavGraphBuilder.addRoutSingleTask(
 }
 
 /** Types Settings */
+
+private fun NavGraphBuilder.addRoutSettingsGeneralTask(
+    navController: NavHostController
+) = composable(
+    route = SettingsRoute.SettingsGeneralChildRoute.route
+) {
+    SettingsGeneralTaskScreen()
+}
+
+private fun NavGraphBuilder.addRoutSettingsRegularTask(
+    navController: NavHostController
+) = composable(
+    route = SettingsRoute.SettingsRegularTaskChildRoute.route
+) {
+    SettingsRegularTaskScreen()
+}
 
 @ExperimentalMaterialApi
 private fun NavGraphBuilder.addRoutSettingsSingleTask(

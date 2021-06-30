@@ -46,4 +46,7 @@ interface TaskDao {
     @Query("SELECT * FROM task_table WHERE dateActivation = 0 AND type = :type")
     fun getNoActiveTasks(type: String): List<Task>
 
+    @Query("SELECT * FROM task_table WHERE dateActivation = 0 AND type = :type")
+    fun getNoActiveTasksFlow(type: String): Flow<List<Task>>
+
 }

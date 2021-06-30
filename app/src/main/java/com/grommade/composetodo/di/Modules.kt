@@ -57,11 +57,17 @@ object Modules {
         @ApplicationContext appContext: Context,
         repo: Repository,
         settings: GetSettings
-    ): DeleteTask =
-        DeleteTaskImpl(appContext, repo, settings)
+    ): DeleteTask = DeleteTaskImpl(appContext, repo, settings)
 
     @Provides
     @Singleton
     fun provideUpdateSettings(repo: Repository): UpdateSettings = UpdateSettingsImpl(repo)
+
+    @Provides
+    @Singleton
+    fun provideGenerateSingleTasks(
+        repo: Repository,
+        settings: GetSettings
+    ): GenerateSingleTasks = GenerateSingleTasksImpl(repo, settings)
 
 }

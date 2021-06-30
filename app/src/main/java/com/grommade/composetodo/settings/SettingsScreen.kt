@@ -27,8 +27,8 @@ fun SettingsScreen(
 
     with(viewModel) {
         SettingsScreenBody(
-            onClickGeneralSettings = { navController.navigate(MainRoute.HomeChildRoute.route) },
-            onClickRegularSettings = { navController.navigate(MainRoute.HomeChildRoute.route) },
+            onClickGeneralSettings = { navController.navigate(SettingsRoute.SettingsGeneralChildRoute.route) },
+            onClickRegularSettings = { navController.navigate(SettingsRoute.SettingsRegularTaskChildRoute.route) },
             onClickSingleSettings = { navController.navigate(SettingsRoute.SettingsSingleTaskChildRoute.route) },
             onBack = { navController.navigateUp() }
         )

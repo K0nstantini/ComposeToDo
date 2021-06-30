@@ -2,13 +2,10 @@ package com.grommade.composetodo.add_classes
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.grommade.composetodo.util.MINUTES_IN_HOUR
-import com.grommade.composetodo.util.daysToMilli
-import com.grommade.composetodo.util.hoursToMilli
-import com.grommade.composetodo.util.toStrTime
+import com.grommade.composetodo.util.*
 import java.util.*
 
-class MyCalendar(private val _milli: Long = 0L) : Parcelable {
+class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalendar> {
     private val calendar = Calendar.getInstance().also { it.timeInMillis = _milli }
 
     val milli: Long
@@ -26,11 +23,34 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable {
     val hours: Int
         get() = calendar.get(Calendar.HOUR_OF_DAY)
 
-    val minutes: Int
+    private val minutes: Int
         get() = calendar.get(Calendar.MINUTE)
 
     private val time: String
         get() = (hours * MINUTES_IN_HOUR + minutes).toStrTime()
+
+//    operator fun rangeTo(other: MyCalendar): Int {
+//        return when {
+//            this.milli > other.milli -> 1
+//            this.milli < other.milli -> -1
+//            else -> 0
+//        }
+//    }
+
+    override operator fun compareTo(other: MyCalendar) = when {
+        milli > other.milli -> 1
+        milli < other.milli -> -1
+        else -> 0
+    }
+
+//    override fun iterator(): Iterator<Long> {
+//        return object : Iterator<Long> {
+//
+//            override fun hasNext(): Boolean = milli < Long.MAX_VALUE
+//
+//            override fun next(): Long = milli + 1
+//        }
+//    }
 
     override fun toString(): String {
         val y = year.toString().padStart(4, '0')
@@ -48,21 +68,19 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable {
         this.also { calendar.set(y, m, d, h, min, s) }
 
     fun addHours(_hours: Int) = MyCalendar(calendar.timeInMillis + _hours.hoursToMilli())
+    fun addMinutes(_minutes: Int) = MyCalendar(calendar.timeInMillis + _minutes.minutesToMilli())
     fun addDays(_days: Int) = MyCalendar(calendar.timeInMillis + _days.daysToMilli())
 
     fun isEmpty() = milli == 0L
     fun isNoEmpty() = milli != 0L
 
+    fun getNumberDayOfWeek() =
+        calendar.get(Calendar.DAY_OF_WEEK) - 2
+
     constructor(parcel: Parcel) : this(parcel.readLong())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeLong(_milli)
-    }
-
-    operator fun compareTo(other: MyCalendar) = when {
-        milli > other.milli -> 1
-        milli < other.milli -> -1
-        else -> 0
     }
 
     operator fun minus(other: MyCalendar) = MyCalendar(milli - other.milli)
@@ -82,6 +100,9 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable {
         fun now() = MyCalendar(System.currentTimeMillis())
         fun today() = MyCalendar(System.currentTimeMillis())
             .apply { calendar.set(year, month, day, 0, 0, 0) }
+
+        fun random(range: ClosedRange<MyCalendar>) =
+            MyCalendar((range.start.milli..range.endInclusive.milli).random())
     }
 
 }

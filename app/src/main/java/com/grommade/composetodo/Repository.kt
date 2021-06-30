@@ -22,30 +22,38 @@ class Repository @Inject constructor(
 
     val settingsFlow: Flow<Settings> = settingsDao.getSettingsFlow()
 
-    suspend fun insertSettings() = settingsDao.insert(Settings())
+    suspend fun insertSettings() =
+        settingsDao.insert(Settings())
 
-    suspend fun updateSettings(set: Settings) = settingsDao.update(set)
+    suspend fun updateSettings(set: Settings) = withContext(ioDispatcher) {
+        settingsDao.update(set)
+    }
 
-    suspend fun getSettings() = withContext(ioDispatcher) {settingsDao.getSettings()}
+    suspend fun getSettings() = withContext(ioDispatcher) {
+        settingsDao.getSettings()
+    }
 
     /** ======================================================================================= */
 
     /** Tasks */
 
-    suspend fun insertTask(task: Task) = taskDao.insert(task)
 
-    suspend fun updateTask(task: Task) = taskDao.update(task)
-
-    suspend fun saveTask(task: Task) {
+    suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
         if (task.isNew) taskDao.insert(task) else taskDao.update(task)
     }
 
-    suspend fun updateTasks(tasks: List<Task>) = taskDao.updateTasks(tasks)
+    suspend fun updateTasks(tasks: List<Task>) = withContext(ioDispatcher) {
+        taskDao.updateTasks(tasks)
+    }
 
-    suspend fun deleteTask(task: Task) = taskDao.deleteTasks(getTasks().nestedTasks(task))
-
-    suspend fun deleteTasks(tasks: List<Task>) = tasks.forEach { task ->
+    suspend fun deleteTask(task: Task) = withContext(ioDispatcher) {
         taskDao.deleteTasks(getTasks().nestedTasks(task))
+    }
+
+    suspend fun deleteTasks(tasks: List<Task>) = withContext(ioDispatcher) {
+        tasks.forEach { task ->
+            taskDao.deleteTasks(getTasks().nestedTasks(task))
+        }
     }
 
     fun getTasksFlow(type: TypeTask) = when (type) {
@@ -62,6 +70,8 @@ class Repository @Inject constructor(
     suspend fun getReadyToActivateSingleTasks() = withContext(Dispatchers.IO) {
         taskDao.getNoActiveTasks(TypeTask.SINGLE_TASK.name)
     }
+
+    val readyToActivateSingleTasks = taskDao.getNoActiveTasksFlow(TypeTask.SINGLE_TASK.name)
 
     private suspend fun getTasks() = withContext(Dispatchers.IO) { taskDao.getTasks() }
 

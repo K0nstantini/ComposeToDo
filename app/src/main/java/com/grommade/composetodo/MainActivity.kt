@@ -12,9 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
-import com.grommade.composetodo.ui.components.AppDrawer
 import com.grommade.composetodo.ui.ToDoNavGraph
-import com.grommade.composetodo.ui.theme.ComposeToDoTheme
+import com.grommade.composetodo.ui.components.AppDrawer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -37,54 +36,54 @@ class MainActivity : ComponentActivity() {
 @ExperimentalComposeUiApi
 @Composable
 private fun ToDoApp() {
-    ComposeToDoTheme {
-        val navController = rememberNavController()
-        val scope = rememberCoroutineScope()
-        val scaffoldState = rememberScaffoldState()
-        val (drawerGesturesEnabled, setDrawerGesturesEnabled) = remember { mutableStateOf(true) }
-        val closeDrawer: () -> Unit = {
-            scope.launch { scaffoldState.drawerState.close() }
-        }
-
-        if (scaffoldState.drawerState.isOpen) {
-            BackPressHandler { closeDrawer() }
-        }
-
-
-        Scaffold(
-            scaffoldState = scaffoldState,
-            drawerContent = {
-                AppDrawer(
-                    navigateToRegularTasks = {
-                        navController.navigate(
-                            MainRoute.TaskListChildRoute.createRoute(
-                                ModeTaskList.DEFAULT,
-                                TypeTask.REGULAR_TASK
-                            )
-                        )
-                    },
-                    navigateToSingleTasks = {
-                        navController.navigate(
-                            MainRoute.TaskListChildRoute.createRoute(
-                                ModeTaskList.DEFAULT,
-                                TypeTask.SINGLE_TASK
-                            )
-                        )
-                    },
-                    navigateToStatistics = { navController.navigate(MainRoute.StatisticsChildRoute.route) },
-                    navigateToSettings = { navController.navigate(MainRoute.SettingsChildRoute.route) },
-                    closeDrawer = closeDrawer
-                )
-            },
-            drawerGesturesEnabled = drawerGesturesEnabled
-        ) {
-            ToDoNavGraph(
-                navController = navController,
-                scaffoldState = scaffoldState,
-                drawerGesturesEnabled = setDrawerGesturesEnabled
-            )
-        }
+//    ComposeToDoTheme {
+    val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
+    val (drawerGesturesEnabled, setDrawerGesturesEnabled) = remember { mutableStateOf(true) }
+    val closeDrawer: () -> Unit = {
+        scope.launch { scaffoldState.drawerState.close() }
     }
+
+    if (scaffoldState.drawerState.isOpen) {
+        BackPressHandler { closeDrawer() }
+    }
+
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        drawerContent = {
+            AppDrawer(
+                navigateToRegularTasks = {
+                    navController.navigate(
+                        MainRoute.TaskListChildRoute.createRoute(
+                            ModeTaskList.DEFAULT,
+                            TypeTask.REGULAR_TASK
+                        )
+                    )
+                },
+                navigateToSingleTasks = {
+                    navController.navigate(
+                        MainRoute.TaskListChildRoute.createRoute(
+                            ModeTaskList.DEFAULT,
+                            TypeTask.SINGLE_TASK
+                        )
+                    )
+                },
+                navigateToStatistics = { navController.navigate(MainRoute.StatisticsChildRoute.route) },
+                navigateToSettings = { navController.navigate(MainRoute.SettingsChildRoute.route) },
+                closeDrawer = closeDrawer
+            )
+        },
+        drawerGesturesEnabled = drawerGesturesEnabled
+    ) {
+        ToDoNavGraph(
+            navController = navController,
+            scaffoldState = scaffoldState,
+            drawerGesturesEnabled = setDrawerGesturesEnabled
+        )
+    }
+//    }
 }
 
 @ExperimentalMaterialApi

@@ -111,10 +111,11 @@
     <!--    Main screen texts-->
     <string name="main_screen_single_task_second_text">Срок: %s</string>
 
-    <!--    Messages-->
+    <!--    Toasts-->
     <string name="message_roll_not_find_task">Не найдено подходящих задач</string>
     <string name="message_not_enough_points">Недостаточно баллов</string>
     <string name="message_over_limit_rolls_for_task">Превышен лимит замен для задачи</string>
+    <string name="toast_settings_s_task_frequency_error">Интервал должен быть положительным числом</string>
 
     <!--    Statistic texts-->
     <string name="statistic_title_points">Баллы</string>

@@ -23,6 +23,7 @@ fun Int.toStrTime(): String {
 }
 
 fun Int.hoursToMilli(): Long = this.toLong() * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
+fun Int.minutesToMilli(): Long = this.toLong() * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 fun Int.daysToMilli(): Long = this.toLong() * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 
 fun Int.minutesToLocalTime(): LocalTime = LocalTime.of(this / MINUTES_IN_HOUR, this % MINUTES_IN_HOUR)

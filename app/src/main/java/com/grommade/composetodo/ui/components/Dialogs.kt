@@ -1,5 +1,6 @@
 package com.grommade.composetodo.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -95,15 +97,19 @@ fun MaterialDialog.BuiltTwoInputDialog(
     isTextValid1: (String) -> Boolean = { true },
     isTextValid2: (String) -> Boolean = { true },
     isTextValidGeneral: (String, String) -> Boolean = { _, _ -> true },
+    error: String = "",
 ) {
     var value1 by remember { mutableStateOf(prefill1) }
     var value2 by remember { mutableStateOf(prefill2) }
 
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
     val onClickOK = {
         if (isTextValidGeneral(value1, value2)) {
             callback(value1, value2)
             hide(focusManager)
+        } else {
+            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
         }
     }
     build {

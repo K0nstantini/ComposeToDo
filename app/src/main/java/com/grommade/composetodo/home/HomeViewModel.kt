@@ -6,12 +6,13 @@ import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
-import com.grommade.composetodo.single_task.CalcSingleTasks
+import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.use_cases.UpdateSettings
 import com.grommade.composetodo.util.change
 import com.grommade.composetodo.util.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repo: Repository,
     private val performSingleTask: PerformSingleTask,
-    private val updateSettings: UpdateSettings
+    private val updateSettings: UpdateSettings,
+    private val generateSingleTasks: GenerateSingleTasks
 ) : BaseViewModel() {
 
     data class HomeTaskItem(
@@ -57,17 +59,17 @@ class HomeViewModel @Inject constructor(
         }
         .asState(emptyList())
 
+
     /** =========================================== FUNCTIONS ==================================================== */
 
-    fun refreshTasks() = viewModelScope.launch {
-        CalcSingleTasks(repo).refresh(viewModelScope)
+    fun refreshTasks() = viewModelScope.launch(Dispatchers.IO) {
+        repo.getSettings()?.let { generateSingleTasks() } // FIXME: WTF?
     }
 
     fun deactivateTasks() = viewModelScope.launch {
         updateSettings(
-            settings.value.change { set: singleSet -> set.copy(dateActivation = MyCalendar()) }
+            settings.value.change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
         )
-//        settings.value.apply { singleTask.dateActivation = MyCalendar() }.update()
         val tasks = repo.getAllSingleTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
             task.apply { single.dateActivation = MyCalendar() }.save()
@@ -96,7 +98,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
-    private fun Settings.update() = viewModelScope.launch { repo.updateSettings(this@update) }
 
 }
 

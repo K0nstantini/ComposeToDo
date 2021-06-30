@@ -76,13 +76,15 @@ private fun SettingsSingleTaskFrequencyScreenBody(
                 .padding(8.dp)
                 .padding(start = 16.dp)
         ) {
-            item { ModeItem(settings.modeGeneration, savesCallbacks.saveMode) }
-            item { TimeItem(settings.periodFrom, settings.periodTo, savesCallbacks) }
-            item { DaysItem(settings.everyFewDays, settings.daysOfWeek, savesCallbacks) }
-            item {
-                when (settings.modeGeneration) {
-                    RANDOM -> FrequencyItem(settings.frequencyFrom, settings.frequencyTo, savesCallbacks)
-                    FIXED -> CountTasksItem(settings.countGeneratedTasksAtATime, savesCallbacks)
+            with(settings) {
+                item { ModeItem(modeGeneration, savesCallbacks.saveMode) }
+                item { TimeItem(periodFrom, periodTo, savesCallbacks) }
+                item { DaysItem(everyFewDays, daysOfWeek, savesCallbacks) }
+                item {
+                    when (modeGeneration) {
+                        RANDOM -> FrequencyItem(frequencyFrom, frequencyTo, savesCallbacks)
+                        FIXED -> CountTasksItem(countGeneratedTasksAtATime, savesCallbacks)
+                    }
                 }
             }
         }
@@ -323,7 +325,8 @@ fun frequencyDialog(
         callback = callback,
         isTextValid1 = { s: String -> s.isDigitsOnly() },
         isTextValid2 = { s: String -> s.isDigitsOnly() && s.isNotEmpty() && s != "0" },
-        isTextValidGeneral = { s1, s2 -> s1.toIntOrNull() ?: 0 < s2.toIntOrNull() ?: 0 }
+        isTextValidGeneral = { s1, s2 -> s1.toIntOrNull() ?: 0 < s2.toIntOrNull() ?: 0 },
+        error = stringResource(R.string.toast_settings_s_task_frequency_error)
     )
 }
 

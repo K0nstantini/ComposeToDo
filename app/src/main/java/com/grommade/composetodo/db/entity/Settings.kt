@@ -29,7 +29,8 @@ data class Settings(
     }
     /**
      * @param active активация режима разовых задач
-     * @param dateActivation время, когда задача запланирована
+     * @param startGeneration дата начала генерации задач
+     * @param lastGeneration время, когда задача запланирована
      * @param showDateNextTask показывать время следующей запланированной задачи
      * @param modeGeneration режим генерации задач (фиксированный - в определенное время или внутри определенного интервала,
      * рандомный - генерацйия задач, основываясь на частоте генерации)
@@ -45,7 +46,8 @@ data class Settings(
      * */
     data class SettingsSingleTask(
         @ColumnInfo(name = "single_active") val active: Boolean = false,
-        val dateActivation: MyCalendar = MyCalendar(),
+        val startGeneration: MyCalendar = MyCalendar(),
+        val lastGeneration: MyCalendar = MyCalendar(),
         val showDateNextTask: Boolean = false,
 
         /** Frequency */

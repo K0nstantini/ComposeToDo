@@ -44,7 +44,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         suspend fun populateDatabase(dao: SettingsDao) {
             dao.deleteAll()
-            dao.insert(Settings())
+            val b = dao.insert(Settings())
+            val a = b
         }
 
         suspend fun populateDatabase(dao: TaskDao) {

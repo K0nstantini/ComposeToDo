@@ -1,7 +1,8 @@
 TODO: Валидация EditText
-TODO: Порверить язык при выборе даты на реальном устройстве
+TODO: Проверить язык при выборе даты на реальном устройстве
 TODO: Добавить описание/заметки к задачам
 TODO: Порверить темную тему (или убрать)
 TODO: Сменить на val в data классах
 TODO: Обработка BackPressHandler для actionMode и пр.
 TODO: Часть настрое спрятать в "расширенный режим"
+TODO: The application may be doing too much work on its main thread
