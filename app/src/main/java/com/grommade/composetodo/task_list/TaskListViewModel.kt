@@ -183,9 +183,8 @@ class TaskListViewModel @Inject constructor(
         return list.toTaskItem()
     }
 
-    private fun setGroupOpenClose(task: Task) = task
-        .apply { groupOpen = !groupOpen }
-        .save()
+    private fun setGroupOpenClose(task: Task) =
+        task.copy(groupOpen = !task.groupOpen).save()
 
     private fun getOpenGroups(): List<Task> =
         allTasks.value.filter { it.group }.map { it.copy(groupOpen = true) }

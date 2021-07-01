@@ -4,11 +4,13 @@ import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.util.delEmptyGroups
 import com.grommade.composetodo.util.hoursToMilli
 import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 interface GenerateSingleTasks {
     suspend operator fun invoke()
@@ -21,28 +23,37 @@ class GenerateSingleTasksImpl @Inject constructor(
 
     override suspend fun invoke() {
         val settings = getSettings()
-        val singleSet = settings.singleTask
         val dateNow = MyCalendar.now()
 
-        if (!settings.singleTask.active || singleSet.lastGeneration > dateNow || singleSet.startGeneration > dateNow) {
-            return
+        if (needToGenerateTask(settings, dateNow) &&
+            settings.singleTask.modeGeneration == ModeGenerationSingleTasks.RANDOM
+        ) {
+            val tasks = repo.getReadyToActivateSingleTasks()
+            val scope = CoroutineScope(coroutineContext)
+
+            generateRandomTasks(
+                tasks = tasks,
+                settings = settings,
+                lastGeneration = settings.singleTask.lastGeneration,
+                dateNow = dateNow,
+                saveTask = { task -> scope.launch { task.save() } },
+                updateSettings = { set -> scope.launch { set.update() } }
+            )
         }
 
-        val tasks = repo.getReadyToActivateSingleTasks()
-
-        generateRandomTasks(
-            tasks = tasks,
-            settings = settings,
-            lastGeneration = singleSet.lastGeneration,
-            dateNow = dateNow
-        )
     }
 
-    private suspend fun generateRandomTasks(
+    private fun needToGenerateTask(settings: Settings, dateNow: MyCalendar): Boolean = with(settings.singleTask) {
+        active && lastGeneration < dateNow && startGeneration < dateNow
+    }
+
+    private fun generateRandomTasks(
         tasks: List<Task>,
         settings: Settings,
         lastGeneration: MyCalendar,
-        dateNow: MyCalendar
+        dateNow: MyCalendar,
+        saveTask: (Task) -> Unit,
+        updateSettings: (Settings) -> Unit,
     ) {
         val frequency = with(settings.singleTask) { frequencyFrom..frequencyTo }
         val period = with(settings.singleTask) { periodFrom..periodTo }
@@ -50,21 +61,30 @@ class GenerateSingleTasksImpl @Inject constructor(
 
         if (lastGeneration.isNoEmpty()) {
             val workDate = lastGeneration.nextSuitableDate(period, settings.singleTask.daysOfWeek, dateNow)
-            generateTask(tasksToActivate)
-                ?.apply { single.dateActivation = workDate }
-                ?.save()
+            generateTask(tasksToActivate)?.let { task ->
+                saveTask(
+                    task.copy(single = task.single.copy(dateActivation = workDate))
+                )
+            }
         }
 
         val lastDate = with(settings.singleTask) { if (lastGeneration.isEmpty()) startGeneration else lastGeneration }
         val newDate = generateDate(frequency, lastDate)
         if (newDate < dateNow) {
-            generateRandomTasks(tasksToActivate, settings, newDate, dateNow)
+            generateRandomTasks(tasksToActivate, settings, newDate, dateNow, saveTask, updateSettings)
         } else {
-            settings.copy(singleTask = settings.singleTask.copy(lastGeneration = newDate)).update()
+            updateSettings(
+                settings.copy(singleTask = settings.singleTask.copy(lastGeneration = newDate))
+            )
         }
     }
 
+    // FIXME:
     private fun generateDate(frequency: IntRange, date: MyCalendar) = MyCalendar(
+        date.milli + (60_000..180_000).random()
+    )
+
+    private fun generateDate2(frequency: IntRange, date: MyCalendar) = MyCalendar(
         date.milli + (frequency.first.hoursToMilli()..frequency.last.hoursToMilli()).random()
     )
 

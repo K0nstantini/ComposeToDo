@@ -12,7 +12,6 @@ import com.grommade.composetodo.use_cases.UpdateSettings
 import com.grommade.composetodo.util.change
 import com.grommade.composetodo.util.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -62,7 +61,7 @@ class HomeViewModel @Inject constructor(
 
     /** =========================================== FUNCTIONS ==================================================== */
 
-    fun refreshTasks() = viewModelScope.launch(Dispatchers.IO) {
+    fun refreshTasks() = viewModelScope.launch {
         repo.getSettings()?.let { generateSingleTasks() } // FIXME: WTF?
     }
 
@@ -72,10 +71,10 @@ class HomeViewModel @Inject constructor(
         )
         val tasks = repo.getAllSingleTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
-            task.apply { single.dateActivation = MyCalendar() }.save()
+            task.copy(single = task.single.copy(dateActivation = MyCalendar())).save()
         }
         tasks.filter { it.single.rolls > 0 }.forEach { task ->
-            task.apply { single.rolls = 0 }.save()
+            task.copy(single = task.single.copy(rolls = 0)).save()
         }
     }
 

@@ -81,7 +81,7 @@ abstract class AppDatabase : RoomDatabase() {
             dao.insert(Task(name = "Рабочий стол (ноут)", parent = pc))
             dao.insert(Task(name = "Рабочий стол (комп)", parent = pc))
             dao.insert(Task(name = "Разобраться с телефоном, бэкап и пр.", parent = pc))
-            dao.insert(Task(name = "Купить что-нибудь в форе", single = single.apply { deadline = 72 }, parent = pc))
+            dao.insert(Task(name = "Купить что-нибудь в форе", single = single.copy(deadline = 72), parent = pc))
 
             val poker = dao.insert(Task(name = "Покер", group = true))
             dao.insert(Task(name = "Сыграть в покер", parent = poker))
