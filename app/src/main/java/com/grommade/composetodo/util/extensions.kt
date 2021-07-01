@@ -17,6 +17,9 @@ fun String.toListInt(): List<Int> = when (this) {
 fun String.toDaysOfWeek(resources: Resources): String =
     split(",").joinToString(",") { resources.getString(DialogDaysOfWeek.values()[it.toInt()].abbr) }
 
+fun String.timeToMinutes() =
+    dropLast(3).toInt() * 60 + this.drop(3).toInt()
+
 fun Int.toStrTime(): String {
     return (this / 60).toString().padStart(2, '0') + ':' +
             (this % 60).toString().padStart(2, '0')

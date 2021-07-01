@@ -8,6 +8,7 @@ import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.use_cases.UpdateSettings
 import com.grommade.composetodo.util.change
 import com.grommade.composetodo.util.singleSet
+import com.grommade.composetodo.util.timeToMinutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +28,7 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
         val savePeriodNoRestrictions: () -> Unit = {},
         val saveEveryFewDays: (String) -> Unit = {},
         val saveDaysOfWeek: (List<Int>) -> Unit = {},
-        val saveDaysNoRestrictions: () -> Unit = {},
+        val saveDaysNoRestriction: () -> Unit = {},
         val saveCountTasks: (String) -> Unit = {},
         val saveFrequency: (String, String) -> Unit = { _, _ -> },
     )
@@ -39,7 +40,7 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
         savePeriodNoRestrictions = ::savePeriodNoRestrictions,
         saveEveryFewDays = ::saveEveryFewDays,
         saveDaysOfWeek = ::saveDaysOfWeek,
-        saveDaysNoRestrictions = ::saveDaysNoRestrictions,
+        saveDaysNoRestriction = ::saveDaysNoRestriction,
         saveCountTasks = ::saveCountTasks,
         saveFrequency = ::saveFrequency,
     )
@@ -58,12 +59,14 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
     }
 
     private fun savePeriodNoRestrictions() {
-        changeSettings { set: singleSet -> set.copy(periodFrom = 0, periodTo = 0) }
+        val from = "00:00".timeToMinutes()
+        val to = "23:59".timeToMinutes()
+        changeSettings { set: singleSet -> set.copy(periodFrom = from, periodTo = to) }
     }
 
     private fun saveEveryFewDays(value: String) {
         when (val days = value.toIntOrNull()) {
-            0, 1 -> saveDaysNoRestrictions()
+            0, 1 -> saveDaysNoRestriction()
             is Int -> changeSettings { set: singleSet -> set.copy(everyFewDays = days, daysOfWeek = "") }
         }
     }
@@ -71,12 +74,12 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
     private fun saveDaysOfWeek(list: List<Int>) {
         val daysOfWeek = list.joinToString(",")
         when (list.count()) {
-            0, 7 -> saveDaysNoRestrictions()
+            0, 7 -> saveDaysNoRestriction()
             else -> changeSettings { set: singleSet -> set.copy(everyFewDays = 1, daysOfWeek = daysOfWeek) }
         }
     }
 
-    private fun saveDaysNoRestrictions() =
+    private fun saveDaysNoRestriction() =
         changeSettings { set: singleSet -> set.copy(everyFewDays = 1, daysOfWeek = "") }
 
     private fun saveCountTasks(value: String) {

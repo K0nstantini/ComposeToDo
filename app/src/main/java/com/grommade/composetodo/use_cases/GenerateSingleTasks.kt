@@ -4,7 +4,6 @@ import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
-import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.util.delEmptyGroups
 import com.grommade.composetodo.util.hoursToMilli
 import kotlinx.coroutines.*
@@ -35,42 +34,31 @@ class GenerateSingleTasksImpl @Inject constructor(
             tasks = tasks,
             settings = settings,
             lastGeneration = singleSet.lastGeneration,
-            dateNow = dateNow,
-            frequency = singleSet.frequencyFrom..singleSet.frequencyTo,
+            dateNow = dateNow
         )
-
-        /** ====================================================================================================== */
-        /**
-        val dates = getDatesToActivateTasks(tasks, singleSet, dateNow)
-
-        val lastDate = dates.last()
-        settings.change { set: singleSet -> set.copy(lastGeneration = lastDate) }.update()
-
-        getTasksToUpdateDatesActivation(tasks, dates).update()
-         */
     }
 
     private suspend fun generateRandomTasks(
         tasks: List<Task>,
         settings: Settings,
         lastGeneration: MyCalendar,
-        dateNow: MyCalendar,
-        frequency: IntRange,
+        dateNow: MyCalendar
     ) {
+        val frequency = with(settings.singleTask) { frequencyFrom..frequencyTo }
+        val period = with(settings.singleTask) { periodFrom..periodTo }
         val tasksToActivate = tasks.filter { it.group || it.singleReadyToActivate }.delEmptyGroups()
 
-
-        if (lastGeneration.isNoEmpty() && lastGeneration.dateInWorkDays(settings.singleTask.daysOfWeek)) {
-            val workDate = with(settings.singleTask) { lastGeneration.getWorkTime(periodFrom..periodTo) }
+        if (lastGeneration.isNoEmpty()) {
+            val workDate = lastGeneration.nextSuitableDate(period, settings.singleTask.daysOfWeek, dateNow)
             generateTask(tasksToActivate)
                 ?.apply { single.dateActivation = workDate }
                 ?.save()
         }
 
-        val newDate = generateDate(frequency, lastGeneration)
-
+        val lastDate = with(settings.singleTask) { if (lastGeneration.isEmpty()) startGeneration else lastGeneration }
+        val newDate = generateDate(frequency, lastDate)
         if (newDate < dateNow) {
-            generateRandomTasks(tasksToActivate, settings, newDate, dateNow, frequency)
+            generateRandomTasks(tasksToActivate, settings, newDate, dateNow)
         } else {
             settings.copy(singleTask = settings.singleTask.copy(lastGeneration = newDate)).update()
         }
@@ -91,91 +79,64 @@ class GenerateSingleTasksImpl @Inject constructor(
         }
     }
 
-    private fun MyCalendar.dateInWorkDays(daysOfWeek: String): Boolean =
-        daysOfWeek == "" || daysOfWeek.contains(getNumberDayOfWeek().toString())
-
-    private fun MyCalendar.getWorkTime(period: IntRange): MyCalendar {
-        val workTime = { time: Int -> MyCalendar.today().addMinutes(time) }
-        val workRange = workTime(period.first)..workTime(period.last)
-        return when (this) {
-            in workRange -> this
-            else -> MyCalendar.random(workRange)
+    /** Ищем подходящую дату с условием разл. ограничений по времени и дням */
+    private fun MyCalendar.nextSuitableDate(
+        period: IntRange,
+        daysOfWeek: String,
+        dateNow: MyCalendar
+    ): MyCalendar {
+        if (!dateInWorkDays(daysOfWeek)) {
+            return nearestRandomWorkDay(daysOfWeek).addMinutes(period.random())
         }
+
+        val currentDateMinutes = getMinutesOfDay()
+        if (currentDateMinutes < period.first) {
+            return startDay().addMinutes(period.random())
+        }
+        if (currentDateMinutes > period.last) {
+            val dateNowMinutes = dateNow.getMinutesOfDay()
+            if (dateNow.startDay().isEqual(startDay()) && dateNowMinutes < period.last) {
+                val periodFromNow = (if (dateNowMinutes < period.first) period.first else dateNowMinutes)..period.last
+                return startDay().addMinutes(periodFromNow.random())
+            }
+            return nextNearestWorkDay(daysOfWeek).addMinutes(period.random())
+        }
+        return this
     }
+
+    /** Ближайший рабочий день */
+    private fun MyCalendar.nextNearestWorkDay(daysOfWeek: String): MyCalendar {
+        val nextDay = { i: Int ->
+            addDays(i).dateInWorkDays(daysOfWeek)
+        }
+        val countDays = generateSequence(1) { if (nextDay(it)) null else it + 1 }.count()
+
+        return startDay().addDays(countDays)
+    }
+
+    /** Ищем ближайший диапазон рабочих дней и случайно выбираем оттуда день */
+    private fun MyCalendar.nearestRandomWorkDay(daysOfWeek: String): MyCalendar {
+        if (daysOfWeek.isEmpty() || daysOfWeek == "0,1,2,3,4,5,6") {
+            return startDay()
+        }
+        val startDay = nextNearestWorkDay(daysOfWeek)
+        val nextDay = { i: Int ->
+            startDay.addDays(i).dateInWorkDays(daysOfWeek)
+        }
+        val countDays = generateSequence(0) { if (nextDay(it + 1)) it + 1 else null }.count() - 1
+
+        val endDay = startDay.addDays(countDays).endDay()
+        return MyCalendar.random(startDay..endDay).startDay()
+    }
+
+    /** Дата входит в рабочие дни */
+    private fun MyCalendar.dateInWorkDays(daysOfWeek: String): Boolean =
+        daysOfWeek.isEmpty() || daysOfWeek.contains(getNumberDayOfWeek().toString())
 
     private suspend fun Task.save() = repo.saveTask(this)
     private suspend fun Settings.update() = repo.updateSettings(this@update)
 
 }
-
-    /**
-
-    private fun getDatesToActivateTasks(
-        tasks: List<Task>,
-        singleSet: Settings.SettingsSingleTask,
-        dateNow: MyCalendar
-    ): List<MyCalendar> {
-        val startDate = if (singleSet.lastGeneration.isEmpty()) singleSet.startGeneration else singleSet.lastGeneration
-        return when (singleSet.modeGeneration) {
-            ModeGenerationSingleTasks.RANDOM ->
-                getDatesToActivateTasksRandomMode(
-                    tasks = tasks,
-                    frequency = singleSet.frequencyFrom..singleSet.frequencyTo,
-                    lastDateActivation = singleSet.lastGeneration,
-                    startDate = startDate,
-                    dateNow = dateNow
-                )
-            ModeGenerationSingleTasks.FIXED -> getDatesToActivateTasksFixedMode(startDate)
-        }
-    }
-
-
-    fun getDatesToActivateTasksRandomMode(
-        tasks: List<Task>,
-        frequency: IntRange,
-        lastDateActivation: MyCalendar,
-        startDate: MyCalendar,
-        dateNow: MyCalendar
-    ): List<MyCalendar> {
-        val dates = generateDatesRandomMode(frequency, startDate, dateNow)
-        return when {
-            noTaskLastDateActivation(tasks, lastDateActivation) -> listOf(lastDateActivation) + dates
-            else -> dates
-        }
-    }
-
-    private fun generateDatesRandomMode(
-        frequency: IntRange,
-        dateFrom: MyCalendar,
-        dateTo: MyCalendar
-    ): List<MyCalendar> {
-        val dateNext = generateDate(frequency, dateFrom)
-        return when {
-            dateNext < dateTo -> listOf(dateNext) + generateDatesRandomMode(frequency, dateNext, dateTo)
-            else -> listOf(dateNext)
-        }
-    }
-
-
-    private fun noTaskLastDateActivation(tasks: List<Task>, date: MyCalendar) =
-        date.isNoEmpty() && !tasks.any { it.single.dateActivation == date }
-
-    private fun getTasksToUpdateDatesActivation(
-        tasks: List<Task>,
-        dates: List<MyCalendar>
-    ): List<Task> {
-        dates.dropLast(1).forEach { date ->
-            val tasksToActivate = tasks.filter { it.group || it.singleReadyToActivate }.delEmptyGroups()
-            when (val task = generateTask(tasksToActivate)) {
-                null -> return@forEach
-                else -> task.single.dateActivation = date
-            }
-        }
-        return tasks.filter { dates.contains(it.single.dateActivation) }
-    }
-
-    */
-
 
 
 

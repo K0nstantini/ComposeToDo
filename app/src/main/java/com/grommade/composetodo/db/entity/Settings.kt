@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
+import com.grommade.composetodo.util.timeToMinutes
 
 @Entity(tableName = "settings_table")
 data class Settings(
@@ -52,8 +53,8 @@ data class Settings(
 
         /** Frequency */
         val modeGeneration: ModeGenerationSingleTasks = ModeGenerationSingleTasks.RANDOM,
-        val periodFrom: Int = 0,
-        val periodTo: Int = 0,
+        val periodFrom: Int = "00:00".timeToMinutes(),
+        val periodTo: Int = "23:59".timeToMinutes(),
         val daysOfWeek: String = "",
         val everyFewDays: Int = 1,
         val countGeneratedTasksAtATime: Int = 1,

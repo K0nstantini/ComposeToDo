@@ -29,28 +29,24 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
     private val time: String
         get() = (hours * MINUTES_IN_HOUR + minutes).toStrTime()
 
-//    operator fun rangeTo(other: MyCalendar): Int {
-//        return when {
-//            this.milli > other.milli -> 1
-//            this.milli < other.milli -> -1
-//            else -> 0
-//        }
+
+    fun getMinutesOfDay() = hours * MINUTES_IN_HOUR + minutes
+
+//    override operator fun compareTo(other: MyCalendar): Int = when {
+//        milli > other.milli -> 1
+//        milli < other.milli -> -1
+//        else -> 0
 //    }
 
-    override operator fun compareTo(other: MyCalendar) = when {
-        milli > other.milli -> 1
-        milli < other.milli -> -1
-        else -> 0
+    fun isEqual(other: MyCalendar) =
+        compareTo(other) == 0
+
+    override fun compareTo(other: MyCalendar): Int {
+        return COMPARATOR.compare(this, other)
     }
 
-//    override fun iterator(): Iterator<Long> {
-//        return object : Iterator<Long> {
-//
-//            override fun hasNext(): Boolean = milli < Long.MAX_VALUE
-//
-//            override fun next(): Long = milli + 1
-//        }
-//    }
+//    override fun compareTo(other: MyCalendar): Int = compareValuesBy(this, other, { it._milli })
+
 
     override fun toString(): String {
         val y = year.toString().padStart(4, '0')
@@ -67,6 +63,20 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
     fun set(y: Int = 0, m: Int = 0, d: Int = 0, h: Int = 0, min: Int = 0, s: Int = 0) =
         this.also { calendar.set(y, m, d, h, min, s) }
 
+    fun startDay(): MyCalendar {
+        val thisDate = this
+        return MyCalendar().apply {
+            calendar.set(thisDate.year, thisDate.month, thisDate.day, 0, 0, 0)
+        }
+    }
+
+    fun endDay(): MyCalendar {
+        val thisDate = this
+        return MyCalendar().apply {
+            calendar.set(thisDate.year, thisDate.month, thisDate.day, 23, 59, 59)
+        }
+    }
+
     fun addHours(_hours: Int) = MyCalendar(calendar.timeInMillis + _hours.hoursToMilli())
     fun addMinutes(_minutes: Int) = MyCalendar(calendar.timeInMillis + _minutes.minutesToMilli())
     fun addDays(_days: Int) = MyCalendar(calendar.timeInMillis + _days.daysToMilli())
@@ -74,8 +84,10 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
     fun isEmpty() = milli == 0L
     fun isNoEmpty() = milli != 0L
 
-    fun getNumberDayOfWeek() =
-        calendar.get(Calendar.DAY_OF_WEEK) - 2
+    fun getNumberDayOfWeek() = when (val day = calendar.get(Calendar.DAY_OF_WEEK)) {
+        Calendar.SUNDAY -> 6
+        else -> day - 2
+    }
 
     constructor(parcel: Parcel) : this(parcel.readLong())
 
@@ -98,11 +110,15 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
         }
 
         fun now() = MyCalendar(System.currentTimeMillis())
-        fun today() = MyCalendar(System.currentTimeMillis())
-            .apply { calendar.set(year, month, day, 0, 0, 0) }
+        fun today(): MyCalendar {
+            val now = now()
+            return MyCalendar().apply { calendar.set(now.year, now.month, now.day, 0, 0, 0) }
+        }
 
         fun random(range: ClosedRange<MyCalendar>) =
             MyCalendar((range.start.milli..range.endInclusive.milli).random())
+
+        private val COMPARATOR = Comparator.comparingLong<MyCalendar> { it.milli }
     }
 
 }

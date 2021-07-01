@@ -31,6 +31,7 @@ import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks.FIXED
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks.RANDOM
 import com.grommade.composetodo.ui.components.*
+import com.grommade.composetodo.util.timeToMinutes
 import com.grommade.composetodo.util.toDaysOfWeek
 import com.grommade.composetodo.util.toListInt
 import com.grommade.composetodo.util.toStrTime
@@ -126,8 +127,8 @@ private fun TimeItem(
     }
     val periodListDialog = periodListDialog(selectPeriod)
 
-    val valueSelectTime = when (periodFrom + periodTo) {
-        0 -> stringResource(R.string.settings_s_task_value_no_period)
+    val valueSelectTime = when (periodTo - periodFrom) {
+        "23:59".timeToMinutes() -> stringResource(R.string.settings_s_task_value_no_period)
         else -> stringResource(R.string.settings_s_task_value_period, periodFrom.toStrTime(), periodTo.toStrTime())
     }
 
@@ -162,7 +163,7 @@ private fun DaysItem(
         when (DialogSelectDays.values()[index]) {
             DialogSelectDays.EVERY_FEW_DAYS -> everyFewDaysInputDialog.show()
             DialogSelectDays.DAYS_OF_WEEK -> daysOfWeekInputDialog.show()
-            DialogSelectDays.NO_RESTRICTIONS -> savesCallbacks.saveDaysNoRestrictions()
+            DialogSelectDays.NO_RESTRICTIONS -> savesCallbacks.saveDaysNoRestriction()
         }
     }
 
