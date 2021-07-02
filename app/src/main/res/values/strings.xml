@@ -3,10 +3,10 @@
 
     <!--    Plurals-->
     <plurals name="every_n_days">
-        <item quantity="one">Не чаще чем раз в %1$d день</item>
-        <item quantity="few">Не чаще чем раз в %1$d дня</item>
-        <item quantity="many">Не чаще чем раз в %1$d дней</item>
-        <item quantity="other">Не чаще чем раз в %1$d дней</item>
+        <item quantity="one">Раз в %1$d день</item>
+        <item quantity="few">Раз в %1$d дня</item>
+        <item quantity="many">Раз в %1$d дней</item>
+        <item quantity="other">Раз в %1$d дней</item>
     </plurals>
 
     <!--    Menu Navigation Drawer-->
@@ -60,9 +60,10 @@
 
     <!--    Settings Items Settings Single Tasks -->
     <string name="settings_s_task_title_active">Активность</string>
-    <string name="settings_s_task_value_active_true">Генерация задач из списка</string>
+    <string name="settings_s_task_value_active_true">Генерация задач из списка. Начало: %s</string>
     <string name="settings_s_task_value_active_false">Включить генерацию задач из списка</string>
     <string name="settings_s_task_title_frequency_and_time">Время и частота</string>
+    <string name="settings_s_task_value_frequency_and_time_random">Каждые %s ч</string>
     <string name="settings_s_task_title_mode_generation">Режим</string>
     <string name="settings_s_task_title_days">Дни</string>
     <string name="settings_s_task_title_period">Время</string>

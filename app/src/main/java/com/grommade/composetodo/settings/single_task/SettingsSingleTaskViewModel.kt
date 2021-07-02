@@ -21,10 +21,10 @@ class SettingsSingleTaskViewModel @Inject constructor(
 
     val settings = repo.settingsFlow.asState(Settings())
 
-    fun onClickActive(active: Boolean) {
-        val startGeneration = if (active) MyCalendar.now() else MyCalendar()
+    fun onClickActive(date: MyCalendar) {
+        val state = date.isNoEmpty()
         changeSettings { set: singleSet ->
-            set.copy(active = active, startGeneration = startGeneration, lastGeneration = MyCalendar())
+            set.copy(active = state, startGeneration = date, lastGeneration = MyCalendar())
         }
     }
 

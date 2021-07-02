@@ -1,45 +1,27 @@
 package com.grommade.composetodo.ui.components
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.util.minutesToLocalTime
-import com.grommade.composetodo.util.toMinutes
+import com.grommade.composetodo.util.MINUTES_IN_HOUR
 import com.vanpra.composematerialdialogs.*
 import com.vanpra.composematerialdialogs.datetime.datepicker.datepicker
+import com.vanpra.composematerialdialogs.datetime.datetimepicker
 import com.vanpra.composematerialdialogs.datetime.timepicker.timepicker
-import java.time.ZoneId
+import java.time.*
 
 @Composable
 fun MaterialDialog.BuiltDateDialog(callback: (MyCalendar) -> Unit) {
     build {
         datepicker { date ->
-            val milli = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            callback(MyCalendar(milli))
+            callback(MyCalendar(date.toMillis()))
         }
         SetButtonsOkCancel()
     }
@@ -55,6 +37,31 @@ fun MaterialDialog.BuiltTimeDialog(initialTime: Int = 0, callback: (Int) -> Unit
         SetButtonsOkCancel()
     }
 }
+
+@Composable
+fun MaterialDialog.BuiltDateTimeDialog(initialTime: MyCalendar, callback: (MyCalendar) -> Unit) {
+    build {
+        datetimepicker(initialDateTime = initialTime.toLocalDateTime()) { dateTime ->
+            callback(MyCalendar(dateTime.toMillis() ?: 0L))
+        }
+    }
+}
+
+private fun LocalDateTime.toMillis(zone: ZoneId = ZoneId.systemDefault()): Long? =
+    atZone(zone)?.toInstant()?.toEpochMilli()
+
+private fun LocalDate.toMillis(zone: ZoneId = ZoneId.systemDefault()): Long =
+    atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+private fun Int.minutesToLocalTime(): LocalTime =
+    LocalTime.of(this / MINUTES_IN_HOUR, this % MINUTES_IN_HOUR)
+
+
+private fun MyCalendar.toLocalDateTime(): LocalDateTime =
+    Instant.ofEpochMilli(this.milli).atZone(ZoneId.systemDefault()).toLocalDateTime()
+
+
+private fun LocalTime.toMinutes(): Int = hour * MINUTES_IN_HOUR + minute
 
 @ExperimentalComposeUiApi
 @Composable

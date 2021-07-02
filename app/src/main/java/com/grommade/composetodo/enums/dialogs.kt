@@ -14,9 +14,9 @@ enum class DialogSelectPeriod(@StringRes val title: Int) {
 }
 
 enum class DialogSelectDays(@StringRes val title: Int) {
-    EVERY_FEW_DAYS(R.string.choice_select_days_every_few_days),
+    NO_RESTRICTIONS(R.string.choice_select_days_no_days),
     DAYS_OF_WEEK(R.string.choice_select_days_days_of_week),
-    NO_RESTRICTIONS(R.string.choice_select_days_no_days);
+    EVERY_FEW_DAYS(R.string.choice_select_days_every_few_days);
 
     companion object {
         fun toList() = values().map { it.title }

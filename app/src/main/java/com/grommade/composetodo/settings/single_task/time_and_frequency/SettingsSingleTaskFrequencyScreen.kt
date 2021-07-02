@@ -80,7 +80,7 @@ private fun SettingsSingleTaskFrequencyScreenBody(
             with(settings) {
                 item { ModeItem(modeGeneration, savesCallbacks.saveMode) }
                 item { TimeItem(periodFrom, periodTo, savesCallbacks) }
-                item { DaysItem(everyFewDays, daysOfWeek, savesCallbacks) }
+                item { DaysItem(everyFewDays, daysOfWeek, modeGeneration, savesCallbacks) }
                 item {
                     when (modeGeneration) {
                         RANDOM -> FrequencyItem(frequencyFrom, frequencyTo, savesCallbacks)
@@ -145,6 +145,7 @@ private fun TimeItem(
 private fun DaysItem(
     everyFewDays: Int,
     daysOfWeek: String,
+    mode: ModeGenerationSingleTasks,
     savesCallbacks: SettingsSingleTaskFrequencyViewModel.SavesCallbacks,
 ) {
     val resources = LocalContext.current.resources
@@ -167,7 +168,7 @@ private fun DaysItem(
         }
     }
 
-    val daysListDialog = daysListDialog(selectDays)
+    val daysListDialog = daysListDialog(mode, selectDays)
 
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_days),
@@ -251,11 +252,17 @@ private fun periodListDialog(
 
 @Composable
 private fun daysListDialog(
+    mode: ModeGenerationSingleTasks,
     selectDays: (Int) -> Unit
 ): MaterialDialog = remember { MaterialDialog() }.apply {
+    val list = when (mode) {
+        RANDOM -> DialogSelectDays.toList() - DialogSelectDays.EVERY_FEW_DAYS.title
+        FIXED -> DialogSelectDays.toList()
+    }.map { stringResource(it) }
+
     BuiltListDialog(
         title = stringResource(R.string.alert_title_select_days_s_tasks),
-        list = DialogSelectDays.toList().map { stringResource(it) },
+        list = list,
         callback = selectDays
     )
 }

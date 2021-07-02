@@ -14,8 +14,10 @@ fun String.toListInt(): List<Int> = when (this) {
     else -> split(",").map { it.toInt() }
 }
 
-fun String.toDaysOfWeek(resources: Resources): String =
-    split(",").joinToString(",") { resources.getString(DialogDaysOfWeek.values()[it.toInt()].abbr) }
+fun String.toDaysOfWeek(resources: Resources): String = when (this) {
+    "" -> ""
+    else -> split(",").joinToString(",") { resources.getString(DialogDaysOfWeek.values()[it.toInt()].abbr) }
+}
 
 fun String.timeToMinutes() =
     dropLast(3).toInt() * 60 + this.drop(3).toInt()
@@ -25,12 +27,12 @@ fun Int.toStrTime(): String {
             (this % 60).toString().padStart(2, '0')
 }
 
+fun IntRange.toStrTime(): String =
+    first.toStrTime() + "-" + last.toStrTime()
+
 fun Int.hoursToMilli(): Long = this.toLong() * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 fun Int.minutesToMilli(): Long = this.toLong() * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 fun Int.daysToMilli(): Long = this.toLong() * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
-
-fun Int.minutesToLocalTime(): LocalTime = LocalTime.of(this / MINUTES_IN_HOUR, this % MINUTES_IN_HOUR)
-fun LocalTime.toMinutes(): Int = hour * MINUTES_IN_HOUR + minute
 
 //FIXME: Не чистая ф-я?
 fun List<Task>.nestedTasks(

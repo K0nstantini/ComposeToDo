@@ -28,6 +28,7 @@ data class Settings(
     ) {
 
     }
+
     /**
      * @param active активация режима разовых задач
      * @param startGeneration дата начала генерации задач
@@ -64,7 +65,8 @@ data class Settings(
         /** Restrictions */
 
         val restrictionOnChange: Boolean = false,                                                                       // ограничение на изменение настроек при активации режима разовых задач
-        val ActivityPeriod: MyCalendar = MyCalendar.today().addHours(ACTIVITY_PERIOD),                                  // период активности режима, до этой даты нельзя отключать режим и менять настройки
+        val ActivityPeriod: MyCalendar = MyCalendar.today()
+            .addHours(ACTIVITY_PERIOD),                                  // период активности режима, до этой даты нельзя отключать режим и менять настройки
         val timeAfterActivationToChangeGeneralSettings: Int = TIME_AFTER_ACTIVATION_TO_CHANGE_GENERAL_SETTINGS,         // период времени после активации режима, когда еще можно изменить общие настройки
         val timeAfterAddingTaskToEditOrDel: Int = TIME_AFTER_ADDING_TASK_TO_EDIT_OR_DEL,                                // период времени после добавления задачи, когда еще можно изменить или удалить ее
 
@@ -87,6 +89,12 @@ data class Settings(
 
         val restrictionIsActive: Boolean
             get() = active && restrictionOnChange
+
+        val periodNoRestriction: Boolean
+            get() = (periodTo - periodFrom) == "23:59".timeToMinutes()
+
+        val daysOfWeekNoRestriction: Boolean
+            get() = daysOfWeek.isEmpty()
 
         companion object {
             const val FREQUENCY_GENERATE_FROM = 1

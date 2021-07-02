@@ -48,6 +48,9 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
     private fun saveMode(index: Int) {
         val mode = ModeGenerationSingleTasks.values()[index]
         changeSettings { set: singleSet -> set.copy(modeGeneration = mode) }
+        if (mode == ModeGenerationSingleTasks.RANDOM && settings.value.singleTask.everyFewDays > 1) {
+            saveDaysNoRestriction()
+        }
     }
 
     private fun savePeriodFrom(time: Int) {
