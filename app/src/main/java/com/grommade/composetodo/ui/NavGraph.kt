@@ -16,6 +16,7 @@ import com.grommade.composetodo.MainRoute
 import com.grommade.composetodo.SettingsRoute
 import com.grommade.composetodo.SettingsSingleTaskRoute
 import com.grommade.composetodo.TasksRoute
+import com.grommade.composetodo.history.HistoryScreen
 import com.grommade.composetodo.home.HomeScreen
 import com.grommade.composetodo.home.HomeViewModel
 import com.grommade.composetodo.settings.SettingsScreen
@@ -48,6 +49,7 @@ fun ToDoNavGraph(
     ) {
         addRoutMainScreen(drawerGesturesEnabled, openDrawer)
         addRoutStatistics(navController, drawerGesturesEnabled)
+        addRoutHistory(navController, drawerGesturesEnabled)
 
         addRoutSettings(navController, drawerGesturesEnabled)
         addRoutSettingsGeneralTask(navController)
@@ -111,6 +113,19 @@ private fun NavGraphBuilder.addRoutSettings(
 ) {
     drawerGesturesEnabled(false)
     SettingsScreen(
+        viewModel = hiltViewModel(),
+        navController
+    )
+}
+
+private fun NavGraphBuilder.addRoutHistory(
+    navController: NavHostController,
+    drawerGesturesEnabled: (Boolean) -> Unit
+) = composable(
+    route = MainRoute.HistoryChildRoute.route
+) {
+    drawerGesturesEnabled(false)
+    HistoryScreen(
         viewModel = hiltViewModel(),
         navController
     )

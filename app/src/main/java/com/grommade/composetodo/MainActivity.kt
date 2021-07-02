@@ -72,6 +72,7 @@ private fun ToDoApp() {
                 },
                 navigateToStatistics = { navController.navigate(MainRoute.StatisticsChildRoute.route) },
                 navigateToSettings = { navController.navigate(MainRoute.SettingsChildRoute.route) },
+                navigateToHistory = {navController.navigate(MainRoute.HistoryChildRoute.route)},
                 closeDrawer = closeDrawer
             )
         },

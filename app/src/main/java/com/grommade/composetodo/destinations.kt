@@ -30,6 +30,7 @@ sealed class MainRoute(val route: String) {
 
     object StatisticsChildRoute : MainRoute("statistics")
     object SettingsChildRoute : MainRoute("settings")
+    object HistoryChildRoute : MainRoute("history")
 }
 
 sealed class TasksRoute(val route: String) {

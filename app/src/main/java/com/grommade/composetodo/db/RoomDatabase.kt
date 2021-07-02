@@ -6,8 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.grommade.composetodo.db.dao.HistoryDao
 import com.grommade.composetodo.db.dao.SettingsDao
 import com.grommade.composetodo.db.dao.TaskDao
+import com.grommade.composetodo.db.entity.History
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.TypeTask
@@ -15,7 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Settings::class, Task::class],
+    entities = [Settings::class, Task::class, History::class],
     version = 2,
     exportSchema = false,
 //    autoMigrations = [
@@ -27,6 +29,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun SettingsDao(): SettingsDao
     abstract fun TaskDao(): TaskDao
+    abstract fun HistoryDao(): HistoryDao
 
     private class AppDatabaseCallback(
         private val scope: CoroutineScope

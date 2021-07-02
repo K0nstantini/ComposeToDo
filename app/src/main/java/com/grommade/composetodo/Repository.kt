@@ -1,7 +1,9 @@
 package com.grommade.composetodo
 
+import com.grommade.composetodo.db.dao.HistoryDao
 import com.grommade.composetodo.db.dao.SettingsDao
 import com.grommade.composetodo.db.dao.TaskDao
+import com.grommade.composetodo.db.entity.History
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.TypeTask
@@ -15,10 +17,11 @@ import javax.inject.Inject
 class Repository @Inject constructor(
     private val settingsDao: SettingsDao,
     private val taskDao: TaskDao,
+    private val historyDao: HistoryDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    /** Settings */
+    /** ============================== Settings ==============================================================*/
 
     val settingsFlow: Flow<Settings> = settingsDao.getSettingsFlow()
 
@@ -33,9 +36,7 @@ class Repository @Inject constructor(
         settingsDao.getSettings()
     }
 
-    /** ======================================================================================= */
-
-    /** Tasks */
+    /** ============================== Tasks ==============================================================*/
 
 
     suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
@@ -56,7 +57,7 @@ class Repository @Inject constructor(
         }
     }
 
-    fun getTasksFlow(type: TypeTask) = when (type) {
+    fun getTasksFlow(type: TypeTask): Flow<List<Task>> = when (type) {
         TypeTask.REGULAR_TASK -> taskDao.getTasksFlow(type.name)
         TypeTask.SINGLE_TASK -> taskDao.getTasksFlow(type.name)
     }
@@ -77,7 +78,15 @@ class Repository @Inject constructor(
 
     suspend fun getTask(id: Long) = withContext(Dispatchers.IO) { taskDao.getTask(id) }
 
-    /** ======================================================================================= */
+    /** ============================== History ==============================================================*/
 
+    val historyFlow: Flow<List<History>> = historyDao.getHistoryFlow()
 
+    suspend fun saveHistory(history: History) = withContext(ioDispatcher) {
+        if (history.isNew) historyDao.insert(history) else historyDao.update(history)
+    }
+
+    suspend fun deleteHistory(history: History) = withContext(ioDispatcher) {
+        historyDao.delete(history)
+    }
 }
