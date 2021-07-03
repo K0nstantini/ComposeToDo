@@ -1,5 +1,6 @@
 package com.grommade.composetodo
 
+import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.db.dao.HistoryDao
 import com.grommade.composetodo.db.dao.SettingsDao
 import com.grommade.composetodo.db.dao.TaskDao
@@ -12,6 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -25,9 +27,6 @@ class Repository @Inject constructor(
 
     val settingsFlow: Flow<Settings> = settingsDao.getSettingsFlow()
 
-    suspend fun insertSettings() =
-        settingsDao.insert(Settings())
-
     suspend fun updateSettings(set: Settings) = withContext(ioDispatcher) {
         settingsDao.update(set)
     }
@@ -39,12 +38,17 @@ class Repository @Inject constructor(
     /** ============================== Tasks ==============================================================*/
 
 
-    suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
-        if (task.isNew) taskDao.insert(task) else taskDao.update(task)
-    }
-
-    suspend fun updateTasks(tasks: List<Task>) = withContext(ioDispatcher) {
-        taskDao.updateTasks(tasks)
+    suspend fun saveTask(task: Task)= withContext(ioDispatcher) {
+        val dateNow = MyCalendar.now()
+        if (task.isNew) {
+            taskDao.insert(task)
+            val history = History(date = dateNow, value = "Inserted new task: '${task.name}'")
+            historyDao.insert(history)
+        } else {
+            taskDao.update(task)
+            val history = History(date = dateNow, value = "Updated task: '${task.name}'")
+            historyDao.insert(history)
+        }
     }
 
     suspend fun deleteTask(task: Task) = withContext(ioDispatcher) {

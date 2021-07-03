@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.sp
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.ui.theme.ComposeToDoTheme
+import timber.log.Timber
 
 @ExperimentalMaterialApi
 @Composable

@@ -123,4 +123,5 @@ data class Settings(
     private fun addSinglePoints(count: Int) =
         copy(singleTask = singleTask.copy(points = singleTask.points + count))
 
+
 }

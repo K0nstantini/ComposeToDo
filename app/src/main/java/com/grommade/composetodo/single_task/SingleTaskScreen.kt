@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +28,7 @@ import com.grommade.composetodo.db.entity.DEFAULT_DEADLINE_SINGLE_TASK
 import com.grommade.composetodo.ui.components.*
 import com.grommade.composetodo.util.Keys
 import com.vanpra.composematerialdialogs.MaterialDialog
+import timber.log.Timber
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
@@ -43,26 +45,21 @@ fun SingleTaskScreen(
             handle.remove<Long>(Keys.SELECTED_TASK_ID)
         }
 
-        val onClickParent: () -> Unit = {
-            navController.navigate(navigateToSelectParent)
+        val onClickParent: () -> Unit = remember {
+            { navController.navigate(navigateToSelectParentRout) }
         }
 
-        val onClickSave: () -> Unit = {
-            saveTask()
-            navController.navigateUp()
-        }
+        navigateToBack.collectAsState().value?.let { navController.navigateUp() }
 
         SingleTaskBody(
-            title = title.collectAsState().value ?: stringResource(R.string.title_add_task_new_task),
             taskItem = taskItem.collectAsState().value,
-            readyToSafe = readyToSafe.collectAsState().value,
             onTaskNameChange = ::onTaskNameChange,
             onClickGroup = ::onGroupClicked,
             onClickParent = onClickParent,
             onClickClearParent = ::onParentClearClicked,
             saveDateStart = ::saveDateStart,
             saveDeadline = ::saveDeadline,
-            onClickSave = onClickSave,
+            onClickSave = ::saveTask,
             onBack = navController::navigateUp
         )
     }
@@ -72,9 +69,7 @@ fun SingleTaskScreen(
 @ExperimentalComposeUiApi
 @Composable
 private fun SingleTaskBody(
-    title: String,
     taskItem: SingleTaskViewModel.SingleTaskItem,
-    readyToSafe: Boolean,
     onTaskNameChange: (String) -> Unit,
     onClickGroup: (Boolean) -> Unit,
     onClickParent: () -> Unit,
@@ -84,11 +79,12 @@ private fun SingleTaskBody(
     onClickSave: () -> Unit,
     onBack: () -> Unit
 ) {
+    Timber.tag("-Timber-").d("Scaffold")
     Scaffold(
         topBar = {
             TopBar(
-                title = title,
-                readyToSafe = readyToSafe,
+                title = taskItem.title ?: stringResource(R.string.title_add_task_new_task),
+                readyToSafe = taskItem.readyToSave,
                 onClickSave = onClickSave,
                 onBack = onBack
             )
@@ -102,7 +98,7 @@ private fun SingleTaskBody(
                 )
         ) {
             TaskNameEditField(
-                text = taskItem.name,
+                name = taskItem.name,
                 onTextChange = onTaskNameChange
             )
             Divider(color = Color.Transparent, thickness = 8.dp)
@@ -130,6 +126,7 @@ fun SetSettingsItems(
     saveDateStart: (MyCalendar) -> Unit,
     saveDeadline: (String) -> Unit,
 ) {
+    Timber.tag("-Timber-").d("SettingsItems")
     val dateStartDialog = remember { MaterialDialog() }.apply { BuiltDateDialog(saveDateStart) }
     val deadlineDialog = remember { MaterialDialog() }.apply {
         BuiltInputDialog(
@@ -141,8 +138,8 @@ fun SetSettingsItems(
             isTextValid = { text -> text.toIntOrNull() ?: 0 > 0 }
         )
     }
-    val onClickDateStart: () -> Unit = { dateStartDialog.show() }
-    val onClickDeadline: () -> Unit = { deadlineDialog.show() }
+    val onClickDateStart: () -> Unit = remember {{ dateStartDialog.show() }}
+    val onClickDeadline: () -> Unit = remember {{ deadlineDialog.show() }}
 
     LazyColumn {
         /** Group */
@@ -198,6 +195,7 @@ private fun TopBar(
     onClickSave: () -> Unit,
     onBack: () -> Unit
 ) {
+    Timber.tag("-Timber-").d("TopAppBar")
     TopAppBar(
         title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
@@ -215,11 +213,12 @@ private fun TopBar(
 
 @Composable
 private fun TaskNameEditField(
-    text: String,
+    name: String,
     onTextChange: (String) -> Unit
 ) {
+    Timber.tag("-Timber-").d("TextField")
     TextField(
-        value = text,
+        value = name,
         onValueChange = onTextChange,
         label = { Text(stringResource(R.string.hint_edit_text_name)) },
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
@@ -235,9 +234,7 @@ private fun TaskNameEditField(
 @Composable
 fun SingleTaskScreenPreview() {
     SingleTaskBody(
-        title = stringResource(R.string.title_add_task_new_task),
         taskItem = SingleTaskViewModel.SingleTaskItem(name = "New Task"),
-        readyToSafe = true,
         onTaskNameChange = {},
         onClickGroup = {},
         onClickParent = {},

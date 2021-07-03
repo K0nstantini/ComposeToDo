@@ -12,6 +12,7 @@ import com.grommade.composetodo.use_cases.DeleteTask
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -202,5 +203,5 @@ class TaskListViewModel @Inject constructor(
 
     private fun getTask(id: Long): Task? = allTasks.value.find { it.id == id }
 
-    private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
+    private fun Task.save() = viewModelScope.launch (Dispatchers.IO) { repo.saveTask(this@save) }
 }

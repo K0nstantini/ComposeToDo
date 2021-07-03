@@ -11,7 +11,8 @@ import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,41 +23,39 @@ class SingleTaskViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     data class SingleTaskItem(
+        val title: String? = null,
         val name: String = "",
         val group: Boolean = false,
         val parent: String? = null,
         val dateStart: String = "",
-        val deadline: Int = 0
+        val deadline: Int = 0,
+        val readyToSave: Boolean = false
     )
 
     private val currentTaskID: Long = handle.get<Long>(Keys.TASK_ID) ?: -1L
     private val currentTask = MutableStateFlow(Task(type = TypeTask.SINGLE_TASK))
 
-    val title = currentTask
-        .map { if (it.isNew) null else it.name }
-        .asState(null)
-
     val taskItem = currentTask
         .map { task ->
             SingleTaskItem(
+                title = if (task.isNew) null else task.name,
                 name = task.name,
                 group = task.group,
                 parent = repo.getTask(task.parent)?.name,
                 dateStart = task.single.dateStart.toString(false),
-                deadline = task.single.deadline
+                deadline = task.single.deadline,
+                readyToSave = task.name.isNotEmpty() && task.single.deadline > 0,
             )
         }.asState(SingleTaskItem())
 
-    val readyToSafe = currentTask
-        .map { task -> task.name.isNotEmpty() && task.single.deadline > 0 }
-        .asState(false)
-
-    val navigateToSelectParent: String
+    val navigateToSelectParentRout: String
         get() = MainRoute.TaskListChildRoute.createRoute(
             mode = ModeTaskList.SELECT_CATALOG,
             type = TypeTask.SINGLE_TASK,
             id = currentTask.value.parent
         )
+
+    val navigateToBack: MutableStateFlow<Boolean?> = MutableStateFlow(null)
 
     /** =========================================== INIT ========================================================= */
 
@@ -86,26 +85,27 @@ class SingleTaskViewModel @Inject constructor(
     }
 
     fun saveDateStart(date: MyCalendar) {
-        currentTask.setValue { copy(single = single.copy(dateStart = date))}
+        currentTask.setValue { copy(single = single.copy(dateStart = date)) }
     }
 
     fun saveDeadline(text: String) {
         text.toIntOrNull()?.let { deadline ->
-            currentTask.setValue { copy(single = single.copy(deadline = deadline))}
+            currentTask.setValue { copy(single = single.copy(deadline = deadline)) }
         }
     }
 
     fun saveTask() {
-        if (readyToSafe.value) {
-            currentTask.value.save()
+        if (taskItem.value.readyToSave) {
+            viewModelScope.launch {
+                repo.saveTask(currentTask.value)
+                navigateToBack.value = true
+            }
         }
     }
 
     fun setParentsID(id: Long) {
         currentTask.setValue { copy(parent = id) }
     }
-
-    private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
 
     private fun MutableStateFlow<Task>.setValue(block: Task.() -> Task) =
         apply { value = block(value) }

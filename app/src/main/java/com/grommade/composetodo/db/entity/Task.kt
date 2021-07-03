@@ -71,4 +71,15 @@ data class Task(
         tasks.find { it.id == task.parent }
     }.count() - 1
 
+    fun getDifferent(other: Task): StringBuilder {
+        val changes = StringBuilder()
+        Task::class.java.declaredFields.forEach { field ->
+            val oldValue = field.get(this)
+            val newValue = field.get(other)
+            if (oldValue != newValue)
+                changes.append("Task '$name' changed '${field.name}' from '$oldValue' to '$newValue'")
+        }
+        return changes
+    }
+
 }
