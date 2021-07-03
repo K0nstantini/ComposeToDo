@@ -2,13 +2,13 @@ package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.MyCalendar
+import com.grommade.composetodo.db.entity.History
 import com.grommade.composetodo.db.entity.Settings
 import com.grommade.composetodo.db.entity.Task
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.util.delEmptyGroups
 import com.grommade.composetodo.util.hoursToMilli
 import kotlinx.coroutines.*
-import java.util.*
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
@@ -25,7 +25,7 @@ class GenerateSingleTasksImpl @Inject constructor(
         val settings = getSettings()
         val dateNow = MyCalendar.now()
 
-        if (needToGenerateTask(settings, dateNow) &&
+        if (needToGenerateTask(settings.singleTask, dateNow) &&
             settings.singleTask.modeGeneration == ModeGenerationSingleTasks.RANDOM
         ) {
             val tasks = repo.getReadyToActivateSingleTasks()
@@ -37,15 +37,14 @@ class GenerateSingleTasksImpl @Inject constructor(
                 lastGeneration = settings.singleTask.lastGeneration,
                 dateNow = dateNow,
                 saveTask = { task -> scope.launch { task.save() } },
-                updateSettings = { set -> scope.launch { set.update() } }
+                updateSettings = { set -> scope.launch { set.save() } },
+                saveHistory = { history -> scope.launch { history.save() } }
             )
         }
-
     }
 
-    private fun needToGenerateTask(settings: Settings, dateNow: MyCalendar): Boolean = with(settings.singleTask) {
-        active && lastGeneration < dateNow && startGeneration < dateNow
-    }
+    private fun needToGenerateTask(set: Settings.SettingsSingleTask, dateNow: MyCalendar): Boolean =
+        set.active && set.lastGeneration < dateNow && set.startGeneration < dateNow
 
     private fun generateRandomTasks(
         tasks: List<Task>,
@@ -54,6 +53,7 @@ class GenerateSingleTasksImpl @Inject constructor(
         dateNow: MyCalendar,
         saveTask: (Task) -> Unit,
         updateSettings: (Settings) -> Unit,
+        saveHistory: (History) -> Unit
     ) {
         val frequency = with(settings.singleTask) { frequencyFrom..frequencyTo }
         val period = with(settings.singleTask) { periodFrom..periodTo }
@@ -65,13 +65,27 @@ class GenerateSingleTasksImpl @Inject constructor(
                 saveTask(
                     task.copy(single = task.single.copy(dateActivation = workDate))
                 )
+                saveHistory(
+                    History(
+                        date = MyCalendar.now(),
+                        value = "'${task.name}' activated. Date activation: $workDate"
+                    )
+                )
             }
         }
 
         val lastDate = with(settings.singleTask) { if (lastGeneration.isEmpty()) startGeneration else lastGeneration }
         val newDate = generateDate(frequency, lastDate)
+
+        saveHistory(
+            History(
+                date = MyCalendar.now(),
+                value = "Generated new activated date: $newDate"
+            )
+        )
+
         if (newDate < dateNow) {
-            generateRandomTasks(tasksToActivate, settings, newDate, dateNow, saveTask, updateSettings)
+            generateRandomTasks(tasksToActivate, settings, newDate, dateNow, saveTask, updateSettings, saveHistory)
         } else {
             updateSettings(
                 settings.copy(singleTask = settings.singleTask.copy(lastGeneration = newDate))
@@ -154,7 +168,8 @@ class GenerateSingleTasksImpl @Inject constructor(
         daysOfWeek.isEmpty() || daysOfWeek.contains(getNumberDayOfWeek().toString())
 
     private suspend fun Task.save() = repo.saveTask(this)
-    private suspend fun Settings.update() = repo.updateSettings(this@update)
+    private suspend fun Settings.save() = repo.updateSettings(this)
+    private suspend fun History.save() = repo.saveHistory(this)
 
 }
 

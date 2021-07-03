@@ -79,7 +79,6 @@ private fun SingleTaskBody(
     onClickSave: () -> Unit,
     onBack: () -> Unit
 ) {
-    Timber.tag("-Timber-").d("Scaffold")
     Scaffold(
         topBar = {
             TopBar(
@@ -126,8 +125,9 @@ fun SetSettingsItems(
     saveDateStart: (MyCalendar) -> Unit,
     saveDeadline: (String) -> Unit,
 ) {
-    Timber.tag("-Timber-").d("SettingsItems")
-    val dateStartDialog = remember { MaterialDialog() }.apply { BuiltDateDialog(saveDateStart) }
+    val dateStartDialog = remember { MaterialDialog() }.apply {
+        BuiltDateDialog(saveDateStart)
+    }
     val deadlineDialog = remember { MaterialDialog() }.apply {
         BuiltInputDialog(
             title = stringResource(R.string.alert_title_add_single_task_deadline),
@@ -138,8 +138,6 @@ fun SetSettingsItems(
             isTextValid = { text -> text.toIntOrNull() ?: 0 > 0 }
         )
     }
-    val onClickDateStart: () -> Unit = remember {{ dateStartDialog.show() }}
-    val onClickDeadline: () -> Unit = remember {{ deadlineDialog.show() }}
 
     LazyColumn {
         /** Group */
@@ -167,7 +165,7 @@ fun SetSettingsItems(
                 title = stringResource(R.string.settings_add_single_task_title_date_start),
                 value = taskItem.dateStart,
                 enabled = !taskItem.group,
-                onClick = onClickDateStart,
+                onClick = dateStartDialog::show,
             )
         }
         /** Deadline */
@@ -182,7 +180,7 @@ fun SetSettingsItems(
                     )
                 },
                 enabled = !taskItem.group,
-                onClick = onClickDeadline,
+                onClick = deadlineDialog::show,
             )
         }
     }
@@ -195,7 +193,6 @@ private fun TopBar(
     onClickSave: () -> Unit,
     onBack: () -> Unit
 ) {
-    Timber.tag("-Timber-").d("TopAppBar")
     TopAppBar(
         title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         navigationIcon = {
@@ -216,7 +213,6 @@ private fun TaskNameEditField(
     name: String,
     onTextChange: (String) -> Unit
 ) {
-    Timber.tag("-Timber-").d("TextField")
     TextField(
         value = name,
         onValueChange = onTextChange,

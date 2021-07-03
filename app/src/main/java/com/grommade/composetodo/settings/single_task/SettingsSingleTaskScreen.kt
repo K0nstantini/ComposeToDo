@@ -1,6 +1,5 @@
 package com.grommade.composetodo.settings.single_task
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
@@ -39,13 +38,15 @@ fun SettingsSingleTaskScreen(
 
     with(viewModel) {
 
+        val navigateToFrequency = remember {
+            { navController.navigate(SettingsSingleTaskRoute.SettingsSingleTaskFrequencyChildRoute.route) }
+        }
+
         SettingsSingleTaskScreenBody(
             settings = settings.collectAsState(Settings()).value.singleTask,
             onClickActive = ::onClickActive,
-            onClickTimeAndFrequency = {
-                navController.navigate(SettingsSingleTaskRoute.SettingsSingleTaskFrequencyChildRoute.route)
-            },
-            onBack = { navController.navigateUp() }
+            onClickTimeAndFrequency = navigateToFrequency,
+            onBack = navController::navigateUp
         )
     }
 

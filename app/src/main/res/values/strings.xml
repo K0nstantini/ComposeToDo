@@ -86,6 +86,7 @@
     <string name="alert_title_postpone_current_task">Отложить текущую задачу</string>
     <string name="alert_title_postpone_next_task">Отложить следующую задачу</string>
     <string name="alert_title_delete_task">Удалить выбранные задачи?</string>
+    <string name="alert_title_delete_history">Очистить историю?</string>
     <string name="alert_message_delete_group_task">Задачи в группе будут также удалены</string>
     <string name="alert_title_mode_generation_s_tasks">Выберите режим генерации задач</string>
     <string name="alert_title_select_time_s_tasks">Время генерации задач</string>

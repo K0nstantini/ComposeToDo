@@ -131,7 +131,7 @@ private fun actionsTopBar(
         )
     }
 
-    IconButton(onClick = { taskDoneDialog.show() }) {
+    IconButton(onClick = taskDoneDialog::show) {
         Icon(Icons.Filled.Done, "")
     }
 }

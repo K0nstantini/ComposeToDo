@@ -35,17 +35,21 @@ fun TaskListScreen(
     viewModel: TaskListViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
-    val onBack: () -> Unit = { navController.navigateUp() }
 
     with(viewModel) {
-        val taskAddEdit = {
-            navController.navigate(routToAddEditTask)
-            closeActionMode()
+        val taskAddEdit = remember {
+            {
+                navController.navigate(routToAddEditTask)
+                closeActionMode()
+            }
         }
-        val onBackWithID = {
-            navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, currentTaskID)
-            onBack()
+        val onBackWithID: () -> Unit = remember {
+            {
+                navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SELECTED_TASK_ID, currentTaskID)
+                navController.navigateUp()
+            }
         }
+
         TaskListBody(
             title = title.collectAsState().value ?: stringResource(defaultTitle),
             actionMode = actionMode.collectAsState().value,
@@ -58,7 +62,7 @@ fun TaskListScreen(
             taskAddEdit = taskAddEdit,
             taskDel = ::onDeleteClicked,
             onBackWithID = onBackWithID,
-            onBack = onBack,
+            onBack = navController::navigateUp,
         )
     }
 }
@@ -181,7 +185,7 @@ private fun TopBarActionModeBody(
         contentColor = MaterialTheme.colors.onPrimary,
         actions = {
             if (availability.showDoneActionMenu) {
-                IconButton(onClick = { taskDoneDialog.show() }) {
+                IconButton(onClick = taskDoneDialog::show) {
                     Icon(Icons.Filled.Done, "")
                 }
             }
@@ -190,7 +194,7 @@ private fun TopBarActionModeBody(
                     Icon(Icons.Filled.Edit, "")
                 }
             }
-            IconButton(onClick = { taskDelDialog.show() }) {
+            IconButton(onClick = taskDelDialog::show) {
                 Icon(Icons.Filled.Delete, "")
             }
         }

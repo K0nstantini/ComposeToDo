@@ -49,7 +49,7 @@ fun SettingsSingleTaskFrequencyScreen(
         SettingsSingleTaskFrequencyScreenBody(
             settings = settings.collectAsState(Settings()).value.singleTask,
             savesCallbacks = savesCallbacks,
-            onBack = { navController.navigateUp() }
+            onBack = navController::navigateUp
         )
     }
 
@@ -65,7 +65,6 @@ private fun SettingsSingleTaskFrequencyScreenBody(
 ) {
     Scaffold(
         topBar = {
-            // TODO: Appbar вынести
             TopAppBar(
                 title = { Text(stringResource(R.string.title_settings_s_tasks_time_and_frequency)) },
                 navigationIcon = { NavigationBackIcon(onBack) },
@@ -104,7 +103,7 @@ private fun ModeItem(
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_mode_generation),
         value = stringResource(mode.title),
-        onClick = { modeDialog.show() },
+        onClick = modeDialog::show,
     )
 }
 
@@ -135,7 +134,7 @@ private fun TimeItem(
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_period),
         value = valueSelectTime,
-        onClick = { periodListDialog.show() },
+        onClick = periodListDialog::show,
     )
 }
 
@@ -173,7 +172,7 @@ private fun DaysItem(
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_days),
         value = valueSelectDays,
-        onClick = { daysListDialog.show() },
+        onClick = daysListDialog::show,
     )
 }
 
@@ -188,7 +187,7 @@ private fun CountTasksItem(
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_count_tasks),
         value = countTasks.toString(),
-        onClick = { countTasksDialog.show() },
+        onClick = countTasksDialog::show,
     )
 }
 
@@ -204,7 +203,7 @@ private fun FrequencyItem(
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_frequency),
         value = stringResource(R.string.settings_s_task_value_frequency, frequencyFrom, frequencyTo),
-        onClick = { frequencyDialog.show() },
+        onClick = frequencyDialog::show,
     )
 }
 

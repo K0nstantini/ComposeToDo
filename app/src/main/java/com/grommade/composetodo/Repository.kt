@@ -42,12 +42,12 @@ class Repository @Inject constructor(
         val dateNow = MyCalendar.now()
         if (task.isNew) {
             taskDao.insert(task)
-            val history = History(date = dateNow, value = "Inserted new task: '${task.name}'")
-            historyDao.insert(history)
+//            val history = History(date = dateNow, value = "Inserted new task: '${task.name}'")
+//            historyDao.insert(history)
         } else {
             taskDao.update(task)
-            val history = History(date = dateNow, value = "Updated task: '${task.name}'")
-            historyDao.insert(history)
+//            val history = History(date = dateNow, value = "Updated task: '${task.name}'")
+//            historyDao.insert(history)
         }
     }
 
@@ -92,5 +92,9 @@ class Repository @Inject constructor(
 
     suspend fun deleteHistory(history: History) = withContext(ioDispatcher) {
         historyDao.delete(history)
+    }
+
+    suspend fun deleteAllHistory() = withContext(ioDispatcher) {
+        historyDao.deleteAll()
     }
 }

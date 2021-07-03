@@ -30,7 +30,7 @@ fun SettingsScreen(
             onClickGeneralSettings = { navController.navigate(SettingsRoute.SettingsGeneralChildRoute.route) },
             onClickRegularSettings = { navController.navigate(SettingsRoute.SettingsRegularTaskChildRoute.route) },
             onClickSingleSettings = { navController.navigate(SettingsRoute.SettingsSingleTaskChildRoute.route) },
-            onBack = { navController.navigateUp() }
+            onBack = navController::navigateUp
         )
     }
 

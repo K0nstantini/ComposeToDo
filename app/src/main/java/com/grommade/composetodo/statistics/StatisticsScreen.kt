@@ -29,7 +29,7 @@ fun StatisticsScreen(
         StatisticsScreenBody(
             regularPoints = regularPoints.collectAsState().value,
             singlePoints = singlePoints.collectAsState().value,
-            onBack = { navController.navigateUp() }
+            onBack = navController::navigateUp
         )
     }
 }
