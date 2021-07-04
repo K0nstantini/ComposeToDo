@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 const val DEFAULT_DEADLINE_SINGLE_TASK = 24
 
 @Parcelize
-@Entity(tableName = "task_table")
+@Entity(tableName = "single_task_table")
 data class Task(
 
     /** General */

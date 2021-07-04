@@ -1,9 +1,9 @@
 package com.grommade.composetodo.settings.single_task.time_and_frequency
 
 import androidx.lifecycle.viewModelScope
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.use_cases.UpdateSettings
 import com.grommade.composetodo.util.change
@@ -15,11 +15,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsSingleTaskFrequencyViewModel @Inject constructor(
-    repo: Repository,
+    repoSettings: RepoSettings,
     private val updateSettings: UpdateSettings
 ) : BaseViewModel() {
 
-    val settings = repo.settingsFlow.asState(Settings())
+    val settings = repoSettings.settingsFlow.asState(Settings())
 
     class SavesCallbacks(
         val saveMode: (Int) -> Unit = {},

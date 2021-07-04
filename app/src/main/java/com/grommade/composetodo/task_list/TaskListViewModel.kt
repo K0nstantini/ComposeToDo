@@ -2,10 +2,10 @@ package com.grommade.composetodo.task_list
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.TasksRoute
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.use_cases.DeleteTask
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
-    private val repo: Repository,
+    private val repoSingleTask: RepoSingleTask,
     private val performSingleTask: PerformSingleTask,
     private val deleteTask: DeleteTask,
     handle: SavedStateHandle,
@@ -54,7 +54,7 @@ class TaskListViewModel @Inject constructor(
 
     /** Variables flow */
 
-    private val allTasks: StateFlow<List<Task>> = repo.getTasksFlow(taskType).asState(emptyList())
+    private val allTasks: StateFlow<List<Task>> = repoSingleTask.allTasks.asState(emptyList())
 
     private var selectedTasks: MutableStateFlow<List<Long>> = MutableStateFlow(
         if (selectedTaskID > 0L) listOf(selectedTaskID) else emptyList()
@@ -108,7 +108,7 @@ class TaskListViewModel @Inject constructor(
     private suspend fun mapToCurrentTask(selected: List<Long>): Task? =
         // При выборе родителя нужно получить текущую задачу сразу и allTask еще не подгрузятся
         when (val id = if (selected.count() == 1) selected.first() else null) {
-            is Long -> getTask(id) ?: repo.getTask(id)
+            is Long -> getTask(id) ?: repoSingleTask.getTask(id)
             else -> null
         }
 
@@ -203,5 +203,5 @@ class TaskListViewModel @Inject constructor(
 
     private fun getTask(id: Long): Task? = allTasks.value.find { it.id == id }
 
-    private fun Task.save() = viewModelScope.launch (Dispatchers.IO) { repo.saveTask(this@save) }
+    private fun Task.save() = viewModelScope.launch (Dispatchers.IO) { repoSingleTask.saveTask(this@save) }
 }

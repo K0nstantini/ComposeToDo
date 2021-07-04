@@ -5,9 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.grommade.composetodo.data.AppDataBase
-import com.grommade.composetodo.data.dao.HistoryDao
 import com.grommade.composetodo.data.dao.SettingsDao
-import com.grommade.composetodo.data.dao.TaskDao
 import com.grommade.composetodo.data.entity.Settings
 import dagger.Module
 import dagger.Provides
@@ -22,7 +20,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class DataModule {
+object RoomDatabaseModule {
 
     @Provides
     @Singleton
@@ -57,19 +55,17 @@ class DataModule {
             .build()
     }
 
+}
+
+@InstallIn(SingletonComponent::class)
+@Module
+object DatabaseDaoModule {
+    @Provides
+    fun provideSettingsDao(db: AppDataBase) = db.SettingsDao()
 
     @Provides
-    fun provideSettingsDao(appDatabase: AppDataBase): SettingsDao {
-        return appDatabase.SettingsDao()
-    }
+    fun provideTaskDao(db: AppDataBase) = db.SingleTaskDao()
 
     @Provides
-    fun provideTaskDao(appDatabase: AppDataBase): TaskDao {
-        return appDatabase.TaskDao()
-    }
-
-    @Provides
-    fun provideHistoryDao(appDatabase: AppDataBase): HistoryDao {
-        return appDatabase.HistoryDao()
-    }
+    fun provideHistoryDao(db: AppDataBase) = db.HistoryDao()
 }

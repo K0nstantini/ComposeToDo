@@ -3,10 +3,10 @@ package com.grommade.composetodo.single_task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.MainRoute
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SingleTaskViewModel @Inject constructor(
-    private val repo: Repository,
+    private val repoSingleTask: RepoSingleTask,
     handle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -41,7 +41,7 @@ class SingleTaskViewModel @Inject constructor(
                 title = if (task.isNew) null else task.name,
                 name = task.name,
                 group = task.group,
-                parent = repo.getTask(task.parent)?.name,
+                parent = repoSingleTask.getTask(task.parent)?.name,
                 dateStart = task.single.dateStart.toString(false),
                 deadline = task.single.deadline,
                 readyToSave = task.name.isNotEmpty() && task.single.deadline > 0,
@@ -61,7 +61,7 @@ class SingleTaskViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repo.getTask(currentTaskID)?.let { task ->
+            repoSingleTask.getTask(currentTaskID)?.let { task ->
                 currentTask.value = task
             }
         }
@@ -97,7 +97,7 @@ class SingleTaskViewModel @Inject constructor(
     fun saveTask() {
         if (taskItem.value.readyToSave) {
             viewModelScope.launch {
-                repo.saveTask(currentTask.value)
+                repoSingleTask.saveTask(currentTask.value)
                 navigateToBack.value = true
             }
         }

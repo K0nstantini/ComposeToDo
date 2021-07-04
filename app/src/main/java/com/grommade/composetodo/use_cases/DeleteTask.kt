@@ -2,13 +2,13 @@ package com.grommade.composetodo.use_cases
 
 import android.content.Context
 import com.grommade.composetodo.R
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.add_classes.ResultOf
 import com.grommade.composetodo.add_classes.doIfFailure
 import com.grommade.composetodo.add_classes.doIfSuccess
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.util.groupIsEmpty
 import javax.inject.Inject
 
@@ -19,7 +19,7 @@ interface DeleteTask {
 // TODO: Check work
 class DeleteTaskImpl @Inject constructor(
     private val appContext: Context,
-    private val repo: Repository,
+    private val repoSingleTask: RepoSingleTask,
     private val getSettings: GetSettings
 ) : DeleteTask {
 
@@ -35,14 +35,14 @@ class DeleteTaskImpl @Inject constructor(
             val result = checkTask(settings, _task)
             result.doIfFailure { message, _ -> errorsMessage.append(message) }
             result.doIfSuccess {
-                repo.deleteTask(_task)
+                repoSingleTask.deleteTask(_task)
                 tasksToDel.remove(_task)
             }
         }
 
         tasksToDel.forEach {
             if (tasksToDel.groupIsEmpty(it)) {
-                repo.deleteTask(it)
+                repoSingleTask.deleteTask(it)
             }
         }
 

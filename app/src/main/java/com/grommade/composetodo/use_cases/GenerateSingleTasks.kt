@@ -1,14 +1,17 @@
 package com.grommade.composetodo.use_cases
 
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.History
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.repos.RepoHistory
+import com.grommade.composetodo.data.repos.RepoSettings
+import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.util.delEmptyGroups
 import com.grommade.composetodo.util.hoursToMilli
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
@@ -17,7 +20,9 @@ interface GenerateSingleTasks {
 }
 
 class GenerateSingleTasksImpl @Inject constructor(
-    private val repo: Repository,
+    private val repoSettings: RepoSettings,
+    private val repoSingleTask: RepoSingleTask,
+    private val repoHistory: RepoHistory,
     private val getSettings: GetSettings
 ) : GenerateSingleTasks {
 
@@ -28,7 +33,7 @@ class GenerateSingleTasksImpl @Inject constructor(
         if (needToGenerateTask(settings.singleTask, dateNow) &&
             settings.singleTask.modeGeneration == ModeGenerationSingleTasks.RANDOM
         ) {
-            val tasks = repo.getReadyToActivateSingleTasks()
+            val tasks = repoSingleTask.getNoActivateTasks()
             val scope = CoroutineScope(coroutineContext)
 
             generateRandomTasks(
@@ -167,9 +172,9 @@ class GenerateSingleTasksImpl @Inject constructor(
     private fun MyCalendar.dateInWorkDays(daysOfWeek: String): Boolean =
         daysOfWeek.isEmpty() || daysOfWeek.contains(getNumberDayOfWeek().toString())
 
-    private suspend fun Task.save() = repo.saveTask(this)
-    private suspend fun Settings.save() = repo.updateSettings(this)
-    private suspend fun History.save() = repo.saveHistory(this)
+    private suspend fun Task.save() = repoSingleTask.saveTask(this)
+    private suspend fun Settings.save() = repoSettings.updateSettings(this)
+    private suspend fun History.save() = repoHistory.saveHistory(this)
 
 }
 

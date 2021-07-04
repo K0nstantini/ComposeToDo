@@ -1,12 +1,12 @@
 package com.grommade.composetodo.settings
 
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
+import com.grommade.composetodo.data.repos.RepoSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val repo: Repository
+    private val repoSettings: RepoSettings
 ) : BaseViewModel() {
 }

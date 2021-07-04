@@ -1,11 +1,12 @@
 package com.grommade.composetodo.home
 
 import androidx.lifecycle.viewModelScope
-import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.repos.RepoSettings
+import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.use_cases.UpdateSettings
@@ -18,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val repo: Repository,
+    private val repoSettings: RepoSettings,
+    private val repoSingleTask: RepoSingleTask,
     private val performSingleTask: PerformSingleTask,
     private val updateSettings: UpdateSettings,
     private val generateSingleTasks: GenerateSingleTasks
@@ -31,9 +33,9 @@ class HomeViewModel @Inject constructor(
         val selected: Boolean
     )
 
-    private val settings: StateFlow<Settings> = repo.settingsFlow.asState(Settings())
+    private val settings: StateFlow<Settings> = repoSettings.settingsFlow.asState(Settings())
 
-    private val activatedSingleTasks = repo.activatedSingleTasks.asState(emptyList())
+    private val activatedSingleTasks = repoSingleTask.activeTasks.asState(emptyList())
 
     private val currentTask = MutableStateFlow<Task?>(null)
 
@@ -62,16 +64,15 @@ class HomeViewModel @Inject constructor(
     /** =========================================== FUNCTIONS ==================================================== */
 
     fun refreshTasks() = viewModelScope.launch {
-        if (repo.getSettings().isNotEmpty()) { // FIXME: WTF?
+        if (repoSettings.getSettings().isNotEmpty()) { // FIXME: WTF?
             generateSingleTasks()
         }
     }
 
     fun deactivateTasks() = viewModelScope.launch {
-        updateSettings(
-            settings.value.change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
-        )
-        val tasks = repo.getAllSingleTasks()
+        val set = settings.value.change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
+        updateSettings(set)
+        val tasks = repoSingleTask.getAllTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
             task.copy(single = task.single.copy(dateActivation = MyCalendar())).save()
         }
@@ -98,7 +99,7 @@ class HomeViewModel @Inject constructor(
         currentTask.value = null
     }
 
-    private fun Task.save() = viewModelScope.launch { repo.saveTask(this@save) }
+    private fun Task.save() = viewModelScope.launch { repoSingleTask.saveTask(this@save) }
 
 }
 
