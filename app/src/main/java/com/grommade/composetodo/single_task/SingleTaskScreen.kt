@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,11 +23,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.db.entity.DEFAULT_DEADLINE_SINGLE_TASK
+import com.grommade.composetodo.data.entity.DEFAULT_DEADLINE_SINGLE_TASK
 import com.grommade.composetodo.ui.components.*
 import com.grommade.composetodo.util.Keys
 import com.vanpra.composematerialdialogs.MaterialDialog
-import timber.log.Timber
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi

@@ -18,8 +18,8 @@ import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.SettingsSingleTaskRoute
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.db.entity.Settings
-import com.grommade.composetodo.db.entity.Settings.SettingsSingleTask
+import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.ui.components.BuiltDateTimeDialog
 import com.grommade.composetodo.ui.components.SetItemDefault

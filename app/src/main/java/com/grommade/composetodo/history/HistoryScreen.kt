@@ -23,7 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.db.entity.History
+import com.grommade.composetodo.data.entity.History
 import com.grommade.composetodo.ui.components.BuiltSimpleOkCancelDialog
 import com.vanpra.composematerialdialogs.MaterialDialog
 

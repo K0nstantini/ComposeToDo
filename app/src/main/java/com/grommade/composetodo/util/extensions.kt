@@ -1,11 +1,9 @@
 package com.grommade.composetodo.util
 
 import android.content.res.Resources
-import com.grommade.composetodo.db.entity.Settings
-import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.enums.DialogDaysOfWeek
-import java.time.LocalTime
-import java.util.*
 
 typealias singleSet = Settings.SettingsSingleTask
 

@@ -1,8 +1,8 @@
 package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.db.entity.Settings
-import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.util.delEmptyGroups
 import com.grommade.composetodo.util.hoursToMilli
 import com.grommade.composetodo.util.timeToMinutes

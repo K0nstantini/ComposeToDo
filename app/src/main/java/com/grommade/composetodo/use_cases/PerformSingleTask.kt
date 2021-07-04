@@ -1,7 +1,7 @@
 package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.Repository
-import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.data.entity.Task
 import javax.inject.Inject
 
 interface PerformSingleTask {

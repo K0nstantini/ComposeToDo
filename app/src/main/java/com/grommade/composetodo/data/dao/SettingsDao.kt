@@ -1,7 +1,7 @@
-package com.grommade.composetodo.db.dao
+package com.grommade.composetodo.data.dao
 
 import androidx.room.*
-import com.grommade.composetodo.db.entity.Settings
+import com.grommade.composetodo.data.entity.Settings
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,7 +22,10 @@ interface SettingsDao {
     @Query("SELECT * FROM settings_table LIMIT 1")
     fun getSettingsFlow(): Flow<Settings>
 
-    @Query("SELECT * FROM settings_table LIMIT 1")
-    fun getSettings(): Settings?
+    @Query("SELECT * FROM settings_table")
+    suspend fun getSettings(): List<Settings>
+
+    @Query("SELECT COUNT(*) FROM settings_table")
+    suspend fun getCountSettings(): Int
 
 }

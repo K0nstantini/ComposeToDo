@@ -1,19 +1,18 @@
 package com.grommade.composetodo
 
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.db.dao.HistoryDao
-import com.grommade.composetodo.db.dao.SettingsDao
-import com.grommade.composetodo.db.dao.TaskDao
-import com.grommade.composetodo.db.entity.History
-import com.grommade.composetodo.db.entity.Settings
-import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.data.dao.HistoryDao
+import com.grommade.composetodo.data.dao.SettingsDao
+import com.grommade.composetodo.data.dao.TaskDao
+import com.grommade.composetodo.data.entity.History
+import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.nestedTasks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 class Repository @Inject constructor(
@@ -31,7 +30,7 @@ class Repository @Inject constructor(
         settingsDao.update(set)
     }
 
-    suspend fun getSettings() = withContext(ioDispatcher) {
+    suspend fun getSettings(): List<Settings> = withContext(ioDispatcher) {
         settingsDao.getSettings()
     }
 

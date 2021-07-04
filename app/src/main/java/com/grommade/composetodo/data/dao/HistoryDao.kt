@@ -1,7 +1,7 @@
-package com.grommade.composetodo.db.dao
+package com.grommade.composetodo.data.dao
 
 import androidx.room.*
-import com.grommade.composetodo.db.entity.History
+import com.grommade.composetodo.data.entity.History
 import kotlinx.coroutines.flow.Flow
 
 @Dao

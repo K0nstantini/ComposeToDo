@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.db.entity.Settings
-import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.use_cases.UpdateSettings
@@ -62,7 +62,9 @@ class HomeViewModel @Inject constructor(
     /** =========================================== FUNCTIONS ==================================================== */
 
     fun refreshTasks() = viewModelScope.launch {
-        repo.getSettings()?.let { generateSingleTasks() } // FIXME: WTF?
+        if (repo.getSettings().isNotEmpty()) { // FIXME: WTF?
+            generateSingleTasks()
+        }
     }
 
     fun deactivateTasks() = viewModelScope.launch {

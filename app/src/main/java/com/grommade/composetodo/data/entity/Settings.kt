@@ -1,4 +1,4 @@
-package com.grommade.composetodo.db.entity
+package com.grommade.composetodo.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

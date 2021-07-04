@@ -1,4 +1,4 @@
-package com.grommade.composetodo.db.entity
+package com.grommade.composetodo.data.entity
 
 import android.os.Parcelable
 import androidx.room.Embedded

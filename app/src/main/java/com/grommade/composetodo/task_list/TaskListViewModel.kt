@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.Repository
 import com.grommade.composetodo.TasksRoute
 import com.grommade.composetodo.add_classes.BaseViewModel
-import com.grommade.composetodo.db.entity.Task
+import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.use_cases.DeleteTask

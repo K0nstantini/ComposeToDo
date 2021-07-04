@@ -20,10 +20,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
-import com.grommade.composetodo.db.entity.Settings
-import com.grommade.composetodo.db.entity.Settings.SettingsSingleTask
-import com.grommade.composetodo.db.entity.Settings.SettingsSingleTask.Companion.FREQUENCY_GENERATE_FROM
-import com.grommade.composetodo.db.entity.Settings.SettingsSingleTask.Companion.FREQUENCY_GENERATE_TO
+import com.grommade.composetodo.data.entity.Settings
+import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask
+import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask.Companion.FREQUENCY_GENERATE_FROM
+import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask.Companion.FREQUENCY_GENERATE_TO
 import com.grommade.composetodo.enums.DialogDaysOfWeek
 import com.grommade.composetodo.enums.DialogSelectDays
 import com.grommade.composetodo.enums.DialogSelectPeriod

@@ -1,4 +1,4 @@
-package com.grommade.composetodo.db
+package com.grommade.composetodo.data
 
 import androidx.room.TypeConverter
 import com.grommade.composetodo.add_classes.MyCalendar

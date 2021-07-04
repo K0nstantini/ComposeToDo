@@ -1,7 +1,7 @@
 package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.Repository
-import com.grommade.composetodo.db.entity.Settings
+import com.grommade.composetodo.data.entity.Settings
 import javax.inject.Inject
 
 interface GetSettings {
@@ -13,11 +13,14 @@ class GetSettingsImpl @Inject constructor(
     private val repo: Repository
 ) : GetSettings {
 
-    override suspend fun invoke() =
-        checkNotNull(repo.getSettings()) { "Settings isn't initialised" }
+    override suspend fun invoke(): Settings {
+        return when (val set = repo.getSettings()) {
+            emptyList<Settings>() -> throw Exception("Settings isn't initialised")
+            else -> set.first()
+        }
+    }
 
 }
-
 
 interface UpdateSettings {
     suspend operator fun invoke(settings: Settings)
