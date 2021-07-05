@@ -1,31 +1,20 @@
 package com.grommade.composetodo.data.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Query
 import com.grommade.composetodo.data.entity.Settings
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SettingsDao {
+abstract class SettingsDao : EntityDao<Settings>() {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(set: Settings)
+    @Query("SELECT * FROM settings_table WHERE id == 1")
+    abstract fun observeSettings(): Flow<Settings>
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(set: Settings)
-
-    @Delete
-    suspend fun delete(set: Settings)
-
-    @Query("DELETE FROM settings_table")
-    suspend fun deleteAll()
-
-    @Query("SELECT * FROM settings_table LIMIT 1")
-    fun getSettingsFlow(): Flow<Settings>
-
-    @Query("SELECT * FROM settings_table")
-    suspend fun getSettings(): List<Settings>
+    @Query("SELECT * FROM settings_table WHERE id == 1")
+    abstract suspend fun getSettings(): Settings?
 
     @Query("SELECT COUNT(*) FROM settings_table")
-    suspend fun getCountSettings(): Int
+    abstract suspend fun getCountSettings(): Int
 
 }

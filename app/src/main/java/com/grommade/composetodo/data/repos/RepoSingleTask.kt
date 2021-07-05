@@ -17,10 +17,7 @@ class RepoSingleTask @Inject constructor(
     val activeTasks: Flow<List<Task>> = singleTaskDao.getActiveTasks()
 
     suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
-        when (task.isNew) {
-            true -> singleTaskDao.insert(task)
-            false -> singleTaskDao.update(task)
-        }
+        singleTaskDao.insertOrUpdate(task)
     }
 
     suspend fun deleteTask(task: Task) = withContext(ioDispatcher) {

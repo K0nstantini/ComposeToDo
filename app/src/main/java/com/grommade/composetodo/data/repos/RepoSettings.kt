@@ -13,13 +13,20 @@ class RepoSettings @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    val settingsFlow: Flow<Settings> = settingsDao.getSettingsFlow()
+    val settingsFlow: Flow<Settings> = settingsDao.observeSettings()
 
     suspend fun updateSettings(set: Settings) = withContext(ioDispatcher) {
         settingsDao.update(set)
     }
 
-    suspend fun getSettings(): List<Settings> = withContext(ioDispatcher) {
-        settingsDao.getSettings()
+    suspend fun getSettings(): Settings = withContext(ioDispatcher) {
+        when (val set = settingsDao.getSettings()) {
+            null -> throw Exception("Settings isn't initialised")
+            else -> set
+        }
+    }
+
+    suspend fun getCountSettings() = withContext(ioDispatcher) {
+        settingsDao.getCountSettings()
     }
 }

@@ -12,11 +12,13 @@ interface PerformSingleTask {
 class PerformSingleTaskImpl @Inject constructor(
     private val repoSettings: RepoSettings,
     private val repoSingleTask: RepoSingleTask,
-    private val getSettings: GetSettings
 ) : PerformSingleTask {
 
     override suspend fun invoke(task: Task) {
-        getSettings().addSinglePointsTaskDone(task).also { repoSettings.updateSettings(it) }
+        repoSettings.getSettings()
+            .addSinglePointsTaskDone(task)
+            .also { repoSettings.updateSettings(it) }
+
         repoSingleTask.deleteTask(task)
     }
 }

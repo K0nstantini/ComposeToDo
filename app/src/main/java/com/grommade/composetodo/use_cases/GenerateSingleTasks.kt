@@ -23,11 +23,10 @@ class GenerateSingleTasksImpl @Inject constructor(
     private val repoSettings: RepoSettings,
     private val repoSingleTask: RepoSingleTask,
     private val repoHistory: RepoHistory,
-    private val getSettings: GetSettings
 ) : GenerateSingleTasks {
 
     override suspend fun invoke() {
-        val settings = getSettings()
+        val settings = repoSettings.getSettings()
         val dateNow = MyCalendar.now()
 
         if (needToGenerateTask(settings.singleTask, dateNow) &&
@@ -173,8 +172,8 @@ class GenerateSingleTasksImpl @Inject constructor(
         daysOfWeek.isEmpty() || daysOfWeek.contains(getNumberDayOfWeek().toString())
 
     private suspend fun Task.save() = repoSingleTask.saveTask(this)
-    private suspend fun Settings.save() = repoSettings.updateSettings(this)
     private suspend fun History.save() = repoHistory.saveHistory(this)
+    private suspend fun Settings.save() = repoSettings.updateSettings(this)
 
 }
 

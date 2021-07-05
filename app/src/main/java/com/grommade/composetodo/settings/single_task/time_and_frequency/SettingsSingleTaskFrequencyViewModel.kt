@@ -5,7 +5,6 @@ import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
-import com.grommade.composetodo.use_cases.UpdateSettings
 import com.grommade.composetodo.util.change
 import com.grommade.composetodo.util.singleSet
 import com.grommade.composetodo.util.timeToMinutes
@@ -15,8 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsSingleTaskFrequencyViewModel @Inject constructor(
-    repoSettings: RepoSettings,
-    private val updateSettings: UpdateSettings
+    private val repoSettings: RepoSettings,
 ) : BaseViewModel() {
 
     val settings = repoSettings.settingsFlow.asState(Settings())
@@ -101,7 +99,7 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
     }
 
     private fun changeSettings(body: (singleSet) -> singleSet) = viewModelScope.launch {
-        updateSettings(settings.value.change(body))
+        repoSettings.updateSettings(settings.value.change(body))
     }
 
 }

@@ -5,19 +5,11 @@ import com.grommade.composetodo.data.entity.History
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface HistoryDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(set: History)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(set: History)
-
-    @Delete
-    suspend fun delete(set: History)
+abstract class HistoryDao : EntityDao<History>() {
 
     @Query("DELETE FROM history_table")
-    suspend fun deleteAll()
+    abstract suspend fun deleteAll()
 
     @Query("SELECT * FROM history_table ORDER BY date DESC")
-    fun getHistoryFlow(): Flow<List<History>>
+    abstract fun getHistoryFlow(): Flow<List<History>>
 }

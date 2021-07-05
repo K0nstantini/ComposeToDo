@@ -9,10 +9,10 @@ import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
-import com.grommade.composetodo.use_cases.UpdateSettings
 import com.grommade.composetodo.util.change
 import com.grommade.composetodo.util.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,56 +22,24 @@ class HomeViewModel @Inject constructor(
     private val repoSettings: RepoSettings,
     private val repoSingleTask: RepoSingleTask,
     private val performSingleTask: PerformSingleTask,
-    private val updateSettings: UpdateSettings,
     private val generateSingleTasks: GenerateSingleTasks
 ) : BaseViewModel() {
 
-    data class HomeTaskItem(
-        val id: Long,
-        val name: String,
-        val deadline: MyCalendar,
-        val selected: Boolean
-    )
+    val state = repoSingleTask.activeTasks.map { tasks ->
+        HomeViewState(tasks)
+    }
 
     private val settings: StateFlow<Settings> = repoSettings.settingsFlow.asState(Settings())
 
-    private val activatedSingleTasks = repoSingleTask.activeTasks.asState(emptyList())
-
-    private val currentTask = MutableStateFlow<Task?>(null)
-
-    val actionMode = currentTask
-        .map { task -> task != null }
-        .asState(false)
-
-    val actionTitle = currentTask
-        .map { task -> task?.name ?: "" }
-        .asState("")
-
-    val tasksItems = activatedSingleTasks.combine(currentTask) { tasks, _ -> tasks }
-        .map { tasks ->
-            tasks.map { task ->
-                HomeTaskItem(
-                    id = task.id,
-                    name = task.name,
-                    deadline = task.single.dateActivation.addHours(task.single.deadline),
-                    selected = task.id == currentTask.value?.id ?: 0
-                )
-            }
-        }
-        .asState(emptyList())
-
-
-    /** =========================================== FUNCTIONS ==================================================== */
-
     fun refreshTasks() = viewModelScope.launch {
-        if (repoSettings.getSettings().isNotEmpty()) { // FIXME: WTF?
+        if (repoSettings.getCountSettings() == 1) { // FIXME: WTF?
             generateSingleTasks()
         }
     }
 
-    fun deactivateTasks() = viewModelScope.launch {
+    fun clearStateTasks() = viewModelScope.launch {
         val set = settings.value.change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
-        updateSettings(set)
+        set.save()
         val tasks = repoSingleTask.getAllTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
             task.copy(single = task.single.copy(dateActivation = MyCalendar())).save()
@@ -81,65 +49,24 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onTaskLongClicked(id: Long) {
-        currentTask.value = when (currentTask.value?.id) {
-            id -> null
-            else -> activatedSingleTasks.value.find { it.id == id }
-        }
-    }
-
-    fun onTaskDoneClicked() {
+    fun onMarkTaskDoneClicked(task: Task) {
         viewModelScope.launch {
-            currentTask.value?.let { performSingleTask(it) }
+            delay(500)
+            performSingleTask(task)
         }
-        closeActionMode()
-    }
-
-    fun closeActionMode() {
-        currentTask.value = null
     }
 
     private fun Task.save() = viewModelScope.launch { repoSingleTask.saveTask(this@save) }
+    private fun Settings.save() = viewModelScope.launch { repoSettings.updateSettings(this@save) }
 
 }
 
 /**
 
 
-val settingsLive = repo.settingsFlow.asLiveData()
-private val settings get() = checkNotNull(settingsLive.value) { "Settings isn't initialised" }
-
-private val sDateActivation get() = settings.singleTask.dateActivation
 private val sPostponeCurrentTask get() = settings.singleTask.postponeCurrentTaskForOnePoint
 private val sPostponeNextTask get() = settings.singleTask.postponeNextTaskForOnePoint
 
-/** ======================================================================================= */
-
-private val tasksLive: LiveData<List<Task>> = repo.getTasksFlow(TypeTask.SINGLE_TASK).asLiveData()
-val shownSingleTasks = Transformations.map(tasksLive) { tasks ->
-tasks.filter { it.single.dateActivation.isNoEmpty() }
-.sortedBy { it.single.dateActivation.milli + it.single.deadline.hoursToMilli() }
-}
-private val tasks: List<Task> get() = tasksLive.value ?: emptyList()
-
-private var isActionMode: Boolean = false
-
-private val _showActionMode = MutableLiveData<Event<Boolean>>()
-val showActionMode: LiveData<Event<Boolean>> get() = _showActionMode
-
-private val _hideActionMode = MutableLiveData<Event<Boolean>>()
-val hideActionMode: LiveData<Event<Boolean>> get() = _hideActionMode
-
-private var currentTask = MutableLiveData<Task?>(null)
-val currentTaskName: String get() = currentTask.value?.name ?: String()
-val currentTaskPosition = Transformations.map(currentTask) { it?.position() ?: -1 }
-
-
-
-fun onItemClicked(task: Task) {
-currentTask.value = task
-if (isActionMode) destroyActionMode() else setActionMode()
-}
 
 fun onPostponeCurrentTaskClicked() = postponeTask(
 ::selectTimeToPostponeCurrentTask,
@@ -167,12 +94,6 @@ setConfirmDialog(dialog)
 }
 }
 }
-
-fun onDoneClicked() = setConfirmDialog(
-MyConfirmAlertDialog(::doneSingleTask)
-.setTitle(currentTaskName)
-.setMessage(R.string.alert_title_single_task_done)
-)
 
 
 private fun postponeTask(foo: (Int) -> Unit, title: Int, pointsForTask: Int): Boolean {

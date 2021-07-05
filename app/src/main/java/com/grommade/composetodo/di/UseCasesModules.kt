@@ -20,27 +20,17 @@ object UseCasesModules {
     @Singleton
     fun providePerformSingleTask(
         repoSettings: RepoSettings,
-        repoSingleTask: RepoSingleTask,
-        settings: GetSettings
-    ): PerformSingleTask =
-        PerformSingleTaskImpl(repoSettings, repoSingleTask, settings)
+        repoSingleTask: RepoSingleTask
+    ): PerformSingleTask = PerformSingleTaskImpl(repoSettings, repoSingleTask)
 
-    @Provides
-    @Singleton
-    fun provideGetSettings(repoSettings: RepoSettings): GetSettings = GetSettingsImpl(repoSettings)
-
-    @Provides
-    @Singleton
-    fun provideUpdateSettings(repoSettings: RepoSettings): UpdateSettings = UpdateSettingsImpl(repoSettings)
 
     @Provides
     @Singleton
     fun provideDeleteTask(
         @ApplicationContext appContext: Context,
+        repoSettings: RepoSettings,
         repoSingleTask: RepoSingleTask,
-        settings: GetSettings
-    ): DeleteTask =
-        DeleteTaskImpl(appContext, repoSingleTask, settings)
+    ): DeleteTask = DeleteTaskImpl(appContext, repoSettings, repoSingleTask)
 
 
     @Provides
@@ -49,8 +39,6 @@ object UseCasesModules {
         repoSettings: RepoSettings,
         repoSingleTask: RepoSingleTask,
         repoHistory: RepoHistory,
-        settings: GetSettings
-    ): GenerateSingleTasks =
-        GenerateSingleTasksImpl(repoSettings, repoSingleTask, repoHistory, settings)
+    ): GenerateSingleTasks = GenerateSingleTasksImpl(repoSettings, repoSingleTask, repoHistory)
 
 }

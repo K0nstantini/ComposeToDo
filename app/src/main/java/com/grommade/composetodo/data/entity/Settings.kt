@@ -10,7 +10,7 @@ import com.grommade.composetodo.util.timeToMinutes
 
 @Entity(tableName = "settings_table")
 data class Settings(
-    @PrimaryKey val id: Int = 1,
+    @PrimaryKey override val id: Long = 1,
 
     /** Regular tasks */
     @Embedded
@@ -21,7 +21,7 @@ data class Settings(
     val singleTask: SettingsSingleTask = SettingsSingleTask()
 
 
-) {
+) : AppEntity {
 
     data class SettingsRegularTask(
         @ColumnInfo(name = "regular_points") val points: Int = 0,                       // баллы за выполнение/невыполнение задач

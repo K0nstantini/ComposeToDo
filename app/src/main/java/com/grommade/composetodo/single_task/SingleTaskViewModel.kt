@@ -43,8 +43,8 @@ class SingleTaskViewModel @Inject constructor(
                 group = task.group,
                 parent = repoSingleTask.getTask(task.parent)?.name,
                 dateStart = task.single.dateStart.toString(false),
-                deadline = task.single.deadline,
-                readyToSave = task.name.isNotEmpty() && task.single.deadline > 0,
+                deadline = task.single.deadlineDays,
+                readyToSave = task.name.isNotEmpty() && task.single.deadlineDays > 0,
             )
         }.asState(SingleTaskItem())
 
@@ -90,7 +90,7 @@ class SingleTaskViewModel @Inject constructor(
 
     fun saveDeadline(text: String) {
         text.toIntOrNull()?.let { deadline ->
-            currentTask.setValue { copy(single = single.copy(deadline = deadline)) }
+            currentTask.setValue { copy(single = single.copy(deadlineDays = deadline)) }
         }
     }
 

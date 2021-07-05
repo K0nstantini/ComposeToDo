@@ -6,10 +6,10 @@ import com.grommade.composetodo.add_classes.MyCalendar
 
 @Entity(tableName = "history_table")
 data class History(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) override val id: Long = 0,
     val date: MyCalendar = MyCalendar(),
     val value: String = ""
-) {
+) : AppEntity {
     val isNew: Boolean
         get() = (id == 0L)
 }

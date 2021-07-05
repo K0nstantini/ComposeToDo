@@ -1,21 +1,18 @@
 package com.grommade.composetodo.data.entity
 
-import android.os.Parcelable
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.enums.TypeTask
-import kotlinx.parcelize.Parcelize
 
 const val DEFAULT_DEADLINE_SINGLE_TASK = 24
 
-@Parcelize
 @Entity(tableName = "single_task_table")
 data class Task(
 
     /** General */
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) override val id: Long = 0L,
     val name: String = "",
     val group: Boolean = false,
     val groupOpen: Boolean = false,
@@ -28,10 +25,9 @@ data class Task(
     @Embedded
     val single: SingleTask = SingleTask(),
 
-    ) : Parcelable {
+    ) : AppEntity {
 
     /** Regular task */
-    @Parcelize
     data class RegularTask(
         val frequencyFrom: Int = 0,
         val frequencyTo: Int = 0,
@@ -42,18 +38,17 @@ data class Task(
         val chooseFromGroup: Boolean = false,                    // Задачи будут рандомно выбираться из всей группы
         val dateActivated: Long = 0L,                            // Дата активации задачи
         val finishDate: Long = 0L,                               // Задача работает до этой даты
-    ) : Parcelable
+    )
 
     /** Single task */
-    @Parcelize
     data class SingleTask(
         val dateActivation: MyCalendar = MyCalendar(),           // Дата активации задачи
         val dateStart: MyCalendar = MyCalendar.today(),          // Дата, начиная с которой, задача становиться активной
         val dateUntilToDo: MyCalendar = MyCalendar(),            // Задача должна быть сгенерирована до этой даты
-        val deadline: Int = DEFAULT_DEADLINE_SINGLE_TASK,
+        val deadlineDays: Int = DEFAULT_DEADLINE_SINGLE_TASK,
         val toDoAfterTask: Long = 0L,                            // Задача будет сегенрирована только после выполнения другой задачи
         val rolls: Int = 0,                                      // количество замен задачи
-    ) : Parcelable
+    )
 
     val isNew: Boolean
         get() = (id == 0L)

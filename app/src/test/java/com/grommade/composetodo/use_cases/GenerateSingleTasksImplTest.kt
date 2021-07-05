@@ -74,7 +74,7 @@ class GenerateSingleTasksImplTest {
         if (lastGeneration.isNoEmpty()) {
             val workDate = lastGeneration.nextSuitableDate(period, settings.singleTask.daysOfWeek, dateNow)
             generateTask(tasksToActivate)
-                ?.apply { single.dateActivation = workDate }
+                ?.apply { single.copy(dateActivation = workDate) }
                 ?.save()
             println("Generation date: $lastGeneration, Task date: $workDate")
         }

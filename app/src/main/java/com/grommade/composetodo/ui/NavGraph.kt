@@ -17,7 +17,7 @@ import com.grommade.composetodo.SettingsRoute
 import com.grommade.composetodo.SettingsSingleTaskRoute
 import com.grommade.composetodo.TasksRoute
 import com.grommade.composetodo.history.HistoryScreen
-import com.grommade.composetodo.home.HomeScreen
+import com.grommade.composetodo.home.HomeUi
 import com.grommade.composetodo.home.HomeViewModel
 import com.grommade.composetodo.settings.SettingsScreen
 import com.grommade.composetodo.settings.general.SettingsGeneralTaskScreen
@@ -72,8 +72,7 @@ private fun NavGraphBuilder.addRoutMainScreen(
     route = MainRoute.HomeChildRoute.route
 ) {
     drawerGesturesEnabled(true)
-    HomeScreen(
-        viewModel = hiltViewModel<HomeViewModel>().also { it.refreshTasks() },
+    HomeUi(
         openDrawer = openDrawer
     )
 }
