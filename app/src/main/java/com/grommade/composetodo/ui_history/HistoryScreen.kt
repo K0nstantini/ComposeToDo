@@ -1,4 +1,4 @@
-package com.grommade.composetodo.history
+package com.grommade.composetodo.ui_history
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

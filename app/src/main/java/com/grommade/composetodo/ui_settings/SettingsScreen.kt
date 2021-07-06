@@ -1,4 +1,4 @@
-package com.grommade.composetodo.settings
+package com.grommade.composetodo.ui_settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.grommade.composetodo.MainRoute
 import com.grommade.composetodo.R
 import com.grommade.composetodo.SettingsRoute
 import com.grommade.composetodo.ui.components.NavigationBackIcon

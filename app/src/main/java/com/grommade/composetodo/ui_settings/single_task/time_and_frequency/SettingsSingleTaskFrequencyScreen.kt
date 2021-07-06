@@ -1,4 +1,4 @@
-package com.grommade.composetodo.settings.single_task.time_and_frequency
+package com.grommade.composetodo.ui_settings.single_task.time_and_frequency
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn

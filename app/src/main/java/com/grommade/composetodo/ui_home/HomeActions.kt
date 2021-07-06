@@ -1,4 +1,4 @@
-package com.grommade.composetodo.home
+package com.grommade.composetodo.ui_home
 
 import com.grommade.composetodo.data.entity.Task
 

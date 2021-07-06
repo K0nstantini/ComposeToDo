@@ -16,12 +16,16 @@ class RepoSingleTask @Inject constructor(
     val allTasks: Flow<List<Task>> = singleTaskDao.getTasksFlow()
     val activeTasks: Flow<List<Task>> = singleTaskDao.getActiveTasks()
 
-    suspend fun saveTask(task: Task) = withContext(ioDispatcher) {
+    suspend fun saveTask(task: Task): Long = withContext(ioDispatcher) {
         singleTaskDao.insertOrUpdate(task)
     }
 
     suspend fun deleteTask(task: Task) = withContext(ioDispatcher) {
         singleTaskDao.delete(task)
+    }
+
+    suspend fun deleteAllTasks() = withContext(ioDispatcher) {
+        singleTaskDao.deleteAll()
     }
 
     suspend fun getAllTasks() = withContext(Dispatchers.IO) {

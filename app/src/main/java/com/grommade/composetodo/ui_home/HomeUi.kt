@@ -1,4 +1,4 @@
-package com.grommade.composetodo.home
+package com.grommade.composetodo.ui_home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,15 +42,15 @@ private fun HomeUi(
     HomeUi(viewState) { action ->
         when (action) {
             is HomeActions.MarkTaskDone -> viewModel.onMarkTaskDoneClicked(action.task)
-            is HomeActions.Refresh -> viewModel.refreshTasks()
-            is HomeActions.ClearStateTasks -> viewModel.clearStateTasks()
-            is HomeActions.OpenDrawer -> openDrawer()
+            HomeActions.Refresh -> viewModel.refreshTasks()
+            HomeActions.ClearStateTasks -> viewModel.clearStateTasks()
+            HomeActions.OpenDrawer -> openDrawer()
         }
     }
 }
 
 @Composable
-private fun HomeUi(
+fun HomeUi(
     viewState: HomeViewState,
     actioner: (HomeActions) -> Unit
 ) {
@@ -79,7 +79,7 @@ private fun HomeUi(
 }
 
 @Composable
-private fun HomeScrollingContent(
+fun HomeScrollingContent(
     tasks: List<Task>,
     actioner: (HomeActions) -> Unit
 ) {
@@ -90,7 +90,7 @@ private fun HomeScrollingContent(
         items(tasks, key = { task -> task.id }) { task ->
             TaskItem(
                 name = task.name,
-                deadline = task.single.dateActivation.addHours(task.single.deadlineDays),
+                deadline = task.deadlineDate,
                 markTask = { actioner(HomeActions.MarkTaskDone(task)) }
             )
         }
@@ -98,7 +98,7 @@ private fun HomeScrollingContent(
 }
 
 @Composable
-private fun TaskItem(
+fun TaskItem(
     name: String,
     deadline: MyCalendar,
     markTask: () -> Unit

@@ -1,4 +1,4 @@
-package com.grommade.composetodo.statistics
+package com.grommade.composetodo.ui_statistics
 
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.data.repos.RepoSettings

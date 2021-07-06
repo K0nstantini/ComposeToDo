@@ -1,4 +1,4 @@
-package com.grommade.composetodo.settings.single_task.time_and_frequency
+package com.grommade.composetodo.ui_settings.single_task.time_and_frequency
 
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel

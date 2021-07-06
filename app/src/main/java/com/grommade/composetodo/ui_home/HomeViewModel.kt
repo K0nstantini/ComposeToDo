@@ -1,4 +1,4 @@
-package com.grommade.composetodo.home
+package com.grommade.composetodo.ui_home
 
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
@@ -26,7 +26,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     val state = repoSingleTask.activeTasks.map { tasks ->
-        HomeViewState(tasks)
+        HomeViewState(tasks.sortedBy { it.deadlineDate })
     }
 
     private val settings: StateFlow<Settings> = repoSettings.settingsFlow.asState(Settings())

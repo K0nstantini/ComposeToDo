@@ -1,4 +1,4 @@
-package com.grommade.composetodo.history
+package com.grommade.composetodo.ui_history
 
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel

@@ -1,4 +1,4 @@
-package com.grommade.composetodo.settings.general
+package com.grommade.composetodo.ui_settings.general
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme

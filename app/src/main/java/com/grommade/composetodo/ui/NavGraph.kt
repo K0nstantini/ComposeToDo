@@ -16,17 +16,16 @@ import com.grommade.composetodo.MainRoute
 import com.grommade.composetodo.SettingsRoute
 import com.grommade.composetodo.SettingsSingleTaskRoute
 import com.grommade.composetodo.TasksRoute
-import com.grommade.composetodo.history.HistoryScreen
-import com.grommade.composetodo.home.HomeUi
-import com.grommade.composetodo.home.HomeViewModel
-import com.grommade.composetodo.settings.SettingsScreen
-import com.grommade.composetodo.settings.general.SettingsGeneralTaskScreen
-import com.grommade.composetodo.settings.regular_task.SettingsRegularTaskScreen
-import com.grommade.composetodo.settings.single_task.SettingsSingleTaskScreen
-import com.grommade.composetodo.settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyScreen
-import com.grommade.composetodo.single_task.SingleTaskScreen
-import com.grommade.composetodo.statistics.StatisticsScreen
-import com.grommade.composetodo.task_list.TaskListScreen
+import com.grommade.composetodo.ui_history.HistoryScreen
+import com.grommade.composetodo.ui_home.HomeUi
+import com.grommade.composetodo.ui_settings.SettingsScreen
+import com.grommade.composetodo.ui_settings.general.SettingsGeneralTaskScreen
+import com.grommade.composetodo.ui_settings.regular_task.SettingsRegularTaskScreen
+import com.grommade.composetodo.ui_settings.single_task.SettingsSingleTaskScreen
+import com.grommade.composetodo.ui_settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyScreen
+import com.grommade.composetodo.ui_single_task.SingleTaskScreen
+import com.grommade.composetodo.ui_statistics.StatisticsScreen
+import com.grommade.composetodo.ui_task_list.TaskListUi
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
@@ -85,10 +84,7 @@ private fun NavGraphBuilder.addRoutTaskList(
     arguments = MainRoute.TaskListChildRoute.addArguments()
 ) {
     drawerGesturesEnabled(false)
-    TaskListScreen(
-        viewModel = hiltViewModel(),
-        navController
-    )
+    TaskListUi(navController)
 }
 
 private fun NavGraphBuilder.addRoutStatistics(

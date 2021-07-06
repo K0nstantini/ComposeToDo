@@ -1,12 +1,15 @@
 package com.grommade.composetodo.data.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Query
 import com.grommade.composetodo.data.entity.Task
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class SingleTaskDao: EntityDao<Task>() {
+abstract class SingleTaskDao : EntityDao<Task>() {
 
+    @Query("DELETE FROM single_task_table")
+    abstract suspend fun deleteAll()
 
     @Query("SELECT * FROM single_task_table WHERE id = :id")
     abstract suspend fun getTask(id: Long): Task?

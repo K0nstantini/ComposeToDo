@@ -1,4 +1,4 @@
-package com.grommade.composetodo.single_task
+package com.grommade.composetodo.ui_single_task
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

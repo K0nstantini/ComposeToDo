@@ -50,6 +50,9 @@ data class Task(
         val rolls: Int = 0,                                      // количество замен задачи
     )
 
+    val deadlineDate: MyCalendar
+            get() = single.dateActivation.addHours(single.deadlineDays)
+
     val isNew: Boolean
         get() = (id == 0L)
 

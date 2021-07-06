@@ -1,4 +1,4 @@
-package com.grommade.composetodo.settings.regular_task
+package com.grommade.composetodo.ui_settings.regular_task
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme

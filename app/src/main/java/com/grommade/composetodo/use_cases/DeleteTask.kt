@@ -11,6 +11,7 @@ import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.util.groupIsEmpty
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 interface DeleteTask {
@@ -19,7 +20,7 @@ interface DeleteTask {
 
 // TODO: Check work
 class DeleteTaskImpl @Inject constructor(
-    private val appContext: Context,
+    @ApplicationContext private val appContext: Context,
     private val repoSettings: RepoSettings,
     private val repoSingleTask: RepoSingleTask,
 ) : DeleteTask {
