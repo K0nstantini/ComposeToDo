@@ -2,7 +2,6 @@ package com.grommade.composetodo
 
 import androidx.navigation.NavType
 import androidx.navigation.compose.navArgument
-import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
 
@@ -10,16 +9,13 @@ import com.grommade.composetodo.util.Keys
 sealed class MainRoute(val route: String) {
     object HomeChildRoute : MainRoute("main")
 
-    object TaskListChildRoute : MainRoute("taskList/{taskTypeKey}?taskListModeKey={taskListModeKey}&taskID={taskID}") {
-        fun createRoute(mode: ModeTaskList, type: TypeTask, id: Long = -1) =
-            "taskList/${type.name}?taskListModeKey=${mode.name}&taskID=$id"
+    object TaskListChildRoute : MainRoute("taskList/{taskTypeKey}?taskID={taskID}") {
+        fun createRoute(type: TypeTask, id: Long = -1) =
+            "taskList/${type.name}?taskID=$id"
 
         fun addArguments() = listOf(
             navArgument(Keys.TASK_TYPE_KEY) {
                 type = NavType.StringType
-            },
-            navArgument(Keys.TASK_LIST_MODE_KEY) {
-                defaultValue = ModeTaskList.DEFAULT.name
             },
             navArgument(Keys.TASK_ID) {
                 defaultValue = -1L
@@ -43,10 +39,13 @@ sealed class TasksRoute(val route: String) {
         fun createRoute(id: Long) = "taskList/SINGLE_TASK/addEditTask?taskID=$id"
         fun addArguments() = addArgumentTaskID()
     }
+}
 
-    fun addArgumentTaskID() = listOf(navArgument(Keys.TASK_ID) {
-        defaultValue = -1L
-    })
+sealed class SelectTaskRoute(val route: String) {
+    object SingleTaskSelectRoute : SelectTaskRoute("taskList/SINGLE_TASK/addEditTask/selectTask?taskID={taskID}") {
+        fun createRoute(id: Long) = "taskList/SINGLE_TASK/addEditTask/selectTask?taskID=$id"
+        fun addArguments() = addArgumentTaskID()
+    }
 }
 
 sealed class SettingsRoute(val route: String) {
@@ -58,3 +57,7 @@ sealed class SettingsRoute(val route: String) {
 sealed class SettingsSingleTaskRoute(val route: String) {
     object SettingsSingleTaskFrequencyChildRoute : SettingsSingleTaskRoute("settings/SINGLE_TASK/frequency")
 }
+
+private fun addArgumentTaskID() = listOf(navArgument(Keys.TASK_ID) {
+    defaultValue = -1L
+})

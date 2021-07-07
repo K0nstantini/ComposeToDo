@@ -32,7 +32,7 @@
     <!--    Fragment Titles-->
     <string name="title_regular_task_list">Регулярные задачи</string>
     <string name="title_single_task_list">Разовые задачи</string>
-    <string name="title_select_catalog">Выберите каталог</string>
+    <string name="title_select_catalog">Выбрать каталог</string>
     <string name="title_select_task">Выберите задачу</string>
     <string name="title_action_mode">Ред.</string>
     <string name="title_add_task_new_task">Новая задача</string>
@@ -87,7 +87,7 @@
     <string name="alert_title_postpone_next_task">Отложить следующую задачу</string>
     <string name="alert_title_delete_task">Удалить выбранные задачи?</string>
     <string name="alert_title_delete_history">Очистить историю?</string>
-    <string name="alert_message_delete_group_task">Задачи в группе будут также удалены</string>
+    <string name="alert_message_delete_group_task">Вложенные задач также будут удалены</string>
     <string name="alert_title_mode_generation_s_tasks">Выберите режим генерации задач</string>
     <string name="alert_title_select_time_s_tasks">Время генерации задач</string>
     <string name="alert_title_select_days_s_tasks">Дни генерации задач</string>

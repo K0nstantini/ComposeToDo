@@ -2,12 +2,11 @@ package com.grommade.composetodo.ui_single_task
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.grommade.composetodo.MainRoute
+import com.grommade.composetodo.SelectTaskRoute
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSingleTask
-import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,11 +48,13 @@ class SingleTaskViewModel @Inject constructor(
         }.asState(SingleTaskItem())
 
     val navigateToSelectParentRout: String
-        get() = MainRoute.TaskListChildRoute.createRoute(
-            mode = ModeTaskList.SELECT_CATALOG,
-            type = TypeTask.SINGLE_TASK,
-            id = currentTask.value.parent
-        )
+        get() = SelectTaskRoute.SingleTaskSelectRoute.createRoute(currentTask.value.parent)
+
+//            MainRoute.TaskListChildRoute.createRoute(
+//            mode = ModeTaskList.SELECT_CATALOG,
+//            type = TypeTask.SINGLE_TASK,
+//            id = currentTask.value.parent
+//        )
 
     val navigateToBack: MutableStateFlow<Boolean?> = MutableStateFlow(null)
 

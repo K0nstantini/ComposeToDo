@@ -31,10 +31,10 @@ import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks.FIXED
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks.RANDOM
 import com.grommade.composetodo.ui.components.*
-import com.grommade.composetodo.util.timeToMinutes
-import com.grommade.composetodo.util.toDaysOfWeek
-import com.grommade.composetodo.util.toListInt
-import com.grommade.composetodo.util.toStrTime
+import com.grommade.composetodo.util.extensions.timeToMinutes
+import com.grommade.composetodo.util.extensions.toDaysOfWeek
+import com.grommade.composetodo.util.extensions.toListInt
+import com.grommade.composetodo.util.extensions.toStrTime
 import com.vanpra.composematerialdialogs.MaterialDialog
 
 @ExperimentalComposeUiApi

@@ -1,14 +1,16 @@
 package com.grommade.composetodo.data.entity
 
+import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
-import com.grommade.composetodo.util.timeToMinutes
+import com.grommade.composetodo.util.extensions.timeToMinutes
 
 @Entity(tableName = "settings_table")
+@Immutable
 data class Settings(
     @PrimaryKey override val id: Long = 1,
 
@@ -23,6 +25,7 @@ data class Settings(
 
 ) : AppEntity {
 
+    @Immutable
     data class SettingsRegularTask(
         @ColumnInfo(name = "regular_points") val points: Int = 0,                       // баллы за выполнение/невыполнение задач
     ) {
@@ -46,6 +49,7 @@ data class Settings(
      *
      *
      * */
+    @Immutable
     data class SettingsSingleTask(
         @ColumnInfo(name = "single_active") val active: Boolean = false,
         val startGeneration: MyCalendar = MyCalendar(),

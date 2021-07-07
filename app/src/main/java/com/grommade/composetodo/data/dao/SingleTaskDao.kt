@@ -15,15 +15,20 @@ abstract class SingleTaskDao : EntityDao<Task>() {
     abstract suspend fun getTask(id: Long): Task?
 
     @Query("SELECT * FROM single_task_table ORDER BY name ASC")
-    abstract fun getTasksFlow(): Flow<List<Task>>
+    abstract suspend fun getAllTasks(): List<Task>
+
+    @Query("SELECT * FROM single_task_table WHERE dateActivation = 0")
+    abstract suspend fun getNoActiveTasks(): List<Task>
+
+    @Query("SELECT * FROM single_task_table WHERE `group` = 1 ORDER BY name ASC")
+    abstract fun getGroups(): Flow<List<Task>>
 
     @Query("SELECT * FROM single_task_table ORDER BY name ASC")
-    abstract fun getAllTasks(): List<Task>
+    abstract fun getTasksFlow(): Flow<List<Task>>
 
     @Query("SELECT * FROM single_task_table WHERE dateActivation > 0")
     abstract fun getActiveTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM single_task_table WHERE dateActivation = 0")
-    abstract suspend fun getNoActiveTasks(): List<Task>
+
 
 }

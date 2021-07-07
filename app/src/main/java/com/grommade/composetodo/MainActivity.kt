@@ -10,8 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.grommade.composetodo.enums.ModeTaskList
 import com.grommade.composetodo.enums.TypeTask
+import com.grommade.composetodo.ui.BackPressHandler
+import com.grommade.composetodo.ui.LocalBackPressedDispatcher
 import com.grommade.composetodo.ui.ToDoNavGraph
 import com.grommade.composetodo.ui.components.AppDrawer
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,18 +57,12 @@ private fun ToDoApp() {
             AppDrawer(
                 navigateToRegularTasks = {
                     navController.navigate(
-                        MainRoute.TaskListChildRoute.createRoute(
-                            ModeTaskList.DEFAULT,
-                            TypeTask.REGULAR_TASK
-                        )
+                        MainRoute.TaskListChildRoute.createRoute(TypeTask.REGULAR_TASK)
                     )
                 },
                 navigateToSingleTasks = {
                     navController.navigate(
-                        MainRoute.TaskListChildRoute.createRoute(
-                            ModeTaskList.DEFAULT,
-                            TypeTask.SINGLE_TASK
-                        )
+                        MainRoute.TaskListChildRoute.createRoute(TypeTask.SINGLE_TASK)
                     )
                 },
                 navigateToStatistics = { navController.navigate(MainRoute.StatisticsChildRoute.route) },

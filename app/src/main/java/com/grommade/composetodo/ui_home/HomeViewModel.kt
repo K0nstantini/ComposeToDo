@@ -9,8 +9,8 @@ import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
-import com.grommade.composetodo.util.change
-import com.grommade.composetodo.util.singleSet
+import com.grommade.composetodo.util.extensions.change
+import com.grommade.composetodo.util.extensions.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*

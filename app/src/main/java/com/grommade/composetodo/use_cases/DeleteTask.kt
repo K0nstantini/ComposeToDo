@@ -10,12 +10,16 @@ import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoSingleTask
-import com.grommade.composetodo.util.groupIsEmpty
+import com.grommade.composetodo.util.extensions.groupIsEmpty
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 interface DeleteTask {
-    suspend operator fun invoke(task: Task? = null, tasks: List<Task> = emptyList()): ResultOf<Boolean>
+    suspend operator fun invoke(
+        task: Task? = null,
+        tasks: List<Task> = emptyList(),
+        tasksID: List<Long> = emptyList(),
+    ): ResultOf<Boolean>
 }
 
 // TODO: Check work
@@ -25,13 +29,17 @@ class DeleteTaskImpl @Inject constructor(
     private val repoSingleTask: RepoSingleTask,
 ) : DeleteTask {
 
-    override suspend fun invoke(task: Task?, tasks: List<Task>): ResultOf<Boolean> {
+    override suspend fun invoke(task: Task?, tasks: List<Task>, tasksID: List<Long>): ResultOf<Boolean> {
         val settings = repoSettings.getSettings()
 
         val errorsMessage = StringBuilder()
 
         val tasksToDel = tasks.toMutableList()
         task?.let { tasksToDel.add(it) }
+
+        tasksID.forEach { id ->
+            repoSingleTask.getTask(id)?.let { task -> tasksToDel.add(task) }
+        }
 
         tasks.filterNot { it.group }.forEach { _task ->
             val result = checkTask(settings, _task)

@@ -5,9 +5,9 @@ import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
-import com.grommade.composetodo.util.change
-import com.grommade.composetodo.util.singleSet
-import com.grommade.composetodo.util.timeToMinutes
+import com.grommade.composetodo.util.extensions.change
+import com.grommade.composetodo.util.extensions.singleSet
+import com.grommade.composetodo.util.extensions.timeToMinutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

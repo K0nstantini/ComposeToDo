@@ -8,8 +8,8 @@ import com.grommade.composetodo.data.repos.RepoHistory
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoSingleTask
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
-import com.grommade.composetodo.util.delEmptyGroups
-import com.grommade.composetodo.util.hoursToMilli
+import com.grommade.composetodo.util.extensions.delEmptyGroups
+import com.grommade.composetodo.util.extensions.hoursToMilli
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

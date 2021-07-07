@@ -1,11 +1,13 @@
 package com.grommade.composetodo.add_classes
 
-import android.os.Parcel
-import android.os.Parcelable
-import com.grommade.composetodo.util.*
+import com.grommade.composetodo.util.MINUTES_IN_HOUR
+import com.grommade.composetodo.util.extensions.daysToMilli
+import com.grommade.composetodo.util.extensions.hoursToMilli
+import com.grommade.composetodo.util.extensions.minutesToMilli
+import com.grommade.composetodo.util.extensions.toStrTime
 import java.util.*
 
-class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalendar> {
+class MyCalendar(private val _milli: Long = 0L) : Comparable<MyCalendar> {
     private val calendar = Calendar.getInstance().also { it.timeInMillis = _milli }
 
     val milli: Long
@@ -32,12 +34,6 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
 
     fun getMinutesOfDay() = hours * MINUTES_IN_HOUR + minutes
 
-//    override operator fun compareTo(other: MyCalendar): Int = when {
-//        milli > other.milli -> 1
-//        milli < other.milli -> -1
-//        else -> 0
-//    }
-
     fun isEqual(other: MyCalendar) =
         compareTo(other) == 0
 
@@ -45,7 +41,6 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
         return COMPARATOR.compare(this, other)
     }
 
-//    override fun compareTo(other: MyCalendar): Int = compareValuesBy(this, other, { it._milli })
 
 
     override fun toString(): String {
@@ -89,25 +84,10 @@ class MyCalendar(private val _milli: Long = 0L) : Parcelable, Comparable<MyCalen
         else -> day - 2
     }
 
-    constructor(parcel: Parcel) : this(parcel.readLong())
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(_milli)
-    }
-
     operator fun minus(other: MyCalendar) = MyCalendar(milli - other.milli)
     operator fun plus(other: MyCalendar) = MyCalendar(milli + other.milli)
 
-    override fun describeContents() = 0
-
-    companion object CREATOR : Parcelable.Creator<MyCalendar> {
-        override fun createFromParcel(parcel: Parcel): MyCalendar {
-            return MyCalendar(parcel)
-        }
-
-        override fun newArray(size: Int): Array<MyCalendar?> {
-            return arrayOfNulls(size)
-        }
+    companion object CREATOR {
 
         fun now() = MyCalendar(System.currentTimeMillis())
         fun today(): MyCalendar {

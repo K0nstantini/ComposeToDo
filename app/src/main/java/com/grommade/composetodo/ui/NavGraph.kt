@@ -1,5 +1,6 @@
 package com.grommade.composetodo.ui
 
+import android.provider.ContactsContract
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
@@ -12,12 +13,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.grommade.composetodo.MainRoute
-import com.grommade.composetodo.SettingsRoute
-import com.grommade.composetodo.SettingsSingleTaskRoute
-import com.grommade.composetodo.TasksRoute
+import com.grommade.composetodo.*
 import com.grommade.composetodo.ui_history.HistoryScreen
 import com.grommade.composetodo.ui_home.HomeUi
+import com.grommade.composetodo.ui_select_task.SelectTaskUi
 import com.grommade.composetodo.ui_settings.SettingsScreen
 import com.grommade.composetodo.ui_settings.general.SettingsGeneralTaskScreen
 import com.grommade.composetodo.ui_settings.regular_task.SettingsRegularTaskScreen
@@ -26,6 +25,7 @@ import com.grommade.composetodo.ui_settings.single_task.time_and_frequency.Setti
 import com.grommade.composetodo.ui_single_task.SingleTaskScreen
 import com.grommade.composetodo.ui_statistics.StatisticsScreen
 import com.grommade.composetodo.ui_task_list.TaskListUi
+import com.grommade.composetodo.util.Keys
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
@@ -59,6 +59,8 @@ fun ToDoNavGraph(
         addRoutTaskList(navController, drawerGesturesEnabled)
         addRoutRegularTask(navController)
         addRoutSingleTask(navController)
+
+        addRoutSingleSelectTask(navController)
     }
 }
 
@@ -148,6 +150,20 @@ private fun NavGraphBuilder.addRoutSingleTask(
     SingleTaskScreen(
         viewModel = hiltViewModel(),
         navController,
+    )
+}
+
+/** Select Tasks */
+
+private fun NavGraphBuilder.addRoutSingleSelectTask(
+    navController: NavHostController
+) = composable(
+    route = SelectTaskRoute.SingleTaskSelectRoute.route,
+    arguments = SelectTaskRoute.SingleTaskSelectRoute.addArguments()
+) { backStackEntry ->
+    SelectTaskUi(
+        id = backStackEntry.arguments?.getLong(Keys.TASK_ID) ?: -1L,
+        navController
     )
 }
 

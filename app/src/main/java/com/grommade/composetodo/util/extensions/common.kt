@@ -1,9 +1,13 @@
-package com.grommade.composetodo.util
+package com.grommade.composetodo.util.extensions
 
 import android.content.res.Resources
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.enums.DialogDaysOfWeek
+import com.grommade.composetodo.util.HOURS_IN_DAY
+import com.grommade.composetodo.util.MILLI_IN_SECOND
+import com.grommade.composetodo.util.MINUTES_IN_HOUR
+import com.grommade.composetodo.util.SECONDS_IN_MINUTE
 
 typealias singleSet = Settings.SettingsSingleTask
 

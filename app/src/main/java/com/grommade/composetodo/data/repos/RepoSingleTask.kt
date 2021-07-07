@@ -15,6 +15,7 @@ class RepoSingleTask @Inject constructor(
 
     val allTasks: Flow<List<Task>> = singleTaskDao.getTasksFlow()
     val activeTasks: Flow<List<Task>> = singleTaskDao.getActiveTasks()
+    val groups: Flow<List<Task>> = singleTaskDao.getGroups()
 
     suspend fun saveTask(task: Task): Long = withContext(ioDispatcher) {
         singleTaskDao.insertOrUpdate(task)

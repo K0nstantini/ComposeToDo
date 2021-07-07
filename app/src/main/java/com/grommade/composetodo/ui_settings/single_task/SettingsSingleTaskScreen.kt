@@ -25,8 +25,8 @@ import com.grommade.composetodo.ui.components.BuiltDateTimeDialog
 import com.grommade.composetodo.ui.components.SetItemDefault
 import com.grommade.composetodo.ui.components.SetItemSwitch
 import com.grommade.composetodo.ui.components.TopBarStandard
-import com.grommade.composetodo.util.toDaysOfWeek
-import com.grommade.composetodo.util.toStrTime
+import com.grommade.composetodo.util.extensions.toDaysOfWeek
+import com.grommade.composetodo.util.extensions.toStrTime
 import com.vanpra.composematerialdialogs.MaterialDialog
 
 @ExperimentalMaterialApi

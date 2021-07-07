@@ -1,5 +1,6 @@
 package com.grommade.composetodo.data.entity
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,6 +10,7 @@ import com.grommade.composetodo.enums.TypeTask
 const val DEFAULT_DEADLINE_SINGLE_TASK = 24
 
 @Entity(tableName = "single_task_table")
+@Immutable
 data class Task(
 
     /** General */
@@ -28,6 +30,7 @@ data class Task(
     ) : AppEntity {
 
     /** Regular task */
+    @Immutable
     data class RegularTask(
         val frequencyFrom: Int = 0,
         val frequencyTo: Int = 0,
@@ -41,6 +44,7 @@ data class Task(
     )
 
     /** Single task */
+    @Immutable
     data class SingleTask(
         val dateActivation: MyCalendar = MyCalendar(),           // Дата активации задачи
         val dateStart: MyCalendar = MyCalendar.today(),          // Дата, начиная с которой, задача становиться активной
@@ -68,6 +72,12 @@ data class Task(
     fun getLevel(tasks: List<Task>) = generateSequence(this) { task ->
         tasks.find { it.id == task.parent }
     }.count() - 1
+
+    fun hierarchicalSort(tasks: List<Task>): String {
+        return generateSequence(this) { task ->
+            tasks.find { it.id == task.parent }
+        }.toList().reversed().joinToString { it.name + it.id }
+    }
 
     fun getDifferent(other: Task): StringBuilder {
         val changes = StringBuilder()
