@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -18,9 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
-import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask
 import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask.Companion.FREQUENCY_GENERATE_FROM
 import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask.Companion.FREQUENCY_GENERATE_TO
@@ -30,44 +29,55 @@ import com.grommade.composetodo.enums.DialogSelectPeriod
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks.FIXED
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks.RANDOM
+import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
 import com.grommade.composetodo.ui.components.*
-import com.grommade.composetodo.util.extensions.timeToMinutes
-import com.grommade.composetodo.util.extensions.toDaysOfWeek
-import com.grommade.composetodo.util.extensions.toListInt
-import com.grommade.composetodo.util.extensions.toStrTime
+import com.grommade.composetodo.util.extensions.*
 import com.vanpra.composematerialdialogs.MaterialDialog
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun SettingsSingleTaskFrequencyScreen(
-    viewModel: SettingsSingleTaskFrequencyViewModel = hiltViewModel(),
-    navController: NavHostController = rememberNavController()
-) {
-
-    with(viewModel) {
-        SettingsSingleTaskFrequencyScreenBody(
-            settings = settings.collectAsState(Settings()).value.singleTask,
-            savesCallbacks = savesCallbacks,
-            onBack = navController::navigateUp
-        )
-    }
-
+fun SettingsSingleTaskFrequencyUi(navController: NavHostController) {
+    SettingsSingleTaskFrequencyUi(
+        viewModel = hiltViewModel(),
+        navController = navController
+    )
 }
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-private fun SettingsSingleTaskFrequencyScreenBody(
-    settings: SettingsSingleTask = SettingsSingleTask(),
-    savesCallbacks: SettingsSingleTaskFrequencyViewModel.SavesCallbacks,
-    onBack: () -> Unit = {}
+fun SettingsSingleTaskFrequencyUi(
+    viewModel: SettingsSingleTaskFrequencyViewModel,
+    navController: NavHostController
+) {
+    val settings by rememberFlowWithLifecycle(viewModel.settingsState)
+        .collectAsState(SettingsSingleTask())
+
+    SettingsSingleTaskFrequencyUi(settings) { action ->
+        when (action) {
+            SetSTaskFreqActions.Back -> navController.navigateUp()
+            else -> viewModel.submitAction(action)
+        }
+    }
+}
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+private fun SettingsSingleTaskFrequencyUi(
+    settings: SettingsSingleTask,
+    actioner: (SetSTaskFreqActions) -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.title_settings_s_tasks_time_and_frequency)) },
-                navigationIcon = { NavigationBackIcon(onBack) },
+                title = {
+                    Text(stringResource(R.string.title_settings_s_tasks_time_and_frequency))
+                },
+                navigationIcon = {
+                    NavigationBackIcon { actioner(SetSTaskFreqActions.Back) }
+                },
             )
         }
     ) {
@@ -77,13 +87,13 @@ private fun SettingsSingleTaskFrequencyScreenBody(
                 .padding(start = 16.dp)
         ) {
             with(settings) {
-                item { ModeItem(modeGeneration, savesCallbacks.saveMode) }
-                item { TimeItem(periodFrom, periodTo, savesCallbacks) }
-                item { DaysItem(everyFewDays, daysOfWeek, modeGeneration, savesCallbacks) }
+                item { ModeItem(modeGeneration, actioner) }
+                item { TimeItem(periodFrom, periodTo, actioner) }
+                item { DaysItem(everyFewDays, daysOfWeek, modeGeneration, actioner) }
                 item {
                     when (modeGeneration) {
-                        RANDOM -> FrequencyItem(frequencyFrom, frequencyTo, savesCallbacks)
-                        FIXED -> CountTasksItem(countGeneratedTasksAtATime, savesCallbacks)
+                        RANDOM -> FrequencyItem(frequencyFrom, frequencyTo, actioner)
+                        FIXED -> CountTasksItem(countGeneratedTasksAtATime, actioner)
                     }
                 }
             }
@@ -97,9 +107,12 @@ private fun SettingsSingleTaskFrequencyScreenBody(
 @Composable
 private fun ModeItem(
     mode: ModeGenerationSingleTasks,
-    saveMode: (Int) -> Unit,
+    actioner: (SetSTaskFreqActions) -> Unit
 ) {
-    val modeDialog = modeDialog(mode.ordinal, saveMode)
+    val modeDialog = modeDialog(mode.ordinal) { value: Int ->
+        actioner(SetSTaskFreqActions.Mode(value))
+    }
+
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_mode_generation),
         value = stringResource(mode.title),
@@ -112,16 +125,20 @@ private fun ModeItem(
 private fun TimeItem(
     periodFrom: Int,
     periodTo: Int,
-    savesCallbacks: SettingsSingleTaskFrequencyViewModel.SavesCallbacks,
+    actioner: (SetSTaskFreqActions) -> Unit
 ) {
-    val timeFromDialog = timeFromDialog(periodFrom, savesCallbacks.savePeriodFrom)
-    val timeToDialog = timeToDialog(periodTo, savesCallbacks.savePeriodTo)
+    val timeFromDialog = timeFromDialog(periodFrom) { value: Int ->
+        actioner(SetSTaskFreqActions.PeriodFrom(value))
+    }
+    val timeToDialog = timeToDialog(periodTo) { value: Int ->
+        actioner(SetSTaskFreqActions.PeriodTo(value))
+    }
 
     val selectPeriod: (Int) -> Unit = { index: Int ->
         when (DialogSelectPeriod.values()[index]) {
             DialogSelectPeriod.FROM -> timeFromDialog.show()
             DialogSelectPeriod.TO -> timeToDialog.show()
-            DialogSelectPeriod.NO_RESTRICTIONS -> savesCallbacks.savePeriodNoRestrictions()
+            DialogSelectPeriod.NO_RESTRICTIONS -> actioner(SetSTaskFreqActions.PeriodNoRestrictions)
         }
     }
     val periodListDialog = periodListDialog(selectPeriod)
@@ -145,7 +162,7 @@ private fun DaysItem(
     everyFewDays: Int,
     daysOfWeek: String,
     mode: ModeGenerationSingleTasks,
-    savesCallbacks: SettingsSingleTaskFrequencyViewModel.SavesCallbacks,
+    actioner: (SetSTaskFreqActions) -> Unit
 ) {
     val resources = LocalContext.current.resources
 
@@ -156,14 +173,18 @@ private fun DaysItem(
         else -> stringResource(R.string.settings_s_task_value_no_days)
     }
 
-    val everyFewDaysInputDialog = everyFewDaysInputDialog(everyFewDays, savesCallbacks.saveEveryFewDays)
-    val daysOfWeekInputDialog = daysOfWeekDialog(daysOfWeek.toListInt(), savesCallbacks.saveDaysOfWeek)
+    val everyFewDaysInputDialog = everyFewDaysInputDialog(everyFewDays) { value: String ->
+        actioner(SetSTaskFreqActions.EveryFewDays(value))
+    }
+    val daysOfWeekInputDialog = daysOfWeekDialog(daysOfWeek.toListInt()) { value: List<Int> ->
+        actioner(SetSTaskFreqActions.DaysOfWeek(value))
+    }
 
     val selectDays: (Int) -> Unit = { index: Int ->
         when (DialogSelectDays.values()[index]) {
             DialogSelectDays.EVERY_FEW_DAYS -> everyFewDaysInputDialog.show()
             DialogSelectDays.DAYS_OF_WEEK -> daysOfWeekInputDialog.show()
-            DialogSelectDays.NO_RESTRICTIONS -> savesCallbacks.saveDaysNoRestriction()
+            DialogSelectDays.NO_RESTRICTIONS -> actioner(SetSTaskFreqActions.DaysNoRestriction)
         }
     }
 
@@ -181,9 +202,11 @@ private fun DaysItem(
 @Composable
 private fun CountTasksItem(
     countTasks: Int,
-    savesCallbacks: SettingsSingleTaskFrequencyViewModel.SavesCallbacks,
+    actioner: (SetSTaskFreqActions) -> Unit
 ) {
-    val countTasksDialog = countTasksDialog(countTasks, savesCallbacks.saveCountTasks)
+    val countTasksDialog = countTasksDialog(countTasks) { value: String ->
+        actioner(SetSTaskFreqActions.CountTasks(value))
+    }
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_count_tasks),
         value = countTasks.toString(),
@@ -197,9 +220,11 @@ private fun CountTasksItem(
 private fun FrequencyItem(
     frequencyFrom: Int,
     frequencyTo: Int,
-    savesCallbacks: SettingsSingleTaskFrequencyViewModel.SavesCallbacks,
+    actioner: (SetSTaskFreqActions) -> Unit
 ) {
-    val frequencyDialog = frequencyDialog(frequencyFrom, frequencyTo, savesCallbacks.saveFrequency)
+    val frequencyDialog = frequencyDialog(frequencyFrom, frequencyTo) { from: String, to: String ->
+        actioner(SetSTaskFreqActions.Frequency(from, to))
+    }
     SetItemDefault(
         title = stringResource(R.string.settings_s_task_title_frequency),
         value = stringResource(R.string.settings_s_task_value_frequency, frequencyFrom, frequencyTo),
@@ -337,10 +362,12 @@ fun frequencyDialog(
     )
 }
 
+/** ============================================ Preview ========================================================== */
+
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Preview
 @Composable
-fun SettingsSingleTaskFrequencyScreenPreview() {
-    SettingsSingleTaskFrequencyScreenBody(savesCallbacks = SettingsSingleTaskFrequencyViewModel.SavesCallbacks())
+fun SettingsSingleTaskFrequencyUiPreview() {
+    SettingsSingleTaskFrequencyUi(SettingsSingleTask()) {}
 }

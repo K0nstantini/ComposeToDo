@@ -44,7 +44,6 @@ class PopulateDBWithTasksImpl @Inject constructor(
         val poker = Task(name = "Покер", group = true).save()
         Task(name = "Сыграть в покер", parent = poker).save()
         Task(name = "Кэшаут Старзы", parent = poker).save()
-        Task(name = "Кэшаут Покерок", parent = poker).save()
 
         val music = Task(name = "Музыка", group = true).save()
 

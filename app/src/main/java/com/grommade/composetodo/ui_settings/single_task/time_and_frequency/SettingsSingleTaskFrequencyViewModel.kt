@@ -9,6 +9,9 @@ import com.grommade.composetodo.util.extensions.change
 import com.grommade.composetodo.util.extensions.singleSet
 import com.grommade.composetodo.util.extensions.timeToMinutes
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,31 +20,33 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
     private val repoSettings: RepoSettings,
 ) : BaseViewModel() {
 
-    val settings = repoSettings.settingsFlow.asState(Settings())
+    private val pendingActions = MutableSharedFlow<SetSTaskFreqActions>()
 
-    class SavesCallbacks(
-        val saveMode: (Int) -> Unit = {},
-        val savePeriodFrom: (Int) -> Unit = {},
-        val savePeriodTo: (Int) -> Unit = {},
-        val savePeriodNoRestrictions: () -> Unit = {},
-        val saveEveryFewDays: (String) -> Unit = {},
-        val saveDaysOfWeek: (List<Int>) -> Unit = {},
-        val saveDaysNoRestriction: () -> Unit = {},
-        val saveCountTasks: (String) -> Unit = {},
-        val saveFrequency: (String, String) -> Unit = { _, _ -> },
-    )
+    private val settings = repoSettings.settingsFlow.asState(Settings())
 
-    val savesCallbacks = SavesCallbacks(
-        saveMode = ::saveMode,
-        savePeriodFrom = ::savePeriodFrom,
-        savePeriodTo = ::savePeriodTo,
-        savePeriodNoRestrictions = ::savePeriodNoRestrictions,
-        saveEveryFewDays = ::saveEveryFewDays,
-        saveDaysOfWeek = ::saveDaysOfWeek,
-        saveDaysNoRestriction = ::saveDaysNoRestriction,
-        saveCountTasks = ::saveCountTasks,
-        saveFrequency = ::saveFrequency,
-    )
+    val settingsState = settings.map { set ->
+        set.singleTask
+    }
+
+    init {
+        viewModelScope.launch {
+            pendingActions.collect { action ->
+                when (action) {
+                    is SetSTaskFreqActions.Mode -> saveMode(action.value)
+                    is SetSTaskFreqActions.PeriodFrom -> savePeriodFrom(action.value)
+                    is SetSTaskFreqActions.PeriodTo -> savePeriodTo(action.value)
+                    is SetSTaskFreqActions.EveryFewDays -> saveEveryFewDays(action.value)
+                    is SetSTaskFreqActions.DaysOfWeek -> saveDaysOfWeek(action.value)
+                    is SetSTaskFreqActions.CountTasks -> saveCountTasks(action.value)
+                    is SetSTaskFreqActions.Frequency -> saveFrequency(action.from, action.to)
+                    SetSTaskFreqActions.PeriodNoRestrictions -> savePeriodNoRestrictions()
+                    SetSTaskFreqActions.DaysNoRestriction -> saveDaysNoRestriction()
+                    else -> {
+                    }
+                }
+            }
+        }
+    }
 
     private fun saveMode(index: Int) {
         val mode = ModeGenerationSingleTasks.values()[index]
@@ -95,6 +100,12 @@ class SettingsSingleTaskFrequencyViewModel @Inject constructor(
         val frequencyTo = valueTo.toIntOrNull() ?: 0
         if (frequencyFrom < frequencyTo) {
             changeSettings { set: singleSet -> set.copy(frequencyFrom = frequencyFrom, frequencyTo = frequencyTo) }
+        }
+    }
+
+    fun submitAction(action: SetSTaskFreqActions) {
+        viewModelScope.launch {
+            pendingActions.emit(action)
         }
     }
 

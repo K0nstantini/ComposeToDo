@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,41 +21,52 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.History
+import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
 import com.grommade.composetodo.ui.components.BuiltSimpleOkCancelDialog
 import com.vanpra.composematerialdialogs.MaterialDialog
 
 @Composable
-fun HistoryScreen(
-    viewModel: HistoryViewModel = hiltViewModel(),
-    navController: NavHostController = rememberNavController(),
-) {
-    with(viewModel) {
-        HistoryScreenBody(
-            histories = histories.collectAsState(emptyList()).value,
-            countRecords = countRecords.collectAsState().value,
-            onDelete = ::onClickDeleteAll,
-            onBack = navController::navigateUp
-        )
-    }
+fun HistoryUi(navController: NavHostController) {
+
+    HistoryUi(
+        viewModel = hiltViewModel(),
+        navController = navController
+    )
 }
 
 @Composable
-private fun HistoryScreenBody(
-    histories: List<History> = emptyList(),
-    countRecords: Int = 0,
-    onDelete: () -> Unit = {},
-    onBack: () -> Unit = {}
+fun HistoryUi(
+    viewModel: HistoryViewModel,
+    navController: NavHostController,
+) {
+    val histories by rememberFlowWithLifecycle(viewModel.histories)
+        .collectAsState(initial = emptyList())
+
+    HistoryUi(histories) { action ->
+        when (action) {
+            HistoryActions.Close -> navController.navigateUp()
+            HistoryActions.Delete -> viewModel.deleteAllHistory()
+        }
+    }
+
+}
+
+@Composable
+fun HistoryUi(
+    histories: List<History>,
+    actioner: (HistoryActions) -> Unit,
 ) {
     Scaffold(
-        topBar = { AppBar(
-            countRecords = countRecords,
-            onDelete = onDelete,
-            onBack = onBack
-        ) },
+        topBar = {
+            AppBar(
+                enabledDeleteBtn = histories.isNotEmpty(),
+                onDelete = { actioner(HistoryActions.Delete) },
+                onBack = { actioner(HistoryActions.Close) }
+            )
+        },
     ) {
         LazyColumn(
             modifier = Modifier.padding(start = 8.dp, end = 8.dp)
@@ -68,7 +80,7 @@ private fun HistoryScreenBody(
 
 @Composable
 private fun AppBar(
-    countRecords: Int,
+    enabledDeleteBtn: Boolean,
     onDelete: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -87,7 +99,7 @@ private fun AppBar(
             }
         },
         actions = {
-            IconButton(onClick = dialogDelete::show, enabled = countRecords > 0) {
+            IconButton(onClick = dialogDelete::show, enabled = enabledDeleteBtn) {
                 Icon(Icons.Filled.Delete, "")
             }
         }
@@ -112,10 +124,11 @@ private fun HistoryItem(
 @Preview
 @Composable
 fun HistoryScreenPreview() {
-    HistoryScreenBody(
+    HistoryUi(
         histories = listOf(
             History(id = 1, date = MyCalendar.now(), value = "Inserted new task: 'Task-1'"),
             History(id = 2, date = MyCalendar.now(), value = "Updated new task: 'Task-2'")
-        )
+        ),
+        actioner = {}
     )
 }

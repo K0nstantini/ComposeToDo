@@ -6,23 +6,22 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.*
-import com.grommade.composetodo.ui_history.HistoryScreen
+import com.grommade.composetodo.ui_history.HistoryUi
 import com.grommade.composetodo.ui_home.HomeUi
 import com.grommade.composetodo.ui_select_task.SelectTaskUi
-import com.grommade.composetodo.ui_settings.SettingsScreen
+import com.grommade.composetodo.ui_settings.SettingsUi
 import com.grommade.composetodo.ui_settings.general.SettingsGeneralTaskScreen
 import com.grommade.composetodo.ui_settings.regular_task.SettingsRegularTaskScreen
-import com.grommade.composetodo.ui_settings.single_task.SettingsSingleTaskScreen
-import com.grommade.composetodo.ui_settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyScreen
+import com.grommade.composetodo.ui_settings.single_task.SettingsSingleTaskUi
+import com.grommade.composetodo.ui_settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyUi
 import com.grommade.composetodo.ui_single_task.SingleTaskUi
-import com.grommade.composetodo.ui_statistics.StatisticsScreen
+import com.grommade.composetodo.ui_statistics.StatisticsUi
 import com.grommade.composetodo.ui_task_list.TaskListUi
 import com.grommade.composetodo.util.Keys
 import kotlinx.coroutines.launch
@@ -95,10 +94,7 @@ private fun NavGraphBuilder.addRoutStatistics(
     route = MainRoute.StatisticsChildRoute.route
 ) {
     drawerGesturesEnabled(false)
-    StatisticsScreen(
-        viewModel = hiltViewModel(),
-        navController
-    )
+    StatisticsUi(navController)
 }
 
 private fun NavGraphBuilder.addRoutSettings(
@@ -108,10 +104,7 @@ private fun NavGraphBuilder.addRoutSettings(
     route = MainRoute.SettingsChildRoute.route
 ) {
     drawerGesturesEnabled(false)
-    SettingsScreen(
-        viewModel = hiltViewModel(),
-        navController
-    )
+    SettingsUi(navController)
 }
 
 private fun NavGraphBuilder.addRoutHistory(
@@ -121,10 +114,7 @@ private fun NavGraphBuilder.addRoutHistory(
     route = MainRoute.HistoryChildRoute.route
 ) {
     drawerGesturesEnabled(false)
-    HistoryScreen(
-        viewModel = hiltViewModel(),
-        navController
-    )
+    HistoryUi(navController)
 }
 
 /** Types Tasks */
@@ -187,10 +177,7 @@ private fun NavGraphBuilder.addRoutSettingsSingleTask(
 ) = composable(
     route = SettingsRoute.SettingsSingleTaskChildRoute.route
 ) {
-    SettingsSingleTaskScreen(
-        viewModel = hiltViewModel(),
-        navController,
-    )
+    SettingsSingleTaskUi(navController)
 }
 
 /** Single Task Settings */
@@ -202,8 +189,5 @@ private fun NavGraphBuilder.addRoutSettingsSingleTaskFrequency(
 ) = composable(
     route = SettingsSingleTaskRoute.SettingsSingleTaskFrequencyChildRoute.route
 ) {
-    SettingsSingleTaskFrequencyScreen(
-        viewModel = hiltViewModel(),
-        navController,
-    )
+    SettingsSingleTaskFrequencyUi(navController)
 }

@@ -13,12 +13,8 @@ class StatisticsViewModel @Inject constructor(
 
     private val settings = repoSettings.settingsFlow
 
-    val regularPoints = settings
-        .map { set-> set.regularTask.points }
-        .asState(0)
-
-    val singlePoints = settings
-        .map { set-> set.singleTask.points }
-        .asState(0)
+    val state = settings.map {set ->
+        StatisticsViewState(singlePoints = set.singleTask.points)
+    }
 
 }

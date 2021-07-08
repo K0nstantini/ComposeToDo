@@ -8,6 +8,8 @@ import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.util.extensions.change
 import com.grommade.composetodo.util.extensions.singleSet
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,9 +18,14 @@ class SettingsSingleTaskViewModel @Inject constructor(
     private val repoSettings: RepoSettings,
 ) : BaseViewModel() {
 
-    val settings = repoSettings.settingsFlow.asState(Settings())
+    private val settings = repoSettings.settingsFlow.asState(Settings())
 
-    fun onClickActive(date: MyCalendar) {
+    val settingsState = settings.map { set ->
+        set.singleTask
+    }
+
+
+    fun changeStartGeneration(date: MyCalendar) {
         val state = date.isNoEmpty()
         changeSettings { set: singleSet ->
             set.copy(active = state, startGeneration = date, lastGeneration = MyCalendar())

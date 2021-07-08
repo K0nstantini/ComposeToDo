@@ -13,13 +13,7 @@ class HistoryViewModel @Inject constructor(private val repoHistory: RepoHistory)
 
     val histories = repoHistory.allHistory
 
-    val countRecords = histories.map { it.count() }.asState(0)
-
-    fun onClickDeleteAll() {
-        deleteAllHistory()
-    }
-
-    private fun deleteAllHistory() = viewModelScope.launch {
+    fun deleteAllHistory() = viewModelScope.launch {
         repoHistory.deleteAllHistory()
     }
 
