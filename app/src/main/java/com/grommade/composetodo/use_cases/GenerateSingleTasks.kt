@@ -98,11 +98,11 @@ class GenerateSingleTasksImpl @Inject constructor(
     }
 
     // FIXME:
-    private fun generateDate(frequency: IntRange, date: MyCalendar) = MyCalendar(
-        date.milli + (60_000..180_000).random()
-    )
+//    private fun generateDate(frequency: IntRange, date: MyCalendar) = MyCalendar(
+//        date.milli + (60_000..180_000).random()
+//    )
 
-    private fun generateDate2(frequency: IntRange, date: MyCalendar) = MyCalendar(
+    private fun generateDate(frequency: IntRange, date: MyCalendar) = MyCalendar(
         date.milli + (frequency.first.hoursToMilli()..frequency.last.hoursToMilli()).random()
     )
 

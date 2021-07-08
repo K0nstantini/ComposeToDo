@@ -2,9 +2,10 @@ package com.grommade.composetodo.ui_settings.single_task
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,16 +17,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.grommade.composetodo.R
-import com.grommade.composetodo.SettingsSingleTaskRoute
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Settings.SettingsSingleTask
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
-import com.grommade.composetodo.ui.components.*
-import com.grommade.composetodo.ui_settings.SettingsActions
+import com.grommade.composetodo.ui.components.BuiltDateTimeDialog
+import com.grommade.composetodo.ui.components.NavigationBackIcon
+import com.grommade.composetodo.ui.components.SetItemDefault
+import com.grommade.composetodo.ui.components.SetItemSwitch
 import com.grommade.composetodo.util.extensions.toDaysOfWeek
 import com.grommade.composetodo.util.extensions.toSettingsSingleTask
 import com.grommade.composetodo.util.extensions.toStrTime

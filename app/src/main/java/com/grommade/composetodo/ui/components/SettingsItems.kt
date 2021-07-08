@@ -4,17 +4,20 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.ui.theme.ComposeToDoTheme
-import timber.log.Timber
 
 @ExperimentalMaterialApi
 @Composable
@@ -52,26 +55,6 @@ fun SetItemWithClear(
     )
 }
 
-@ExperimentalMaterialApi
-@Composable
-fun SetItemSwitch(
-    title: String,
-    value: String = "",
-    stateSwitch: Boolean = false,
-    enabled: Boolean = true,
-    onClick: () -> Unit = {},
-    onClickSwitch: (Boolean) -> Unit = {},
-) {
-    SetItemBody(
-        title = title,
-        value = value,
-        showSwitch = true,
-        enabled = enabled,
-        stateSwitch = stateSwitch,
-        onClick = onClick,
-        onClickSwitch = onClickSwitch
-    )
-}
 
 @ExperimentalMaterialApi
 @Composable
@@ -135,6 +118,59 @@ private fun SetItemBody(
     Divider(thickness = 1.dp)
 }
 
+@ExperimentalMaterialApi
+@Composable
+fun SetItemSwitch(
+    title: String,
+    value: String = "",
+    stateSwitch: Boolean = false,
+    enabled: Boolean = true,
+    onClick: () -> Unit = {},
+    onClickSwitch: (Boolean) -> Unit = {},
+) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.padding(vertical = 8.dp),
+        enabled = enabled
+    ) {
+        ConstraintLayout(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val (texts, switch) = createRefs()
+            Column(
+                Modifier.constrainAs(texts) {
+                    start.linkTo(parent.start)
+                    end.linkTo(switch.start)
+                    width = Dimension.fillToConstraints
+                }
+            ) {
+                Text(
+                    text = title,
+                    style = when (enabled) {
+                        true -> MaterialTheme.typography.h6.copy(fontSize = 16.sp)
+                        false -> MaterialTheme.typography.h6.copy(fontSize = 16.sp, color = Color.Gray)
+                    }
+                )
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = if (enabled) value else "-",
+                        style = MaterialTheme.typography.body2.copy(color = Color.DarkGray)
+                    )
+                }
+            }
+            Switch(
+                checked = stateSwitch,
+                onCheckedChange = onClickSwitch,
+                enabled = enabled,
+                modifier = Modifier.constrainAs(switch) {
+                    end.linkTo(parent.end)
+                }
+            )
+        }
+    }
+    Divider(thickness = 1.dp)
+}
+
 @Composable
 fun SetItemTitle(text: String) {
     Divider(color = Color.Transparent, thickness = 4.dp)
@@ -176,7 +212,10 @@ fun SetItemWithClearPreview() {
 @Composable
 fun SetItemSwitchPreview() {
     ComposeToDoTheme {
-        SetItemSwitch(stringResource(R.string.settings_add_task_title_group))
+        SetItemSwitch(
+            title = stringResource(R.string.settings_add_task_title_group),
+            value = "@Immutable для классов которые не изменяются bncvvc "
+        )
     }
 }
 
@@ -193,5 +232,33 @@ fun SetItemTitlePreview() {
             )
         }
 
+    }
+}
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun SetItemDel() {
+    Surface(modifier = Modifier.padding(vertical = 8.dp)) {
+        ConstraintLayout(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val (text1, text2) = createRefs()
+            Text(
+                "11111111111111111111111111111111111111111111111111",
+                Modifier.constrainAs(text1) {
+                    start.linkTo(parent.start)
+                    end.linkTo(text2.start)
+                    width = Dimension.fillToConstraints
+                },
+                overflow = TextOverflow.Clip
+            )
+            Text("2222222222222",
+                Modifier.constrainAs(text2) {
+                    start.linkTo(parent.end)
+                    end.linkTo(parent.end)
+                }
+            )
+        }
     }
 }
