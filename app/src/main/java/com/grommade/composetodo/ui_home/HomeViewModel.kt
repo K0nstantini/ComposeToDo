@@ -7,6 +7,7 @@ import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.ui_task_list.TaskListActions
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.util.extensions.change
@@ -25,21 +26,39 @@ class HomeViewModel @Inject constructor(
     private val generateSingleTasks: GenerateSingleTasks
 ) : BaseViewModel() {
 
+    private val pendingAction = MutableSharedFlow<HomeActions>()
+
     val state = repoSingleTask.activeTasks.map { tasks ->
         HomeViewState(tasks.sortedBy { it.deadlineDate })
     }
 
     private val settings: StateFlow<Settings> = repoSettings.settingsFlow.asState(Settings())
 
-    fun refreshTasks() = viewModelScope.launch {
+    init {
+        viewModelScope.launch {
+            pendingAction.collect { action ->
+                when (action) {
+                    is HomeActions.MarkTaskDone -> onMarkTaskDoneClicked(action.task)
+                    HomeActions.Refresh -> refreshTasks()
+                    HomeActions.ClearStateTasks -> clearStateTasks()
+                    else -> {
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun refreshTasks() = viewModelScope.launch {
         if (repoSettings.getCountSettings() == 1) { // FIXME: WTF?
             generateSingleTasks()
         }
     }
 
-    fun clearStateTasks() = viewModelScope.launch {
-        val set = settings.value.change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
-        set.save()
+    private fun clearStateTasks() = viewModelScope.launch {
+        settings.value
+            .change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
+            .save()
         val tasks = repoSingleTask.getAllTasks()
         tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
             task.copy(single = task.single.copy(dateActivation = MyCalendar())).save()
@@ -49,11 +68,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun onMarkTaskDoneClicked(task: Task) {
+    private fun onMarkTaskDoneClicked(task: Task) {
         viewModelScope.launch {
             delay(500)
             performSingleTask(task)
         }
+    }
+
+    fun submitAction(action: HomeActions) {
+        viewModelScope.launch { pendingAction.emit(action) }
     }
 
     private fun Task.save() = viewModelScope.launch { repoSingleTask.saveTask(this@save) }

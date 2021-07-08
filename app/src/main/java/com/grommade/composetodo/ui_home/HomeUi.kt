@@ -41,10 +41,8 @@ private fun HomeUi(
 
     HomeUi(viewState) { action ->
         when (action) {
-            is HomeActions.MarkTaskDone -> viewModel.onMarkTaskDoneClicked(action.task)
-            HomeActions.Refresh -> viewModel.refreshTasks()
-            HomeActions.ClearStateTasks -> viewModel.clearStateTasks()
             HomeActions.OpenDrawer -> openDrawer()
+            else -> viewModel.submitAction(action)
         }
     }
 }
@@ -119,11 +117,11 @@ fun TaskItem(
                     style = MaterialTheme.typography.subtitle2.copy(fontSize = 12.sp, color = Color.Gray)
                 )
             }
-            val checkedState = remember { mutableStateOf(false) }
+            var checkedState by remember { mutableStateOf(false) }
             Checkbox(
-                checked = checkedState.value,
+                checked = checkedState,
                 onCheckedChange = {
-                    checkedState.value = true
+                    checkedState = true
                     markTask()
                 }
             )

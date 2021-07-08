@@ -71,8 +71,8 @@ fun MaterialDialog.BuiltInputDialog(
     prefill: String = "",
     label: String = "",
     hint: String = "",
+    isTextValid: (String) -> Boolean = { true },
     callback: (String) -> Unit,
-    isTextValid: (String) -> Boolean = { true }
 ) {
     build {
         SetTitle(title, message)

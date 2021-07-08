@@ -1,6 +1,5 @@
 package com.grommade.composetodo.ui
 
-import android.provider.ContactsContract
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
@@ -22,7 +21,7 @@ import com.grommade.composetodo.ui_settings.general.SettingsGeneralTaskScreen
 import com.grommade.composetodo.ui_settings.regular_task.SettingsRegularTaskScreen
 import com.grommade.composetodo.ui_settings.single_task.SettingsSingleTaskScreen
 import com.grommade.composetodo.ui_settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyScreen
-import com.grommade.composetodo.ui_single_task.SingleTaskScreen
+import com.grommade.composetodo.ui_single_task.SingleTaskUi
 import com.grommade.composetodo.ui_statistics.StatisticsScreen
 import com.grommade.composetodo.ui_task_list.TaskListUi
 import com.grommade.composetodo.util.Keys
@@ -147,10 +146,7 @@ private fun NavGraphBuilder.addRoutSingleTask(
     route = TasksRoute.SingleTaskChildRoute.route,
     arguments = TasksRoute.SingleTaskChildRoute.addArguments()
 ) {
-    SingleTaskScreen(
-        viewModel = hiltViewModel(),
-        navController,
-    )
+    SingleTaskUi(navController)
 }
 
 /** Select Tasks */

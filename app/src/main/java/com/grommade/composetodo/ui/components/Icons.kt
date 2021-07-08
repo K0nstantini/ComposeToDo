@@ -26,6 +26,15 @@ fun NavigationCloseIcon(
 }
 
 @Composable
+fun SaveIcon(
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(Icons.Filled.Save, "")
+    }
+}
+
+@Composable
 fun DeleteIcon(
     callback: () -> Unit
 ) {
