@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class RepoSingleTask @Inject constructor(
+class RepoTask @Inject constructor(
     private val singleTaskDao: SingleTaskDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {

@@ -3,6 +3,7 @@ package com.grommade.composetodo.data
 import androidx.room.TypeConverter
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
+import com.grommade.composetodo.enums.ScheduleTask
 import com.grommade.composetodo.enums.TypeTask
 
 class Converters {
@@ -24,4 +25,10 @@ class Converters {
 
     @TypeConverter
     fun toModeGenerationSingleTasks(name: String) = ModeGenerationSingleTasks.valueOf(name)
+
+    @TypeConverter
+    fun fromScheduleTask(schedule: ScheduleTask) = schedule.name
+
+    @TypeConverter
+    fun toScheduleTask(name: String) = ScheduleTask.valueOf(name)
 }

@@ -6,8 +6,7 @@ import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSettings
-import com.grommade.composetodo.data.repos.RepoSingleTask
-import com.grommade.composetodo.ui_task_list.TaskListActions
+import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.util.extensions.change
@@ -21,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repoSettings: RepoSettings,
-    private val repoSingleTask: RepoSingleTask,
+    private val repoSingleTask: RepoTask,
     private val performSingleTask: PerformSingleTask,
     private val generateSingleTasks: GenerateSingleTasks
 ) : BaseViewModel() {
@@ -60,8 +59,8 @@ class HomeViewModel @Inject constructor(
             .change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
             .save()
         val tasks = repoSingleTask.getAllTasks()
-        tasks.filter { it.single.dateActivation.isNoEmpty() }.forEach { task ->
-            task.copy(single = task.single.copy(dateActivation = MyCalendar())).save()
+        tasks.filter { it.dates.dateActivation.isNoEmpty() }.forEach { task ->
+            task.copy(dates = task.dates.copy(dateActivation = MyCalendar())).save()
         }
         tasks.filter { it.single.rolls > 0 }.forEach { task ->
             task.copy(single = task.single.copy(rolls = 0)).save()

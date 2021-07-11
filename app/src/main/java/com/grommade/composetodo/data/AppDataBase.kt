@@ -12,7 +12,7 @@ import com.grommade.composetodo.data.entity.Task
 
 @Database(
     entities = [Settings::class, Task::class, History::class],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)

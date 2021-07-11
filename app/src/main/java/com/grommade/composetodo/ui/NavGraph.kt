@@ -20,8 +20,9 @@ import com.grommade.composetodo.ui_settings.general.SettingsGeneralTaskScreen
 import com.grommade.composetodo.ui_settings.regular_task.SettingsRegularTaskScreen
 import com.grommade.composetodo.ui_settings.single_task.SettingsSingleTaskUi
 import com.grommade.composetodo.ui_settings.single_task.time_and_frequency.SettingsSingleTaskFrequencyUi
-import com.grommade.composetodo.ui_single_task.SingleTaskUi
 import com.grommade.composetodo.ui_statistics.StatisticsUi
+import com.grommade.composetodo.ui_task.TaskUi
+import com.grommade.composetodo.ui_task.ui_type_task.TypeTaskUi
 import com.grommade.composetodo.ui_task_list.TaskListUi
 import com.grommade.composetodo.util.Keys
 import kotlinx.coroutines.launch
@@ -56,9 +57,10 @@ fun ToDoNavGraph(
 
         addRoutTaskList(navController, drawerGesturesEnabled)
         addRoutRegularTask(navController)
-        addRoutSingleTask(navController)
+        addRoutTask(navController)
+        addRoutTypeTask(navController)
 
-        addRoutSingleSelectTask(navController)
+        addRoutSelectTask(navController)
     }
 }
 
@@ -130,18 +132,30 @@ private fun NavGraphBuilder.addRoutRegularTask(
 
 @ExperimentalMaterialApi
 @ExperimentalComposeUiApi
-private fun NavGraphBuilder.addRoutSingleTask(
+private fun NavGraphBuilder.addRoutTask(
     navController: NavHostController
 ) = composable(
-    route = TasksRoute.SingleTaskChildRoute.route,
-    arguments = TasksRoute.SingleTaskChildRoute.addArguments()
+    route = TasksRoute.TaskChildRoute.route,
+    arguments = TasksRoute.TaskChildRoute.addArguments()
 ) {
-    SingleTaskUi(navController)
+//    SingleTaskUi(navController)
+    TaskUi(navController)
+}
+
+/** Add Tasks */
+
+private fun NavGraphBuilder.addRoutTypeTask(
+    navController: NavHostController
+) = composable(
+    route = TypeTaskRoute.TypeTaskChildRoute.route,
+    arguments = TypeTaskRoute.TypeTaskChildRoute.addArguments()
+) {
+    TypeTaskUi(navController)
 }
 
 /** Select Tasks */
 
-private fun NavGraphBuilder.addRoutSingleSelectTask(
+private fun NavGraphBuilder.addRoutSelectTask(
     navController: NavHostController
 ) = composable(
     route = SelectTaskRoute.SingleTaskSelectRoute.route,

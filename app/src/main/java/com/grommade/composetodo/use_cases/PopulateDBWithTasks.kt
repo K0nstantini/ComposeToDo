@@ -1,7 +1,7 @@
 package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.data.entity.Task
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import javax.inject.Inject
 
 interface PopulateDBWithTasks {
@@ -9,7 +9,7 @@ interface PopulateDBWithTasks {
 }
 
 class PopulateDBWithTasksImpl @Inject constructor(
-    private val repoSingleTask: RepoSingleTask
+    private val repoSingleTask: RepoTask
 ) : PopulateDBWithTasks {
     override suspend fun invoke() {
 
@@ -21,7 +21,6 @@ class PopulateDBWithTasksImpl @Inject constructor(
         Task(name = "Убраться в отделении на столе", parent = routine).save()
         Task(name = "Убраться в верхнем ящике стола", parent = routine).save()
         Task(name = "Убраться в среднем ящике стола", parent = routine).save()
-        Task(name = "Убраться в нижнем ящике стола", parent = routine).save()
         Task(name = "Разобрать пакет под стулом", parent = routine).save()
         Task(name = "Разметить турник", parent = routine).save()
         Task(name = "Заказ Aliexpress (тестер, ключ и пр.)", parent = routine).save()

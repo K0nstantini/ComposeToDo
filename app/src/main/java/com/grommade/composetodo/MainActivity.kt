@@ -57,12 +57,12 @@ private fun ToDoApp() {
             AppDrawer(
                 navigateToRegularTasks = {
                     navController.navigate(
-                        MainRoute.TaskListChildRoute.createRoute(TypeTask.REGULAR_TASK)
+                        MainRoute.TaskListChildRoute.createRoute(TypeTask.LONG_REGULAR_TASK)
                     )
                 },
                 navigateToSingleTasks = {
                     navController.navigate(
-                        MainRoute.TaskListChildRoute.createRoute(TypeTask.SINGLE_TASK)
+                        MainRoute.TaskListChildRoute.createRoute(TypeTask.UNIMPORTANT)
                     )
                 },
                 navigateToStatistics = { navController.navigate(MainRoute.StatisticsChildRoute.route) },

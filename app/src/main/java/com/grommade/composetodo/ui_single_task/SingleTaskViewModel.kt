@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.Task
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,12 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SingleTaskViewModel @Inject constructor(
-    private val repoSingleTask: RepoSingleTask,
+    private val repoSingleTask: RepoTask,
     handle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -34,7 +33,7 @@ class SingleTaskViewModel @Inject constructor(
             group = task.group,
             parentStr = repoSingleTask.getTask(task.parent)?.name,
             parentId = task.parent,
-            dateStart = task.single.dateStart.toString(false),
+            dateStart = task.dates.dateStart.toString(false),
             deadline = task.single.deadlineDays,
         )
     }
@@ -83,7 +82,7 @@ class SingleTaskViewModel @Inject constructor(
     }
 
     private fun changeDateStart(date: MyCalendar) {
-        currentTask.setValue { copy(single = single.copy(dateStart = date)) }
+        currentTask.setValue { copy(dates = currentTask.value.dates.copy(dateStart = date)) }
     }
 
     private fun changeDeadline(value: Int) {

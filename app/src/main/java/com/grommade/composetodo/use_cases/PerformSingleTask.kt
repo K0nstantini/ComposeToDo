@@ -2,7 +2,7 @@ package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSettings
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import javax.inject.Inject
 
 interface PerformSingleTask {
@@ -11,7 +11,7 @@ interface PerformSingleTask {
 
 class PerformSingleTaskImpl @Inject constructor(
     private val repoSettings: RepoSettings,
-    private val repoSingleTask: RepoSingleTask,
+    private val repoSingleTask: RepoTask,
 ) : PerformSingleTask {
 
     override suspend fun invoke(task: Task) {

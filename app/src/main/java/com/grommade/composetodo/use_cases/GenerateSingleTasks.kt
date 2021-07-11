@@ -6,7 +6,7 @@ import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoHistory
 import com.grommade.composetodo.data.repos.RepoSettings
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.enums.ModeGenerationSingleTasks
 import com.grommade.composetodo.util.extensions.delEmptyGroups
 import com.grommade.composetodo.util.extensions.hoursToMilli
@@ -21,7 +21,7 @@ interface GenerateSingleTasks {
 
 class GenerateSingleTasksImpl @Inject constructor(
     private val repoSettings: RepoSettings,
-    private val repoSingleTask: RepoSingleTask,
+    private val repoSingleTask: RepoTask,
     private val repoHistory: RepoHistory,
 ) : GenerateSingleTasks {
 
@@ -67,7 +67,7 @@ class GenerateSingleTasksImpl @Inject constructor(
             val workDate = lastGeneration.nextSuitableDate(period, settings.singleTask.daysOfWeek, dateNow)
             generateTask(tasksToActivate)?.let { task ->
                 saveTask(
-                    task.copy(single = task.single.copy(dateActivation = workDate))
+                    task.copy(dates = task.dates.copy(dateActivation = workDate))
                 )
                 saveHistory(
                     History(

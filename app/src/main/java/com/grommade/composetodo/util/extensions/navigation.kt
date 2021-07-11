@@ -1,13 +1,11 @@
 package com.grommade.composetodo.util.extensions
 
 import androidx.navigation.NavController
-import com.grommade.composetodo.SelectTaskRoute
-import com.grommade.composetodo.SettingsRoute
-import com.grommade.composetodo.SettingsSingleTaskRoute
-import com.grommade.composetodo.TasksRoute
+import com.grommade.composetodo.*
+import com.grommade.composetodo.enums.TypeTask
 
-fun NavController.toSingleTask(id: Long) =
-    navigate(TasksRoute.SingleTaskChildRoute.createRoute(id))
+fun NavController.toAddEditTask(type: TypeTask, id: Long = -1) =
+    navigate(TasksRoute.TaskChildRoute.createRoute(type, id))
 
 fun NavController.toSelectParent(id: Long) =
     navigate(SelectTaskRoute.SingleTaskSelectRoute.createRoute(id))
@@ -23,3 +21,6 @@ fun NavController.toSingleSettings() =
 
 fun NavController.toSettingsSingleTask() =
     navigate(SettingsSingleTaskRoute.SettingsSingleTaskFrequencyChildRoute.route)
+
+fun NavController.toTypeTask(type: TypeTask) =
+    navigate(TypeTaskRoute.TypeTaskChildRoute.createRoute(type.name))

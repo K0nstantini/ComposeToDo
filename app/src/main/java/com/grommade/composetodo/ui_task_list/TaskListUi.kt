@@ -1,6 +1,7 @@
 package com.grommade.composetodo.ui_task_list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,10 +27,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.grommade.composetodo.R
 import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
 import com.grommade.composetodo.ui.components.*
-import com.grommade.composetodo.util.extensions.toSingleTask
+import com.grommade.composetodo.util.extensions.toAddEditTask
 import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.title
 
 @Composable
 fun TaskListUi(navController: NavHostController) {
@@ -50,8 +53,8 @@ fun TaskListUi(
 
     TaskListUi(viewState) { action ->
         when (action) {
-            is TaskListActions.OpenTask -> navController.toSingleTask(action.id)
-            TaskListActions.NewTask -> navController.toSingleTask(-1)
+            is TaskListActions.OpenTask -> navController.toAddEditTask(action.type, action.id)
+            is TaskListActions.NewTask -> navController.toAddEditTask(action.type)
             TaskListActions.Back -> navController.navigateUp()
             else -> viewModel.submitAction(action)
         }
@@ -93,9 +96,7 @@ fun TaskListUi(
         },
         floatingActionButton = {
             if (selectedTasks.isEmpty()) {
-                FloatingActionButton(onClick = { actioner(TaskListActions.NewTask) }) {
-                    Icon(Icons.Filled.Add, "")
-                }
+                AddTaskButton(actioner)
             }
         }
 
@@ -178,6 +179,57 @@ fun DropdownMenu(populateDBWithTasks: () -> Unit) {
 }
 
 @Composable
+fun AddTaskButton(
+    actioner: (TaskListActions) -> Unit
+) {
+    val typeTaskDialog = typeTaskDialog(actioner)
+
+    FloatingActionButton(onClick = typeTaskDialog::show) {
+        Icon(Icons.Filled.Add, "")
+    }
+}
+
+@Composable
+private fun typeTaskDialog(
+    actioner: (TaskListActions) -> Unit
+): MaterialDialog = remember { MaterialDialog() }.apply {
+    build {
+        title("Тип задачи")
+        Column(modifier = Modifier.padding(start = 24.dp)) {
+            Text("Разовые", color = Color.Blue)
+            TypeTaskItem(TypeTask.IMPORTANT, actioner)
+            TypeTaskItem(TypeTask.UNIMPORTANT, actioner)
+            Text("Разовые", color = Color.Blue)
+            TypeTaskItem(TypeTask.LONG_REGULAR_TASK, actioner)
+            TypeTaskItem(TypeTask.SHORT_REGULAR_TASK, actioner)
+            TypeTaskItem(TypeTask.CONTAINER_TASK, actioner)
+        }
+    }
+}
+
+@Composable
+fun MaterialDialog.TypeTaskItem(
+    type: TypeTask,
+    actioner: (TaskListActions) -> Unit
+) {
+    Text(
+        text = stringResource(type.title),
+        color = MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.body1,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                onClick = {
+                    hide()
+                    actioner(TaskListActions.NewTask(type))
+                }
+            )
+            .padding(top = 12.dp, bottom = 12.dp, start = 24.dp, end = 24.dp)
+            .wrapContentWidth(Alignment.Start)
+    )
+}
+
+@Composable
 fun TaskListScrollingContent(
     tasks: List<Task>,
     selected: SnapshotStateMap<Long, Boolean>,
@@ -200,7 +252,7 @@ fun TaskListScrollingContent(
                 onClick = {
                     when (selected.containsValue(true)) {
                         true -> markItem(task.id)
-                        false -> actioner(TaskListActions.OpenTask(task.id))
+                        false -> actioner(TaskListActions.OpenTask(task.type, task.id))
                     }
                 },
                 onGroupClicked = {

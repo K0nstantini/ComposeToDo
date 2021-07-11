@@ -49,7 +49,7 @@
     <!--    Hints-->
     <string name="hint_edit_text_name">Наименование</string>
 
-    <!--    Settings Items Single Tasks-->
+    <!--    Tasks' Card-->
     <string name="settings_add_task_title_group">Группа</string>
     <string name="settings_add_task_title_parent">В группе</string>
     <string name="settings_main_catalog_text">Основной каталог</string>
@@ -58,6 +58,25 @@
     <string name="settings_add_single_task_deadline_zero_text">Укажите время, отведенное на выполнение задачи</string>
     <string name="settings_add_single_task_deadline_time_hours_text">%dч</string>
     <string name="settings_add_regular_task_choose_from_group_text">Выбирать из группы</string>
+    <string name="settings_add_task_title_type">Тип задачи</string>
+    <string name="task_card_title_type_task_temp">Временная</string>
+    <string name="task_card_value_type_task_temp">Временная запись для дальнейшего уточнения. Записать чтобы не забыть.</string>
+    <string name="task_card_title_type_task_single">Разовая</string>
+    <string name="task_card_value_type_task_single">Задачи будут выбираться случайным образом из списка разовых задач в соответствии с настройками.
+        \nПримеры: \'Купить наушники\', \'Сходить в банк\'</string>
+    <string name="task_card_title_type_task_regular">Регулярная</string>
+    <string name="task_card_value_type_task_regular">Различного рода так или иначе повторяющиейся задачи, события, привычки и т. д.</string>
+    <string name="task_card_title_type_task_regular_long">Долгосрочная</string>
+    <string name="task_card_value_type_task_regular_long">Задачи с довольно низкой периодичностью и большим периодом действия.
+        \nПримеры: \'Физ. активность\' не реже раз/нед., \'Мед. обследование\' не реже раз/год.</string>
+    <string name="task_card_title_type_task_regular_short">Краткосрочная</string>
+    <string name="task_card_value_type_task_regular_short">Задачи, планируемые на небольшой обязательный период времени с продлением по желанию.
+    \nПримеры: \'Физ. активность\' 3 раз в неделю в течении месяца.</string>
+    <string name="task_card_title_type_task_regular_short_usual">Обычная</string>
+    <string name="task_card_value_type_task_regular_short_usual">Примеры: \'Физ. активность\' 3 раз в неделю в течении месяца.</string>
+    <string name="task_card_title_type_task_regular_container">Контейнер</string>
+    <string name="task_card_value_type_task_regular_container">Содержит вложенные задачи, выбираемые случайным образом.</string>
+
 
     <!--    Settings Items Settings Single Tasks -->
     <string name="settings_s_task_title_active">Активность</string>
@@ -136,6 +155,13 @@
     <string name="failure_text_settings_load_error">Настройки не загружены. Требуется перезапустить приложение</string>
 
     <!--    Choice dialogs-->
+
+    <string name="choice_type_task_important">Важная</string>
+    <string name="choice_type_task_unimportant">Не важная</string>
+    <string name="choice_type_task_long_regular">Долгосрочная</string>
+    <string name="choice_type_task_short_regular">Краткосрочная</string>
+    <string name="choice_type_task_container">Контейнер</string>
+
     <string name="choice_mode_generation_s_tasks_random">Случайный</string>
     <string name="choice_mode_generation_s_tasks_fixed">Фиксированный</string>
 

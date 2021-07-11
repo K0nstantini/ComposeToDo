@@ -50,7 +50,6 @@ fun SingleTaskUi(
         handle.remove<Long>(Keys.SELECTED_TASK_ID)
     }
 
-    Timber.tag("-Timber-").d("Refreshed")
     viewModel.navigateToBack.collectAsState().value?.let { navController.navigateUp() }
 
     val viewState by rememberFlowWithLifecycle(viewModel.state)

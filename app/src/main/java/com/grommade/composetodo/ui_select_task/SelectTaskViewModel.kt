@@ -1,14 +1,14 @@
 package com.grommade.composetodo.ui_select_task
 
 import androidx.lifecycle.ViewModel
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class SelectTaskViewModel @Inject constructor(
-    repoSingleTask: RepoSingleTask,
+    repoSingleTask: RepoTask,
 ) : ViewModel() {
 
     private val groups = repoSingleTask.groups

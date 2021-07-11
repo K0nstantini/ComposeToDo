@@ -5,7 +5,7 @@ import com.grommade.composetodo.data.dao.SettingsDao
 import com.grommade.composetodo.data.dao.SingleTaskDao
 import com.grommade.composetodo.data.repos.RepoHistory
 import com.grommade.composetodo.data.repos.RepoSettings
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,7 +22,7 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideRepositorySingleTask(singleTaskDao: SingleTaskDao) = RepoSingleTask(singleTaskDao)
+    fun provideRepositorySingleTask(singleTaskDao: SingleTaskDao) = RepoTask(singleTaskDao)
 
     @Provides
     @Singleton

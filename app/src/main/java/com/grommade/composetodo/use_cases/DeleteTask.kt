@@ -9,7 +9,7 @@ import com.grommade.composetodo.add_classes.doIfSuccess
 import com.grommade.composetodo.data.entity.Settings
 import com.grommade.composetodo.data.entity.Task
 import com.grommade.composetodo.data.repos.RepoSettings
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.util.extensions.groupIsEmpty
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -26,7 +26,7 @@ interface DeleteTask {
 class DeleteTaskImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val repoSettings: RepoSettings,
-    private val repoSingleTask: RepoSingleTask,
+    private val repoSingleTask: RepoTask,
 ) : DeleteTask {
 
     override suspend fun invoke(task: Task?, tasks: List<Task>, tasksID: List<Long>): ResultOf<Boolean> {
@@ -66,13 +66,14 @@ class DeleteTaskImpl @Inject constructor(
     private fun checkTask(settings: Settings, task: Task): ResultOf<Task> {
         return when {
             task.singleIsActivated -> ResultOf.Failure(R.string.failure_text_task_is_active.asString(task))
-            settings.singleTask.restrictionIsActive &&
-                    (MyCalendar.now() - task.dateCreation).hours > settings.singleTask.timeAfterAddingTaskToEditOrDel ->
+            settings.singleTask.restrictionIsActive && (MyCalendar.now() - task.dates.dateCreation).hours >
+                    settings.singleTask.timeAfterAddingTaskToEditOrDel ->
                 ResultOf.Failure(R.string.failure_text_delete_restrict_by_settings.asString(task))
             else -> ResultOf.Success(task)
         }
     }
 
-    private fun Int.asString(task: Task) = appContext.getString(this, task.name)
+    private fun Int.asString(task: Task) =
+        appContext.getString(this, task.name)
 
 }

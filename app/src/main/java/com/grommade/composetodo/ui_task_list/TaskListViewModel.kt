@@ -3,7 +3,7 @@ package com.grommade.composetodo.ui_task_list
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.data.entity.Task
-import com.grommade.composetodo.data.repos.RepoSingleTask
+import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.use_cases.DeleteTask
 import com.grommade.composetodo.use_cases.PerformSingleTask
 import com.grommade.composetodo.use_cases.PopulateDBWithTasks
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskListViewModel @Inject constructor(
-    private val repoSingleTask: RepoSingleTask,
+    private val repoSingleTask: RepoTask,
     private val performSingleTask: PerformSingleTask,
     private val populateDBWithTasks: PopulateDBWithTasks,
     private val deleteTask: DeleteTask,

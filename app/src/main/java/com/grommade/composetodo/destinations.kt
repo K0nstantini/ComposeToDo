@@ -35,10 +35,29 @@ sealed class TasksRoute(val route: String) {
         fun addArguments() = addArgumentTaskID()
     }
 
-    object SingleTaskChildRoute : TasksRoute("taskList/SINGLE_TASK/addEditTask?taskID={taskID}") {
-        fun createRoute(id: Long) = "taskList/SINGLE_TASK/addEditTask?taskID=$id"
-        fun addArguments() = addArgumentTaskID()
+    object TaskChildRoute : TasksRoute("taskList/task/addEditTask?type={type}&taskID={taskID}") {
+        fun createRoute(type: TypeTask, id: Long = -1) = "taskList/task/addEditTask?type=$type&taskID=$id"
+        fun addArguments() = listOf(
+            navArgument(Keys.TASK_TYPE_KEY) {
+                defaultValue = TypeTask.IMPORTANT
+            },
+            navArgument(Keys.TASK_ID) {
+                defaultValue = -1L
+            }
+        )
     }
+}
+
+sealed class TypeTaskRoute(val route: String) {
+    object TypeTaskChildRoute : TasksRoute("taskList/SINGLE_TASK/addEditTask/type?type={type}") {
+        fun createRoute(type: String) = "taskList/SINGLE_TASK/addEditTask/type?type=$type"
+        fun addArguments() = listOf(
+            navArgument(Keys.TASK_TYPE_KEY) {
+                type = NavType.StringType
+            }
+        )
+    }
+
 }
 
 sealed class SelectTaskRoute(val route: String) {
