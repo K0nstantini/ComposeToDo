@@ -156,8 +156,8 @@
 
     <!--    Choice dialogs-->
 
-    <string name="choice_type_task_important">Важная</string>
-    <string name="choice_type_task_unimportant">Не важная</string>
+    <string name="choice_type_task_exact_time">Точное время/период</string>
+    <string name="choice_type_task_random">Случайная</string>
     <string name="choice_type_task_long_regular">Долгосрочная</string>
     <string name="choice_type_task_short_regular">Краткосрочная</string>
     <string name="choice_type_task_container">Контейнер</string>

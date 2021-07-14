@@ -8,10 +8,10 @@ import com.grommade.composetodo.data.dao.SettingsDao
 import com.grommade.composetodo.data.dao.SingleTaskDao
 import com.grommade.composetodo.data.entity.History
 import com.grommade.composetodo.data.entity.Settings
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 
 @Database(
-    entities = [Settings::class, Task::class, History::class],
+    entities = [Settings::class, RandomTask::class, History::class],
     version = 4,
     exportSchema = false,
 )

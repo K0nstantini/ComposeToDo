@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.grommade.composetodo.R
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
 import com.grommade.composetodo.util.Keys
 
@@ -98,7 +98,7 @@ fun SelectTaskUi(
 
 @Composable
 fun TaskListScrollingContent(
-    tasks: List<Task>,
+    tasks: List<RandomTask>,
     selected: Long,
     setSelected: (Long) -> Unit,
 ) {

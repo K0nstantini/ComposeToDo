@@ -2,7 +2,7 @@ package com.grommade.composetodo.ui_task_list
 
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.use_cases.DeleteTask
 import com.grommade.composetodo.use_cases.PerformSingleTask
@@ -48,9 +48,9 @@ class TaskListViewModel @Inject constructor(
     }
 
     // FIXME?
-    private fun List<Task>.hierarchicalView(id: Long = 0, list: MutableList<Task> = mutableListOf()): List<Task> {
+    private fun List<RandomTask>.hierarchicalView(id: Long = 0, list: MutableList<RandomTask> = mutableListOf()): List<RandomTask> {
         filter { it.parent == id }
-            .sortedWith(compareByDescending<Task> { it.group }.thenBy { it.name })
+            .sortedWith(compareByDescending<RandomTask> { it.group }.thenBy { it.name })
             .forEach {
                 list.add(it)
                 if (it.groupOpen) {
@@ -60,11 +60,11 @@ class TaskListViewModel @Inject constructor(
         return list
     }
 
-    private fun openCloseGroup(task: Task) {
+    private fun openCloseGroup(task: RandomTask) {
         if (task.group) {
             task.copy(groupOpen = !task.groupOpen).save()
         }
     }
 
-    private fun Task.save() = viewModelScope.launch(Dispatchers.IO) { repoSingleTask.saveTask(this@save) }
+    private fun RandomTask.save() = viewModelScope.launch(Dispatchers.IO) { repoSingleTask.saveTask(this@save) }
 }

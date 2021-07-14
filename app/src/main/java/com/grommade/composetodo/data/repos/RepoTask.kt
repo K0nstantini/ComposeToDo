@@ -1,7 +1,7 @@
 package com.grommade.composetodo.data.repos
 
 import com.grommade.composetodo.data.dao.SingleTaskDao
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,15 @@ class RepoTask @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    val allTasks: Flow<List<Task>> = singleTaskDao.getTasksFlow()
-    val activeTasks: Flow<List<Task>> = singleTaskDao.getActiveTasks()
-    val groups: Flow<List<Task>> = singleTaskDao.getGroups()
+    val allTasks: Flow<List<RandomTask>> = singleTaskDao.getTasksFlow()
+    val activeTasks: Flow<List<RandomTask>> = singleTaskDao.getActiveTasks()
+    val groups: Flow<List<RandomTask>> = singleTaskDao.getGroups()
 
-    suspend fun saveTask(task: Task): Long = withContext(ioDispatcher) {
+    suspend fun saveTask(task: RandomTask): Long = withContext(ioDispatcher) {
         singleTaskDao.insertOrUpdate(task)
     }
 
-    suspend fun deleteTask(task: Task) = withContext(ioDispatcher) {
+    suspend fun deleteTask(task: RandomTask) = withContext(ioDispatcher) {
         singleTaskDao.delete(task)
     }
 

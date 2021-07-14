@@ -1,15 +1,14 @@
 package com.grommade.composetodo.use_cases
 
 import com.grommade.composetodo.add_classes.MyCalendar
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.entity.Settings
-import com.grommade.composetodo.data.entity.Task
-import com.grommade.composetodo.util.delEmptyGroups
-import com.grommade.composetodo.util.hoursToMilli
-import com.grommade.composetodo.util.timeToMinutes
-import com.grommade.composetodo.util.toStrTime
+import com.grommade.composetodo.util.extensions.delEmptyGroups
+import com.grommade.composetodo.util.extensions.hoursToMilli
+import com.grommade.composetodo.util.extensions.timeToMinutes
+import com.grommade.composetodo.util.extensions.toStrTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.*
 
 class GenerateSingleTasksImplTest {
 
@@ -44,8 +43,8 @@ class GenerateSingleTasksImplTest {
 
             with(settings.singleTask) {
                 tasks.filter { it.singleIsActivated }.forEach { task ->
-                    if (!task.single.dateActivation.dateInWorkDays(daysOfWeek) ||
-                        task.single.dateActivation.getMinutesOfDay() !in periodFrom..periodTo
+                    if (!task.dateActivation.dateInWorkDays(daysOfWeek) ||
+                        task.dateActivation.getMinutesOfDay() !in periodFrom..periodTo
                     ) {
                         result = false
                         return@forEach
@@ -62,7 +61,7 @@ class GenerateSingleTasksImplTest {
 
     /** Testing */
     private fun generateRandomTasks(
-        tasks: List<Task>,
+        tasks: List<RandomTask>,
         settings: Settings,
         lastGeneration: MyCalendar,
         dateNow: MyCalendar
@@ -74,7 +73,7 @@ class GenerateSingleTasksImplTest {
         if (lastGeneration.isNoEmpty()) {
             val workDate = lastGeneration.nextSuitableDate(period, settings.singleTask.daysOfWeek, dateNow)
             generateTask(tasksToActivate)
-                ?.apply { single.copy(dateActivation = workDate) }
+                ?.apply { copy(dateActivation = workDate) }
                 ?.save()
             println("Generation date: $lastGeneration, Task date: $workDate")
         }
@@ -93,7 +92,7 @@ class GenerateSingleTasksImplTest {
 //        println("Settings, last generation: ${singleTask.lastGeneration}")
     }
 
-    private fun Task.save() {
+    private fun RandomTask.save() {
 //        println("Activated: $name, date: ${single.dateActivation}")
     }
 
@@ -362,14 +361,14 @@ class GenerateSingleTasksImplTest {
         assertEquals(true, true)
     }
 
-    private fun getTasks(): List<Task> {
-        val tasks = mutableListOf<Task>()
+    private fun getTasks(): List<RandomTask> {
+        val tasks = mutableListOf<RandomTask>()
         for (i in 1L..10L) {
-            tasks.add(Task(id = i, name = "Group-1L", group = true))
+            tasks.add(RandomTask(id = i, name = "Group-1L", group = true))
             for (j in 1L..10L) {
-                tasks.add(Task(id = i * 10 + j, name = "Group-2L", parent = i, group = true))
+                tasks.add(RandomTask(id = i * 10 + j, name = "Group-2L", parent = i, group = true))
                 for (k in 1L..10L) {
-                    tasks.add(Task(id = i * 100 + j * 10 + k, name = "$i - $j ($k)", parent = j))
+                    tasks.add(RandomTask(id = i * 100 + j * 10 + k, name = "$i - $j ($k)", parent = j))
                 }
             }
         }
@@ -377,7 +376,7 @@ class GenerateSingleTasksImplTest {
     }
 
     /** Testing */
-    private fun generateTask(tasks: List<Task>, parent: Long = 0L): Task? {
+    private fun generateTask(tasks: List<RandomTask>, parent: Long = 0L): RandomTask? {
         val task = tasks.filter { it.parent == parent }
             .shuffled()
             .randomOrNull()

@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.Settings
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.use_cases.GenerateSingleTasks
@@ -59,15 +59,15 @@ class HomeViewModel @Inject constructor(
             .change { set: singleSet -> set.copy(lastGeneration = MyCalendar()) }
             .save()
         val tasks = repoSingleTask.getAllTasks()
-        tasks.filter { it.dates.dateActivation.isNoEmpty() }.forEach { task ->
-            task.copy(dates = task.dates.copy(dateActivation = MyCalendar())).save()
+        tasks.filter { it.dateActivation.isNoEmpty() }.forEach { task ->
+            task.copy(dateActivation = MyCalendar()).save()
         }
         tasks.filter { it.single.rolls > 0 }.forEach { task ->
             task.copy(single = task.single.copy(rolls = 0)).save()
         }
     }
 
-    private fun onMarkTaskDoneClicked(task: Task) {
+    private fun onMarkTaskDoneClicked(task: RandomTask) {
         viewModelScope.launch {
             delay(500)
             performSingleTask(task)
@@ -78,7 +78,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { pendingAction.emit(action) }
     }
 
-    private fun Task.save() = viewModelScope.launch { repoSingleTask.saveTask(this@save) }
+    private fun RandomTask.save() = viewModelScope.launch { repoSingleTask.saveTask(this@save) }
     private fun Settings.save() = viewModelScope.launch { repoSettings.updateSettings(this@save) }
 
 }

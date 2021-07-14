@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.grommade.composetodo.R
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
 
 @Composable
@@ -78,7 +78,7 @@ fun HomeUi(
 
 @Composable
 fun HomeScrollingContent(
-    tasks: List<Task>,
+    tasks: List<RandomTask>,
     actioner: (HomeActions) -> Unit
 ) {
     LazyColumn(

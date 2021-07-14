@@ -31,4 +31,10 @@ class Converters {
 
     @TypeConverter
     fun toScheduleTask(name: String) = ScheduleTask.valueOf(name)
+
+    @TypeConverter
+    fun fromListLong(list: List<Long>) = list.joinToString()
+
+    @TypeConverter
+    fun toListLong(str: String) = str.split(", ").map { it.toLong() }
 }

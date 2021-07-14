@@ -2,7 +2,7 @@ package com.grommade.composetodo.util.extensions
 
 import android.content.res.Resources
 import com.grommade.composetodo.data.entity.Settings
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.enums.DialogDaysOfWeek
 import com.grommade.composetodo.util.HOURS_IN_DAY
 import com.grommade.composetodo.util.MILLI_IN_SECOND
@@ -37,27 +37,27 @@ fun Int.minutesToMilli(): Long = this.toLong() * SECONDS_IN_MINUTE * MILLI_IN_SE
 fun Int.daysToMilli(): Long = this.toLong() * HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 
 //FIXME: Не чистая ф-я?
-fun List<Task>.nestedTasks(
-    task: Task,
-    list: MutableList<Task> = mutableListOf()
-): List<Task> {
+fun List<RandomTask>.nestedTasks(
+    task: RandomTask,
+    list: MutableList<RandomTask> = mutableListOf()
+): List<RandomTask> {
     list.add(task)
     this.filter { it.parent == task.id }.forEach { this.nestedTasks(it, list) }
     return list
 }
 
-fun List<Task>.groupIsEmpty(task: Task): Boolean =
+fun List<RandomTask>.groupIsEmpty(task: RandomTask): Boolean =
     task.group && nestedTasks(task).count() == 1
 
 //FIXME: Не чистая ф-я?
-fun List<Task>.delEmptyGroups(): List<Task> {
-    val emptyGroups = mutableListOf<Task>()
+fun List<RandomTask>.delEmptyGroups(): List<RandomTask> {
+    val emptyGroups = mutableListOf<RandomTask>()
     this.filter { it.group }.forEach { task ->
         if (this.nestedTasks(task).all { it.group }) {
             emptyGroups.add(task)
         }
     }
-    val noEmptyGroups: MutableList<Task> = this.toMutableList()
+    val noEmptyGroups: MutableList<RandomTask> = this.toMutableList()
     emptyGroups.forEach { task ->
         noEmptyGroups.remove(task)
     }

@@ -14,10 +14,6 @@ import com.grommade.composetodo.util.extensions.timeToMinutes
 data class Settings(
     @PrimaryKey override val id: Long = 1,
 
-    /** Regular tasks */
-    @Embedded
-    val regularTask: SettingsRegularTask = SettingsRegularTask(),
-
     /** Single tasks */
     @Embedded
     val singleTask: SettingsSingleTask = SettingsSingleTask()
@@ -25,12 +21,6 @@ data class Settings(
 
 ) : AppEntity {
 
-    @Immutable
-    data class SettingsRegularTask(
-        @ColumnInfo(name = "regular_points") val points: Int = 0,                       // баллы за выполнение/невыполнение задач
-    ) {
-
-    }
 
     /**
      * @param active активация режима разовых задач
@@ -117,7 +107,7 @@ data class Settings(
 
     }
 
-    fun addSinglePointsTaskDone(task: Task) = addSinglePoints(
+    fun addSinglePointsTaskDone(task: RandomTask) = addSinglePoints(
         when (task.singleIsActivated) {
             true -> singleTask.pointsForTask
             else -> singleTask.pointsForOutOfOrderTask

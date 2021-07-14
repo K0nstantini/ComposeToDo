@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.grommade.composetodo.R
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.ui.common.rememberFlowWithLifecycle
 import com.grommade.composetodo.ui.components.*
@@ -197,12 +197,12 @@ private fun typeTaskDialog(
         title("Тип задачи")
         Column(modifier = Modifier.padding(start = 24.dp)) {
             Text("Разовые", color = Color.Blue)
-            TypeTaskItem(TypeTask.IMPORTANT, actioner)
-            TypeTaskItem(TypeTask.UNIMPORTANT, actioner)
+            TypeTaskItem(TypeTask.EXACT_TIME, actioner)
+            TypeTaskItem(TypeTask.RANDOM, actioner)
             Text("Разовые", color = Color.Blue)
-            TypeTaskItem(TypeTask.LONG_REGULAR_TASK, actioner)
-            TypeTaskItem(TypeTask.SHORT_REGULAR_TASK, actioner)
-            TypeTaskItem(TypeTask.CONTAINER_TASK, actioner)
+            TypeTaskItem(TypeTask.LONG_REGULAR, actioner)
+            TypeTaskItem(TypeTask.SHORT_REGULAR, actioner)
+            TypeTaskItem(TypeTask.CONTAINER, actioner)
         }
     }
 }
@@ -231,7 +231,7 @@ fun MaterialDialog.TypeTaskItem(
 
 @Composable
 fun TaskListScrollingContent(
-    tasks: List<Task>,
+    tasks: List<RandomTask>,
     selected: SnapshotStateMap<Long, Boolean>,
     actioner: (TaskListActions) -> Unit
 ) {

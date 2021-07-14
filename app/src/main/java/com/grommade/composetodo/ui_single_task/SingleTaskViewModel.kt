@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
 import com.grommade.composetodo.add_classes.MyCalendar
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.repos.RepoTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ class SingleTaskViewModel @Inject constructor(
     private val pendingActions = MutableSharedFlow<SingleTaskActions>()
 
     private val currentTaskID: Long = handle.get<Long>(Keys.TASK_ID) ?: -1L
-    private val currentTask = MutableStateFlow(Task())
+    private val currentTask = MutableStateFlow(RandomTask())
 
     val state = currentTask.map { task ->
         SingleTaskViewState(
@@ -33,7 +33,7 @@ class SingleTaskViewModel @Inject constructor(
             group = task.group,
             parentStr = repoSingleTask.getTask(task.parent)?.name,
             parentId = task.parent,
-            dateStart = task.dates.dateStart.toString(false),
+            dateStart = task.dateStart.toString(false),
             deadline = task.single.deadlineDays,
         )
     }
@@ -82,7 +82,7 @@ class SingleTaskViewModel @Inject constructor(
     }
 
     private fun changeDateStart(date: MyCalendar) {
-        currentTask.setValue { copy(dates = currentTask.value.dates.copy(dateStart = date)) }
+        currentTask.setValue { copy(dateStart = date) }
     }
 
     private fun changeDeadline(value: Int) {
@@ -102,7 +102,7 @@ class SingleTaskViewModel @Inject constructor(
         currentTask.setValue { copy(parent = id) }
     }
 
-    private fun MutableStateFlow<Task>.setValue(block: Task.() -> Task) =
+    private fun MutableStateFlow<RandomTask>.setValue(block: RandomTask.() -> RandomTask) =
         apply { value = block(value) }
 
 }

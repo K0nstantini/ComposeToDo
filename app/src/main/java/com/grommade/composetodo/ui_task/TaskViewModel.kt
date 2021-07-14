@@ -3,8 +3,9 @@ package com.grommade.composetodo.ui_task
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.grommade.composetodo.add_classes.BaseViewModel
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.repos.RepoTask
+import com.grommade.composetodo.enums.TypeTask
 import com.grommade.composetodo.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,8 +23,11 @@ class TaskViewModel @Inject constructor(
 
     private val pendingActions = MutableSharedFlow<TaskActions>()
 
-    private val currentTaskID: Long = handle.get<Long>(Keys.TASK_ID) ?: -1L
-    private val currentTask = MutableStateFlow(Task())
+    private val taskId: Long = handle.get<Long>(Keys.TASK_ID) ?: -1L
+    private val taskTypeStr: String = handle.get<String>(Keys.TASK_TYPE_KEY) ?: TypeTask.EXACT_TIME.name
+    private val taskType: TypeTask = TypeTask.valueOf(taskTypeStr)
+
+    private val currentTask = MutableStateFlow(RandomTask(type = taskType))
 
     val navigateToBack = MutableStateFlow<Boolean?>(null)
 
@@ -36,7 +40,7 @@ class TaskViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repoTask.getTask(currentTaskID)?.let { task ->
+            repoTask.getTask(taskId)?.let { task ->
                 currentTask.value = task
             }
             pendingActions.collect { action ->
@@ -64,7 +68,7 @@ class TaskViewModel @Inject constructor(
         }
     }
 
-    private fun MutableStateFlow<Task>.setValue(block: Task.() -> Task) =
+    private fun MutableStateFlow<RandomTask>.setValue(block: RandomTask.() -> RandomTask) =
         apply { value = block(value) }
 
     fun submitAction(action: TaskActions) {

@@ -35,11 +35,11 @@ sealed class TasksRoute(val route: String) {
         fun addArguments() = addArgumentTaskID()
     }
 
-    object TaskChildRoute : TasksRoute("taskList/task/addEditTask?type={type}&taskID={taskID}") {
-        fun createRoute(type: TypeTask, id: Long = -1) = "taskList/task/addEditTask?type=$type&taskID=$id"
+    object TaskChildRoute : TasksRoute("taskList/task/addEditTask?taskTypeKey={taskTypeKey}&taskID={taskID}") {
+        fun createRoute(type: TypeTask, id: Long = -1) = "taskList/task/addEditTask?taskTypeKey=${type.name}&taskID=$id"
         fun addArguments() = listOf(
             navArgument(Keys.TASK_TYPE_KEY) {
-                defaultValue = TypeTask.IMPORTANT
+                defaultValue = TypeTask.EXACT_TIME.name
             },
             navArgument(Keys.TASK_ID) {
                 defaultValue = -1L

@@ -3,7 +3,7 @@ package com.grommade.composetodo.use_cases
 import com.grommade.composetodo.add_classes.MyCalendar
 import com.grommade.composetodo.data.entity.History
 import com.grommade.composetodo.data.entity.Settings
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.repos.RepoHistory
 import com.grommade.composetodo.data.repos.RepoSettings
 import com.grommade.composetodo.data.repos.RepoTask
@@ -51,11 +51,11 @@ class GenerateSingleTasksImpl @Inject constructor(
         set.active && set.lastGeneration < dateNow && set.startGeneration < dateNow
 
     private fun generateRandomTasks(
-        tasks: List<Task>,
+        tasks: List<RandomTask>,
         settings: Settings,
         lastGeneration: MyCalendar,
         dateNow: MyCalendar,
-        saveTask: (Task) -> Unit,
+        saveTask: (RandomTask) -> Unit,
         updateSettings: (Settings) -> Unit,
         saveHistory: (History) -> Unit
     ) {
@@ -67,7 +67,7 @@ class GenerateSingleTasksImpl @Inject constructor(
             val workDate = lastGeneration.nextSuitableDate(period, settings.singleTask.daysOfWeek, dateNow)
             generateTask(tasksToActivate)?.let { task ->
                 saveTask(
-                    task.copy(dates = task.dates.copy(dateActivation = workDate))
+                    task.copy(dateActivation = workDate)
                 )
                 saveHistory(
                     History(
@@ -106,7 +106,7 @@ class GenerateSingleTasksImpl @Inject constructor(
         date.milli + (frequency.first.hoursToMilli()..frequency.last.hoursToMilli()).random()
     )
 
-    private fun generateTask(tasks: List<Task>, parent: Long = 0L): Task? {
+    private fun generateTask(tasks: List<RandomTask>, parent: Long = 0L): RandomTask? {
         val task = tasks.filter { it.parent == parent }
             .shuffled()
             .randomOrNull()
@@ -171,7 +171,7 @@ class GenerateSingleTasksImpl @Inject constructor(
     private fun MyCalendar.dateInWorkDays(daysOfWeek: String): Boolean =
         daysOfWeek.isEmpty() || daysOfWeek.contains(getNumberDayOfWeek().toString())
 
-    private suspend fun Task.save() = repoSingleTask.saveTask(this)
+    private suspend fun RandomTask.save() = repoSingleTask.saveTask(this)
     private suspend fun History.save() = repoHistory.saveHistory(this)
     private suspend fun Settings.save() = repoSettings.updateSettings(this)
 

@@ -38,7 +38,7 @@ fun TypeTaskUi(
     navController: NavController
 ) {
     val type by rememberFlowWithLifecycle(viewModel.type)
-        .collectAsState(initial = TypeTask.IMPORTANT)
+        .collectAsState(initial = TypeTask.EXACT_TIME)
 
     TypeTaskUi(type) { action ->
         when (action) {
@@ -86,33 +86,33 @@ fun TypeTaskBody(
 ) {
     Column(Modifier.selectableGroup()) {
         RadioButtonItem(
-            selected = type == TypeTask.IMPORTANT,
+            selected = type == TypeTask.EXACT_TIME,
             title = stringResource(R.string.task_card_title_type_task_temp),
             value = stringResource(R.string.task_card_value_type_task_temp),
-        ) { onClick(TypeTask.IMPORTANT) }
+        ) { onClick(TypeTask.EXACT_TIME) }
         RadioButtonItem(
-            selected = type == TypeTask.UNIMPORTANT,
+            selected = type == TypeTask.RANDOM,
             title = stringResource(R.string.task_card_title_type_task_single),
             value = stringResource(R.string.task_card_value_type_task_single),
-        ) { onClick(TypeTask.UNIMPORTANT) }
+        ) { onClick(TypeTask.RANDOM) }
         RadioButtonItem(
             selected = type.regular,
             title = stringResource(R.string.task_card_title_type_task_regular),
             value = stringResource(R.string.task_card_value_type_task_regular),
-        ) { onClick(TypeTask.SHORT_REGULAR_TASK) }
+        ) { onClick(TypeTask.SHORT_REGULAR) }
     }
 
     Column(Modifier.selectableGroup()) {
         RadioButtonItem(
-            selected = type == TypeTask.LONG_REGULAR_TASK,
+            selected = type == TypeTask.LONG_REGULAR,
             title = stringResource(R.string.task_card_title_type_task_regular_long),
             value = stringResource(R.string.task_card_value_type_task_regular_long),
-        ) { onClick(TypeTask.LONG_REGULAR_TASK) }
+        ) { onClick(TypeTask.LONG_REGULAR) }
         RadioButtonItem(
-            selected = type == TypeTask.SHORT_REGULAR_TASK || type == TypeTask.CONTAINER_TASK,
+            selected = type == TypeTask.SHORT_REGULAR || type == TypeTask.CONTAINER,
             title = stringResource(R.string.task_card_title_type_task_regular_short),
             value = stringResource(R.string.task_card_value_type_task_regular_short),
-        ) { onClick(TypeTask.SHORT_REGULAR_TASK) }
+        ) { onClick(TypeTask.SHORT_REGULAR) }
     }
 
     Row(
@@ -121,11 +121,11 @@ fun TypeTaskBody(
         modifier = Modifier.padding(8.dp)
     ) {
         Checkbox(
-            checked = type == TypeTask.CONTAINER_TASK,
+            checked = type == TypeTask.CONTAINER,
             onCheckedChange = { value ->
                 when (value) {
-                    true -> onClick(TypeTask.SHORT_REGULAR_TASK)
-                    false -> onClick(TypeTask.CONTAINER_TASK)
+                    true -> onClick(TypeTask.SHORT_REGULAR)
+                    false -> onClick(TypeTask.CONTAINER)
                 }
             }
         )
@@ -184,5 +184,5 @@ fun RadioButtonItem(
 @Preview
 @Composable
 fun TypeTaskUiPreview() {
-    TypeTaskUi(TypeTask.IMPORTANT) {}
+    TypeTaskUi(TypeTask.EXACT_TIME) {}
 }

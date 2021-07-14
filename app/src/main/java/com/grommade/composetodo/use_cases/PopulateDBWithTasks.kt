@@ -1,6 +1,6 @@
 package com.grommade.composetodo.use_cases
 
-import com.grommade.composetodo.data.entity.Task
+import com.grommade.composetodo.data.entity.RandomTask
 import com.grommade.composetodo.data.repos.RepoTask
 import javax.inject.Inject
 
@@ -15,60 +15,60 @@ class PopulateDBWithTasksImpl @Inject constructor(
 
         repoSingleTask.deleteAllTasks()
 
-        val single = Task.SingleTask()
-        val routine = Task(name = "Быт", group = true).save()
-        Task(name = "Убрать на столе", parent = routine).save()
-        Task(name = "Убраться в отделении на столе", parent = routine).save()
-        Task(name = "Убраться в верхнем ящике стола", parent = routine).save()
-        Task(name = "Убраться в среднем ящике стола", parent = routine).save()
-        Task(name = "Разобрать пакет под стулом", parent = routine).save()
-        Task(name = "Разметить турник", parent = routine).save()
-        Task(name = "Заказ Aliexpress (тестер, ключ и пр.)", parent = routine).save()
-        Task(name = "Заказ/Выбор IHerb", parent = routine).save()
-        Task(name = "Компьютер в зале", parent = routine).save()
-        Task(name = "Сиденье унитаза", parent = routine).save()
-        Task(name = "Почистить кофемашину", parent = routine).save()
-        Task(name = "Сходить в банк", parent = routine).save()
-        Task(name = "Разобраться с пылесосом", parent = routine).save()
+        val single = RandomTask.SingleTask()
+        val routine = RandomTask(name = "Быт", group = true).save()
+        RandomTask(name = "Убрать на столе", parent = routine).save()
+        RandomTask(name = "Убраться в отделении на столе", parent = routine).save()
+        RandomTask(name = "Убраться в верхнем ящике стола", parent = routine).save()
+        RandomTask(name = "Убраться в среднем ящике стола", parent = routine).save()
+        RandomTask(name = "Разобрать пакет под стулом", parent = routine).save()
+        RandomTask(name = "Разметить турник", parent = routine).save()
+        RandomTask(name = "Заказ Aliexpress (тестер, ключ и пр.)", parent = routine).save()
+        RandomTask(name = "Заказ/Выбор IHerb", parent = routine).save()
+        RandomTask(name = "Компьютер в зале", parent = routine).save()
+        RandomTask(name = "Сиденье унитаза", parent = routine).save()
+        RandomTask(name = "Почистить кофемашину", parent = routine).save()
+        RandomTask(name = "Сходить в банк", parent = routine).save()
+        RandomTask(name = "Разобраться с пылесосом", parent = routine).save()
 
-        val pc = Task(name = "Компьютер, телефон и пр.", group = true).save()
-        Task(name = "Придумать систему бэкапов", parent = pc).save()
-        Task(name = "Вкладки Chrome (ноут)", parent = pc).save()
-        Task(name = "Вкладки Chrome (комп)", parent = pc).save()
-        Task(name = "Рабочий стол (ноут)", parent = pc).save()
-        Task(name = "Рабочий стол (комп)", parent = pc).save()
-        Task(name = "Разобраться с телефоном, бэкап и пр.", parent = pc).save()
-        Task(name = "Купить что-нибудь в форе", single = single.copy(deadlineDays = 72), parent = pc).save()
+        val pc = RandomTask(name = "Компьютер, телефон и пр.", group = true).save()
+        RandomTask(name = "Придумать систему бэкапов", parent = pc).save()
+        RandomTask(name = "Вкладки Chrome (ноут)", parent = pc).save()
+        RandomTask(name = "Вкладки Chrome (комп)", parent = pc).save()
+        RandomTask(name = "Рабочий стол (ноут)", parent = pc).save()
+        RandomTask(name = "Рабочий стол (комп)", parent = pc).save()
+        RandomTask(name = "Разобраться с телефоном, бэкап и пр.", parent = pc).save()
+        RandomTask(name = "Купить что-нибудь в форе", single = single.copy(deadlineDays = 72), parent = pc).save()
 
-        val poker = Task(name = "Покер", group = true).save()
-        Task(name = "Сыграть в покер", parent = poker).save()
-        Task(name = "Кэшаут Старзы", parent = poker).save()
+        val poker = RandomTask(name = "Покер", group = true).save()
+        RandomTask(name = "Сыграть в покер", parent = poker).save()
+        RandomTask(name = "Кэшаут Старзы", parent = poker).save()
 
-        val music = Task(name = "Музыка", group = true).save()
+        val music = RandomTask(name = "Музыка", group = true).save()
 
-        val mOthers = Task(name = "Прочее", parent = music, group = true).save()
-        Task(name = "Подключить синтезатор", parent = mOthers).save()
-        Task(name = "Найти/заказать дисковод/дискеты", parent = mOthers).save()
-        Task(name = "Выбрать 'песню' для аранжировки", parent = mOthers).save()
+        val mOthers = RandomTask(name = "Прочее", parent = music, group = true).save()
+        RandomTask(name = "Подключить синтезатор", parent = mOthers).save()
+        RandomTask(name = "Найти/заказать дисковод/дискеты", parent = mOthers).save()
+        RandomTask(name = "Выбрать 'песню' для аранжировки", parent = mOthers).save()
 
-        val mPractice = Task(name = "Практика", parent = music, group = true).save()
-        Task(name = "Сольфеджио", parent = mPractice).save()
-        Task(name = "Электрогитара", parent = mPractice).save()
-        Task(name = "Тренажер слуха", parent = mPractice).save()
+        val mPractice = RandomTask(name = "Практика", parent = music, group = true).save()
+        RandomTask(name = "Сольфеджио", parent = mPractice).save()
+        RandomTask(name = "Электрогитара", parent = mPractice).save()
+        RandomTask(name = "Тренажер слуха", parent = mPractice).save()
 
-        val mTheory = Task(name = "Теория", parent = music, group = true).save()
-        Task(name = "Дослушать Баха", parent = mTheory).save()
-        Task(name = "Музыкофилия 30 мин.", parent = mTheory).save()
+        val mTheory = RandomTask(name = "Теория", parent = music, group = true).save()
+        RandomTask(name = "Дослушать Баха", parent = mTheory).save()
+        RandomTask(name = "Музыкофилия 30 мин.", parent = mTheory).save()
 
 
-        val english = Task(name = "Английский", group = true).save()
-        Task(name = "Дочитать главу HPMOR", parent = english).save()
-        Task(name = "Досмотреть форд против феррари", parent = english).save()
-        Task(name = "Серия How I Met Your Mother", parent = english).save()
-        Task(name = "Bill Perkins 1 chapter or 30 min", parent = english).save()
+        val english = RandomTask(name = "Английский", group = true).save()
+        RandomTask(name = "Дочитать главу HPMOR", parent = english).save()
+        RandomTask(name = "Досмотреть форд против феррари", parent = english).save()
+        RandomTask(name = "Серия How I Met Your Mother", parent = english).save()
+        RandomTask(name = "Bill Perkins 1 chapter or 30 min", parent = english).save()
 
         
     }
     
-    private suspend fun Task.save() = repoSingleTask.saveTask(this)
+    private suspend fun RandomTask.save() = repoSingleTask.saveTask(this)
 }

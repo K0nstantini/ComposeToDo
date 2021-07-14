@@ -13,7 +13,7 @@ class TypeTaskViewModel @Inject constructor(
     handle: SavedStateHandle
 ) : ViewModel() {
 
-    private val typeName: String = handle.get<String>(Keys.TASK_TYPE_KEY) ?: TypeTask.IMPORTANT.name
+    private val typeName: String = handle.get<String>(Keys.TASK_TYPE_KEY) ?: TypeTask.EXACT_TIME.name
 
     val type = MutableStateFlow(TypeTask.valueOf(typeName))
 
